@@ -250,7 +250,7 @@ public enum ServerManager {
 		// 缓存 用户-通道信息
 		ServerDataPool.USER_CHANNEL_MAP.put(userId,context);
 
-		System.out.println(ServerDataPool.USER_CHANNEL_MAP.size() + "U C" + ServerDataPool.CHANNEL_USER_MAP.size());
+//		System.out.println(ServerDataPool.USER_CHANNEL_MAP.size() + "U C" + ServerDataPool.CHANNEL_USER_MAP.size());
 
 		// 如果用户不是中心
 		if (!ConfManager.getCenterId().equals(userId)) {
@@ -274,7 +274,7 @@ public enum ServerManager {
 		// 缓存 通道-用户信息
 		ServerDataPool.CHANNEL_USER_MAP.put(context, userId);
 		
-		System.out.println(ServerDataPool.USER_CHANNEL_MAP.size() + "U C" + ServerDataPool.CHANNEL_USER_MAP.size());
+//		System.out.println(ServerDataPool.USER_CHANNEL_MAP.size() + "U C" + ServerDataPool.CHANNEL_USER_MAP.size());
 
 		// 如果用户不是中心
 		if (!ConfManager.getCenterId().equals(userId)) {
@@ -380,7 +380,7 @@ public enum ServerManager {
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(entry.getKey());
 			// 如果通道不为空
 			if (null == ctx) {
-				return;
+				continue;
 			}
 
 			// 向通道写数据并发送

@@ -47,6 +47,8 @@ import com.sa.service.server.ServerRequestcRemove;
 import com.sa.service.server.ServerRequestcRoomRemove;
 import com.sa.service.server.ServerRequestcShareRemove;
 import com.sa.service.server.ServerRequesthRoomUser;
+import com.sa.service.sys.SysCloseRoomReq;
+import com.sa.service.sys.SysCloseRoomRes;
 import com.sa.service.sys.SysGetRoomStudentsReq;
 import com.sa.service.sys.SysGetRoomStudentsRes;
 import com.sa.service.sys.SysGetRoomsReq;
@@ -122,7 +124,9 @@ public enum PacketType {
 	SysGetRoomStudentsReq((short) 10005, SysGetRoomStudentsReq.class),
 	SysGetRoomStudentsRes((short) 10006, SysGetRoomStudentsRes.class),
 	SysLoginOutReq((short) 10007, SysLoginOutReq.class),
-	SysLoginOutRes((short) 10008, SysLoginOutRes.class)
+	SysLoginOutRes((short) 10008, SysLoginOutRes.class),
+	SysCloseRoomReq((short) 10009, SysCloseRoomReq.class),
+	SysCloseRoomRes((short) 10010, SysCloseRoomRes.class)
 	;
 
 	private short type;	// 消息类型
