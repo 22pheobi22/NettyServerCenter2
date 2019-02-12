@@ -70,6 +70,7 @@ public class SysGetRoomStudentsReq extends Packet {
 				SysGetRoomStudentsRes sysGetRoomStudentsRes = new SysGetRoomStudentsRes();
 				sysGetRoomStudentsRes.setPacketHead(this.getPacketHead());
 				sysGetRoomStudentsRes.setOption(1, json);
+				sysGetRoomStudentsRes.setOption(2, this.getOption(2));
 
 				sysGetRoomStudentsRes.execPacket();
 			}

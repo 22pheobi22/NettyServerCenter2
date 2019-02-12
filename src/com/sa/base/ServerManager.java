@@ -374,7 +374,7 @@ public enum ServerManager {
 				continue;
 			}
 
-			System.out.println(entry.getKey() + " " + pact.getPacketType());
+//			System.out.println(entry.getKey() + " " + pact.getPacketType());
 
 			// 获取用户通道
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(entry.getKey());

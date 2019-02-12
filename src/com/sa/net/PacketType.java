@@ -57,6 +57,8 @@ import com.sa.service.sys.SysLoginOutReq;
 import com.sa.service.sys.SysLoginOutRes;
 import com.sa.service.sys.SysLoginReq;
 import com.sa.service.sys.SysLoginRes;
+import com.sa.service.sys.SysUpdRoomReq;
+import com.sa.service.sys.SysUpdRoomRes;
 
 public enum PacketType {
 	// 业务上行数据包
@@ -126,7 +128,9 @@ public enum PacketType {
 	SysLoginOutReq((short) 10007, SysLoginOutReq.class),
 	SysLoginOutRes((short) 10008, SysLoginOutRes.class),
 	SysCloseRoomReq((short) 10009, SysCloseRoomReq.class),
-	SysCloseRoomRes((short) 10010, SysCloseRoomRes.class)
+	SysCloseRoomRes((short) 10010, SysCloseRoomRes.class),
+	SysUpdRoomReq((short) 10011, SysUpdRoomReq.class),
+	SysUpdRoomRes((short) 10012, SysUpdRoomRes.class)
 	;
 
 	private short type;	// 消息类型
