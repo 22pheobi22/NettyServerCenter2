@@ -23,12 +23,18 @@ public class SysUpdRoomReq extends Packet {
 
 	@Override
 	public void execPacket() {
-		ServerRequestbRoomUser serverRequestbRoomUser = new ServerRequestbRoomUser();
-		serverRequestbRoomUser.setPacketHead(this.getPacketHead());
-		serverRequestbRoomUser.setRoomId((String) this.getOption(2));
-		serverRequestbRoomUser.setFromUserId((String) this.getOption(3));
-		
-		serverRequestbRoomUser.execPacket();
+		String stuIds = (String) this.getOption(3);
+		if (null != stuIds) {
+			String[] arr = stuIds.split(",");
+			for (String tmp : arr) {
+				ServerRequestbRoomUser serverRequestbRoomUser = new ServerRequestbRoomUser();
+				serverRequestbRoomUser.setPacketHead(this.getPacketHead());
+				serverRequestbRoomUser.setRoomId((String) this.getOption(2));
+				serverRequestbRoomUser.setFromUserId(tmp);
+
+				serverRequestbRoomUser.execPacket();
+			}
+		}
 		
 		SysUpdRoomRes sysUpdRoomRes = new SysUpdRoomRes();
 		sysUpdRoomRes.setPacketHead(this.getPacketHead());
