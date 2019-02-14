@@ -59,13 +59,19 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
 		System.err.println("TCP closed...");
-		String userId = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		String roomId = ServerDataPool.serverDataManager.getUserRoomNo(userId);
 
-		ClientLoginOut clientLoginOut = new ClientLoginOut();
-		clientLoginOut.setRoomId(roomId);
-		clientLoginOut.setFromUserId(userId);
-		clientLoginOut.execPacket();
+		String userId = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+		if (null != userId) {
+			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(userId);
+
+			if (null != roomId) {
+				ClientLoginOut clientLoginOut = new ClientLoginOut();
+				clientLoginOut.setRoomId(roomId);
+				clientLoginOut.setFromUserId(userId);
+				clientLoginOut.execPacket();
+			}
+		}
+
 //		ServerManager.INSTANCE.ungisterUserContext(ctx);
 		ctx.close(promise);
 	}
