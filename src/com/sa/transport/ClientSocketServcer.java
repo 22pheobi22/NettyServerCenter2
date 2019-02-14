@@ -53,7 +53,7 @@ public class ClientSocketServcer implements Runnable {
 			.option(ChannelOption.SO_BACKLOG, 1024*100)
 			.childHandler(new ChildChannelHandler());
 			
-			ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
+//			ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
 			
 			ChannelFuture f = b.bind(new InetSocketAddress(this.port)).sync();
 			f.channel().closeFuture().sync();
