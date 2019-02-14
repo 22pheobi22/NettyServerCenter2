@@ -296,7 +296,7 @@ public enum ServerManager {
 	 */
 	public void ungisterUserId(String userId) {
 		// 如果用户id不为空
-		if(userId  != null){
+		if(userId  != null) {
 			// 获取用户通道信息
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(userId);
 
@@ -326,7 +326,7 @@ public enum ServerManager {
 	 */
 	public void ungisterUserContext(ChannelHandlerContext context) {
 		// 如果通道不为空
-		if(context  != null){
+		if(context  != null) {
 			// 根据通道获取用户id
 			String userId = ServerDataPool.CHANNEL_USER_MAP.get(context);
 			// 如果用户id为空 则返回
