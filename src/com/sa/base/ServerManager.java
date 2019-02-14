@@ -3,10 +3,14 @@ package com.sa.base;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
+import com.sa.thread.MongoLogSync;
 import com.sa.util.Constant;
 import com.sa.util.StringUtil;
 
@@ -15,7 +19,11 @@ import io.netty.channel.ChannelHandlerContext;
 public enum ServerManager {
 
 	INSTANCE;
-
+	private static ExecutorService timelyLogExecutor = Executors.newSingleThreadExecutor();
+	/**
+	 * 上一个达到立即保存日志线程的是否完毕 true为完毕 
+	 */
+	public final AtomicBoolean lastTimelyLogThreadExecuteStatus = new AtomicBoolean(true);
 	/** 向通道写消息并发送*/
 	private void writeAndFlush(ChannelHandlerContext ctx, Packet pact) throws Exception {
 //		// 将数据包封成二进制包
@@ -396,7 +404,17 @@ public enum ServerManager {
 		packet.printPacket(consoleFlag, Constant.CONSOLE_CODE_R, fileFlag, fileLogPath);
 
 		// 缓存消息日志
-		if (packet.getPacketType() != PacketType.ServerHearBeat && packet.getPacketType() != PacketType.ServerLogin)
-			ServerDataPool.log.put(System.currentTimeMillis()+""+packet.getTransactionId(), packet);
+		if (packet.getPacketType() != PacketType.ServerHearBeat && packet.getPacketType() != PacketType.ServerLogin){
+			ServerDataPool.log.put(System.currentTimeMillis()+ConfManager.getLogKeySplit()+packet.getTransactionId(), packet);
+			int logTotalSize = ServerDataPool.log.size();
+			if(logTotalSize > ConfManager.getTimelyDealLogMaxThreshold() && lastTimelyLogThreadExecuteStatus.get()){
+				lastTimelyLogThreadExecuteStatus.set(false);
+				long nowTimestamp = System.currentTimeMillis();
+				System.out.println(nowTimestamp+"及时清理开始>>"+logTotalSize+"[ThreadName]>"+Thread.currentThread().getName());
+				Thread timelyLogThread = new Thread(new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(), ConfManager.getMongoNettyLogDBName(),ConfManager.getMongoNettyLogTableName(),ConfManager.getMongoNettyLogUserName(),ConfManager.getMongoNettyLogPassword(), ConfManager.getLogTime(),true,lastTimelyLogThreadExecuteStatus));
+				timelyLogExecutor.submit(timelyLogThread);
+				System.out.println(nowTimestamp+"及时清理结束>>"+logTotalSize+"[ThreadName]>"+Thread.currentThread().getName());
+			}
+		}
 	}
 }
