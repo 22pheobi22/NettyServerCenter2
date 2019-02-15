@@ -89,7 +89,7 @@ public class ConfManager {
 
 	/** 间隔同步入库时间（单位：分钟）*/
 	public static int getLogTime() {
-		String strLogTime = CONF_MAP.get("log.out.db.time");
+		String strLogTime = CONF_MAP.get("log.out.db.time.minute");
 
 		if (StringUtil.isEmpty(strLogTime) || !StringUtil.isInteger(strLogTime)) {
 			strLogTime = "1";
