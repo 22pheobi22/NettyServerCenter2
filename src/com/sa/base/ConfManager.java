@@ -252,4 +252,9 @@ public class ConfManager {
 
 		return strSignKey;
 	}
+	
+	/** 远程校验地址 */
+	public static String getRemoteValidateUrl() {
+		return CONF_MAP.get("remote.validate.url");
+	}
 }

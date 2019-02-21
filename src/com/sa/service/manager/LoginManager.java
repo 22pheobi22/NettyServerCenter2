@@ -51,6 +51,8 @@ public enum LoginManager {
 		}
 		/** 获取 用户 角色*/
 		String role = (String) loginPact.getOption(2);
+		/** 获取 用户 token*/
+		String token = (String) loginPact.getOption(6);
 		/** 是否 启用 外部校验*/
 		boolean validEnable = ConfManager.getValidateEnable();
 		/** 如果 有 外部校验*/
@@ -60,7 +62,8 @@ public enum LoginManager {
 				strUserId = strUserId.replace("APP", "");
 			}
 			/** 用户 远程校验*/
-			role = remoteValidate(context, loginPact.getRoomId(), strUserId, (String) loginPact.getOption(1));
+			//role = remoteValidate(context, loginPact.getRoomId(), strUserId, (String) loginPact.getOption(1),role,token);
+			role = remoteValidate(loginPact.getRoomId(), strUserId,role,token);
 		}
 		/** 格式化 用户角色*/
 		HashSet<String> userRole = toRole(role);
@@ -161,18 +164,21 @@ public enum LoginManager {
 	}
 
 	/** 远程校验用户登录*/
-	private String remoteValidate(ChannelHandlerContext context, String roomId, String userId, String userKey) {
+	//private String remoteValidate(ChannelHandlerContext context, String roomId, String userId, String userKey,String role,String token) {
+	private String remoteValidate(String roomId, String userId, String role,String token) {
 
-		String url=ConfManager.getValidateUrl();
+		String url=ConfManager.getRemoteValidateUrl();
 
-		String key = ConfManager.getMd5Key();
-		String sign = MD5Util.MD5(roomId+"authorizeLiveShare"+userId+userKey+key);
-
+		//String key = ConfManager.getMd5Key();
+		//String sign = MD5Util.MD5(roomId+"authorizeLiveShare"+userId+userKey+key);
+		
 		Map<String, String> params = new HashMap<>();
 		params.put("courseId", roomId);
 		params.put("userId", userId);
-		params.put("userKey", userKey);
-		params.put("sign", sign);
+		//params.put("userKey", userKey);
+		//params.put("sign", sign);
+		params.put("role", role);
+		params.put("token", token);
 		String rs = HttpClientUtil.post(url, params);
 
 		return rs;
