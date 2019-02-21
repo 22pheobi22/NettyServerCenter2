@@ -1,6 +1,7 @@
 package com.sa;
 
 import com.sa.base.ConfManager;
+import com.sa.thread.MongoLogSync;
 import com.sa.transport.ClientSocketServcer;
 import com.sa.util.ReadConf;
 
@@ -10,6 +11,8 @@ public class ServerStart {
 		initConf();
 
 //		new Thread(new LogSync(ConfManager.getLogUrl(), ConfManager.getLogTime())).start();
+		
+		new Thread(new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(), ConfManager.getMongoNettyLogDBName(),ConfManager.getMongoNettyLogTableName(),ConfManager.getMongoNettyLogUserName(),ConfManager.getMongoNettyLogPassword(), ConfManager.getLogTime(),false)).start();
 
 //		new Thread(new HttpServer(ConfManager.getHttpPort())).start();
 

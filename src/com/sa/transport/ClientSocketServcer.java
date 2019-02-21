@@ -31,7 +31,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.ResourceLeakDetector;
 
 public class ClientSocketServcer implements Runnable {
 	private int port = 0;
@@ -39,43 +38,40 @@ public class ClientSocketServcer implements Runnable {
 	public ClientSocketServcer(int port) {
 		this.port = port;
 	}
-	
+
 	public void bind() throws IOException {
-		//避免使用默认线程数参数
+		// 避免使用默认线程数参数
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
 		System.out.println("服务端已启动，正在监听中心的请求......");
-		try{
+		try {
 			ServerBootstrap b = new ServerBootstrap();
 
-			b.group(bossGroup,workerGroup)
-			.channel(NioServerSocketChannel.class)
-			.option(ChannelOption.SO_BACKLOG, 1024*100)
-			.childHandler(new ChildChannelHandler());
-			
-			ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
-			
+			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+					.option(ChannelOption.SO_BACKLOG, 1024 * 100).childHandler(new ChildChannelHandler());
+
+			// ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
+
 			ChannelFuture f = b.bind(new InetSocketAddress(this.port)).sync();
 			f.channel().closeFuture().sync();
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-		}finally{
+		} finally {
 			bossGroup.shutdownGracefully();
 			workerGroup.shutdownGracefully();
 		}
 	}
-	
-	private class ChildChannelHandler extends ChannelInitializer<SocketChannel>{
 
+	private class ChildChannelHandler extends ChannelInitializer<SocketChannel> {
 		@Override
 		protected void initChannel(SocketChannel arg0) throws Exception {
-			 ChannelPipeline pipeline = arg0.pipeline();
-		            pipeline.addLast(new PacketDecoder(1024*100,0,4,0,4));
-		            pipeline.addLast(new LengthFieldPrepender(4));
-		            pipeline.addLast(new PacketEncoder());
-		            //当有操作操作超出指定空闲秒数时，便会触发UserEventTriggered事件
-		            pipeline.addLast("idleStateHandler", new IdleStateHandler(60, 0, 0));
-		            pipeline.addLast(new ClientSocketServcerHandler());
+			ChannelPipeline pipeline = arg0.pipeline();
+			pipeline.addLast(new PacketDecoder(1024 * 100, 0, 4, 0, 4));
+			pipeline.addLast(new LengthFieldPrepender(4));
+			pipeline.addLast(new PacketEncoder());
+			// 当有操作操作超出指定空闲秒数时，便会触发UserEventTriggered事件
+			pipeline.addLast("idleStateHandler", new IdleStateHandler(60, 0, 0));
+			pipeline.addLast(new ClientSocketServcerHandler());
 		}
 	}
 

@@ -33,7 +33,7 @@ public enum Permission {
 	 */
 	public Map<String, Object> checkUserAuth(String roomId, String userId, String auth) {
 		Integer code = 0;
-		String msg = "";
+		String msg = "success";
 
 		HashMap<String, Integer> hm = ServerDataPool.serverDataManager.getRoomUesrAuth(roomId, userId);
 		if (null == hm) {
@@ -56,7 +56,7 @@ public enum Permission {
 	 */
 	public Map<String, Object> checkUserRole(String roomId, String userId, String role) {
 		Integer code = 0;
-		String msg = "";
+		String msg = "success";
 		/** 获取用户角色*/
 		HashSet<String> hs = ServerDataPool.serverDataManager.getRoomUesrRole(roomId, userId);
 		/** 如果角色为空*/

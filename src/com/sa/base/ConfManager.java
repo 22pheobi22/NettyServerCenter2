@@ -89,7 +89,7 @@ public class ConfManager {
 
 	/** 间隔同步入库时间（单位：分钟）*/
 	public static int getLogTime() {
-		String strLogTime = CONF_MAP.get("log.out.db.time");
+		String strLogTime = CONF_MAP.get("log.out.db.time.minute");
 
 		if (StringUtil.isEmpty(strLogTime) || !StringUtil.isInteger(strLogTime)) {
 			strLogTime = "1";
@@ -252,7 +252,48 @@ public class ConfManager {
 
 		return strSignKey;
 	}
+	/** 日志 key的分割符 */
+	public static String getLogKeySplit() {
+		String strLogKeySplit = CONF_MAP.get("log.key.split");
+
+		if (StringUtil.isEmpty(strLogKeySplit) || !StringUtil.isInteger(strLogKeySplit)) {
+			strLogKeySplit = "LOGSPLIT";
+		}
+
+		return strLogKeySplit;
+	}
+
+	public static String getMongoIp() {
+		return CONF_MAP.get("mongo.ip");
+	}
+	public static Integer getMongoPort() {
+		return Integer.parseInt(CONF_MAP.get("mongo.port"));
+	}
+	public static String getMongoNettyLogDBName() {
+		return CONF_MAP.get("mongo.log.netty.dbname");
+	}
+
 	
+
+	public static String getMongoNettyLogTableName() {
+		return CONF_MAP.get("mongo.log.netty.table.name");
+	}
+
+	public static String getMongoNettyLogUserName() {
+		return CONF_MAP.get("mongo.log.netty.user.name");
+	}
+
+	public static String getMongoNettyLogPassword() {
+		return CONF_MAP.get("mongo.log.netty.user.password");
+	}
+
+	public static int getTimelyDealLogMaxThreshold() {
+		return Integer.parseInt(CONF_MAP.get("log.out.timely.deal.max.threshold"));
+	}
+
+	public static int getLogBatchSaveMaxSize() {
+		return Integer.parseInt(CONF_MAP.get("mongo.log.netty.batch.save.max.size"));
+	}
 	/** 远程校验地址 */
 	public static String getRemoteValidateUrl() {
 		return CONF_MAP.get("remote.validate.url");

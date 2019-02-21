@@ -44,6 +44,8 @@ public class ServerRequestbShareUpd extends Packet {
 			result = Permission.INSTANCE.checkUserAuth(this.getRoomId(), userId, (String) this.getOption(100));
 		}
 
+		result.put("code", 0);
+
 		/** 如果校验成功*/
 		if (0 == ((Integer) result.get("code"))) {
 			/** 如果有中心 并 目标IP不是中心IP*/

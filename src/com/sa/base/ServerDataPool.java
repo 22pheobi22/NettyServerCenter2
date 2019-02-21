@@ -24,7 +24,6 @@ public class ServerDataPool {
 	/** 中心不存在的时候启用 */
 	/** 操作日志 */
 	public static Map<String, Packet> log = new ConcurrentHashMap<>();
-
 	/** 缓存 后台用户 通道 */
 	public static Map<String, ChannelHandlerContext> USER_CHANNEL_MAP_BACK  = new ConcurrentHashMap<>();
 	/** 缓存 后台用户 请求信息 */
