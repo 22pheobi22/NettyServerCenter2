@@ -263,6 +263,13 @@ public class ConfManager {
 		return strLogKeySplit;
 	}
 
+	/** 
+	 * 自动回收时存储星星数的连接
+	 */
+	public static String getStatSaveUrl() {
+		return CONF_MAP.get("stat.save.url");
+	}
+
 	public static String getMongoIp() {
 		return CONF_MAP.get("mongo.ip");
 	}

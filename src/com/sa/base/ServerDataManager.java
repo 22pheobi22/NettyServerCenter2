@@ -32,6 +32,7 @@ import com.sa.base.element.People;
 import com.sa.base.element.Room;
 import com.sa.base.element.Share;
 import com.sa.util.Constant;
+import com.sa.util.HttpClientUtil;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -183,6 +184,26 @@ public class ServerDataManager {
 	public Room removeRoom(String roomId) {
 
 		Room room = ROOM_INFO_MAP.remove(roomId);
+
+		Map<String, Share> shareMap = room.getShare();
+		if (null != shareMap) {
+			Share share = shareMap.get("starcount");
+			if (null != share) { 
+				String statNum = (String) share.getContent();
+
+				if (null != statNum && !"".equals(statNum)) {
+					statNum = statNum.replaceAll("{", "").replaceAll("}", "").replaceAll("\"", "").replaceAll(":", "-1-");
+					
+					String url = ConfManager.getStatSaveUrl();
+					if (null != url && !"".equals(url)) {
+						String httpUrl = url+"?class_id="+roomId+"&status="+statNum;
+						String str = HttpClientUtil.get(httpUrl);
+
+						System.out.println(httpUrl+"\r\n"+str);
+					}
+				}
+			}
+		}
 
 		Map<String, People> peoplesMap = room.getPeoples();
 		for (Entry<String, People> people : peoplesMap.entrySet()) {

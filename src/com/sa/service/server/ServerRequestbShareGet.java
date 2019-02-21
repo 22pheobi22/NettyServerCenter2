@@ -55,20 +55,29 @@ public class ServerRequestbShareGet extends Packet {
 				List<Object> list = ServerDataPool.serverDataManager.getShareList(this.getRoomId(), op1);
 				/** 设置共享 */
 				/** 实例化获取共享类型 下行 并赋值*/
-				List<Object> temp = new ArrayList<>();
-				for (int i=0; i<list.size(); i++) {
-					temp.add(list.get(i));
-					
-					if ((i+1)%21 == 0 || i+1 >= list.size()) {
-						ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
-						clientResponebShareGet.setOptions(this.getOptions());
-						clientResponebShareGet.setOption(3, JSON.toJSONString(temp));
-
-						/** 执行*/
-						clientResponebShareGet.execPacket();
-
-						temp = new ArrayList<>();
+				if (null != list) {
+					List<Object> temp = new ArrayList<>();
+					for (int i=0; i<list.size(); i++) {
+						temp.add(list.get(i));
+						
+						if ((i+1)%51 == 0 || i+1 >= list.size()) {
+							ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
+							clientResponebShareGet.setOptions(this.getOptions());
+							clientResponebShareGet.setOption(3, JSON.toJSONString(temp));
+	
+							/** 执行*/
+							clientResponebShareGet.execPacket();
+	
+							temp = new ArrayList<>();
+						}
 					}
+				} else {
+					ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
+					clientResponebShareGet.setOptions(this.getOptions());
+					clientResponebShareGet.setOption(3, "");
+
+					/** 执行*/
+					clientResponebShareGet.execPacket();
 				}
 			} else {
 				ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
