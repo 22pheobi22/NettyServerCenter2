@@ -294,11 +294,8 @@ public class ConfManager {
 	public static int getLogBatchSaveMaxSize() {
 		return Integer.parseInt(CONF_MAP.get("mongo.log.netty.batch.save.max.size"));
 	}
-<<<<<<< HEAD
 	/** 远程校验地址 */
 	public static String getRemoteValidateUrl() {
 		return CONF_MAP.get("remote.validate.url");
 	}
-=======
->>>>>>> branch 'develop' of http://liyahui@192.168.0.101:5811/bestmath-framework/NettyServer.git
 }
