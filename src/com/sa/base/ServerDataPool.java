@@ -18,7 +18,7 @@ public class ServerDataPool {
 	public static ServerDataManager serverDataManager = new ServerDataManager();
 
 	/** 临时连接 */
-	public static Map<ChannelHandlerContext, Integer> TEMP_CONN_MAP = new ConcurrentHashMap<>();
+	public static Map<ChannelHandlerContext, Long> TEMP_CONN_MAP = new ConcurrentHashMap<>();
 	public static Map<String, ChannelHandlerContext> TEMP_CONN_MAP2 = new ConcurrentHashMap<>();
 
 	/** 中心不存在的时候启用 */

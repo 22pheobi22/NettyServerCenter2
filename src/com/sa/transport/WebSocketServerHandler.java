@@ -57,7 +57,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
-		ServerDataPool.TEMP_CONN_MAP.put(ctx, 0);
+		ServerDataPool.TEMP_CONN_MAP.put(ctx, System.currentTimeMillis());
 	}
 
 	@Override

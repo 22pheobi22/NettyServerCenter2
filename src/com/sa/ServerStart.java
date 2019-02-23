@@ -1,6 +1,7 @@
 package com.sa;
 
 import com.sa.base.ConfManager;
+import com.sa.thread.AutoCancelTempConnect;
 import com.sa.thread.MongoLogSync;
 import com.sa.thread.RoomCancelSync;
 import com.sa.transport.ClientSocketServcer;
@@ -10,20 +11,20 @@ public class ServerStart {
 
 	public static void main(String[] args) {
 		initConf();
-
-//		new Thread(new LogSync(ConfManager.getLogUrl(), ConfManager.getLogTime())).start();
 		
-		new Thread(new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(), ConfManager.getMongoNettyLogDBName(),ConfManager.getMongoNettyLogTableName(),ConfManager.getMongoNettyLogUserName(),ConfManager.getMongoNettyLogPassword(), ConfManager.getLogTime(),false)).start();
+		new Thread(new AutoCancelTempConnect()).start();
 
-//		new Thread(new HttpServer(ConfManager.getHttpPort())).start();
+		new Thread(new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(), ConfManager.getMongoNettyLogDBName(),ConfManager.getMongoNettyLogTableName(),ConfManager.getMongoNettyLogUserName(),ConfManager.getMongoNettyLogPassword(), ConfManager.getLogTime(),false)).start();
 
 		new Thread(new RoomCancelSync()).start();
 
-//		if (!ConfManager.getIsCenter()) {
-//			new Thread(new StatisticRoomInfoSync(ConfManager.getStatisticUrl(), ConfManager.getStatisticTime())).start();
-//		} else {
-//			new Thread(new ClientSocketServcer(ConfManager.getCenterPort())).start();
-//		}
+/*		new Thread(new HttpServer(ConfManager.getHttpPort())).start();
+		new Thread(new LogSync(ConfManager.getLogUrl(), ConfManager.getLogTime())).start();
+		if (!ConfManager.getIsCenter()) {
+			new Thread(new StatisticRoomInfoSync(ConfManager.getStatisticUrl(), ConfManager.getStatisticTime())).start();
+		} else {
+			new Thread(new ClientSocketServcer(ConfManager.getCenterPort())).start();
+		}*/
 
 		startNetty();
 	}

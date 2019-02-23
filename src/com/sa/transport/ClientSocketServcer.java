@@ -48,7 +48,7 @@ public class ClientSocketServcer implements Runnable {
 			ServerBootstrap b = new ServerBootstrap();
 
 			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-					.option(ChannelOption.SO_BACKLOG, 1024 * 100).childHandler(new ChildChannelHandler());
+					.option(ChannelOption.SO_BACKLOG, 1024*10).childHandler(new ChildChannelHandler());
 
 			// ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
 
@@ -66,7 +66,7 @@ public class ClientSocketServcer implements Runnable {
 		@Override
 		protected void initChannel(SocketChannel arg0) throws Exception {
 			ChannelPipeline pipeline = arg0.pipeline();
-			pipeline.addLast(new PacketDecoder(1024 * 100, 0, 4, 0, 4));
+			pipeline.addLast(new PacketDecoder(1024*100, 0, 4, 0, 4));
 			pipeline.addLast(new LengthFieldPrepender(4));
 			pipeline.addLast(new PacketEncoder());
 			// 当有操作操作超出指定空闲秒数时，便会触发UserEventTriggered事件
