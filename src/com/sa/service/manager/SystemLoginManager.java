@@ -28,7 +28,9 @@ public enum SystemLoginManager {
 	public void login(ChannelHandlerContext context, SysLoginReq loginPact) {
 		ServerDataPool.SYSTEM_CHANNEL_MAP.put(loginPact.getFromUserId(), context);
 		ServerDataPool.CHANNEL_SYSTEM_MAP.put(context, loginPact.getFromUserId());
-		
+
+		ServerDataPool.TEMP_CONN_MAP.remove(context);
+
 		SysLoginRes SysLoginRes = new SysLoginRes();
 		SysLoginRes.setPacketHead(loginPact.getPacketHead());
 		SysLoginRes.setOptions(loginPact.getOptions());
