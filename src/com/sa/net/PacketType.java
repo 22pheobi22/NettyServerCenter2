@@ -61,6 +61,8 @@ import com.sa.service.sys.SysLoginOutReq;
 import com.sa.service.sys.SysLoginOutRes;
 import com.sa.service.sys.SysLoginReq;
 import com.sa.service.sys.SysLoginRes;
+import com.sa.service.sys.SysReloadConfigReq;
+import com.sa.service.sys.SysReloadConfigRes;
 import com.sa.service.sys.SysUpdRoomReq;
 import com.sa.service.sys.SysUpdRoomRes;
 
@@ -138,7 +140,9 @@ public enum PacketType {
 	SysChangeSpeakStatusReq((short) 10013, SysChangeSpeakStatusReq.class),
 	SysChangeSpeakStatusRes((short) 10014, SysChangeSpeakStatusRes.class),
 	SysCloseStudentReq((short) 10015, SysCloseStudentReq.class),
-	SysCloseStudentRes((short) 10016, SysCloseStudentRes.class)
+	SysCloseStudentRes((short) 10016, SysCloseStudentRes.class),
+	SysReloadConfigReq((short) 10017, SysReloadConfigReq.class),
+	SysReloadConfigRes((short) 10018, SysReloadConfigRes.class)
 	;
 
 	private short type;	// 消息类型

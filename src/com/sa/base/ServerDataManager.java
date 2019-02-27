@@ -350,8 +350,11 @@ public class ServerDataManager {
 	}
 
 	public Set<String> getRooms() {
-		Set<String> keys = ROOM_INFO_MAP.keySet();
-
+//		Set<String> keys = ROOM_INFO_MAP.keySet();
+		Set<String> keys = new HashSet<>();
+		for (Map.Entry<String, Room> m : ROOM_INFO_MAP.entrySet()) {
+			keys.add(m.getKey()+"["+m.getValue().getPeopleNum()+"]");
+		}
 		return keys;
 	}
 	/**
