@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.ServerManager;
+import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
 import com.sa.net.PacketType;
@@ -57,7 +58,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
-		ServerDataPool.TEMP_CONN_MAP.put(ctx, System.currentTimeMillis());
+		ServerDataPool.TEMP_CONN_MAP.put(ctx, new ChannelExtend(1));
 	}
 
 	@Override
@@ -143,9 +144,9 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 		if (packet.getPacketType() == PacketType.ServerLogin) { // 如果是登录类型
 			ServerLogin loginPact = (ServerLogin) packet; // 消息转为登录类型
 
-			packet.printPacket(ConfManager.getConsoleFlag(), Constant.CONSOLE_CODE_USERLOGIN, ConfManager.getFileLogFlag(), ConfManager.getFileLogPath());
-
-			ServerManager.INSTANCE.log(packet);
+//			packet.printPacket(ConfManager.getConsoleFlag(), Constant.CONSOLE_CODE_USERLOGIN, ConfManager.getFileLogFlag(), ConfManager.getFileLogPath());
+//
+//			ServerManager.INSTANCE.log(packet);
 			// 登录
 			LoginManager.INSTANCE.login(context, loginPact);
 
@@ -153,7 +154,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 			PacketManager.INSTANCE.execPacket(packet);
 		} else { // 其他
 			if (validateSession(packet, context)) { // 验证session
-				packet.printPacket(ConfManager.getConsoleFlag(), Constant.CONSOLE_CODE_R, ConfManager.getFileLogFlag(), ConfManager.getFileLogPath());
+//				packet.printPacket(ConfManager.getConsoleFlag(), Constant.CONSOLE_CODE_R, ConfManager.getFileLogFlag(), ConfManager.getFileLogPath());
 
 				ServerManager.INSTANCE.log(packet);
 
@@ -176,6 +177,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
 		System.err.println("TCP closed...");
+		loginOut(ctx);
 		ctx.close(promise);
 	}
 
@@ -185,14 +187,14 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
 		loginOut(ctx);
 
-		ServerManager.INSTANCE.ungisterUserContext(ctx);
+//		ServerManager.INSTANCE.ungisterUserContext(ctx);
 	}
 
 	public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise)
 			throws Exception {
 		loginOut(ctx);
 
-		ServerManager.INSTANCE.ungisterUserContext(ctx);
+//		ServerManager.INSTANCE.ungisterUserContext(ctx);
 		ctx.disconnect(promise);
 		System.err.println("客户端关闭2");
 	}
@@ -236,17 +238,20 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
 	private void loginOut(ChannelHandlerContext ctx) {
 		try {
-		String fromUserId = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		String roomId = ServerDataPool.serverDataManager.getUserRoomNo(fromUserId);
+			ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+			if (null != ce) {
+				String fromUserId = ce.getUserId();
+				String roomId = ServerDataPool.serverDataManager.getUserRoomNo(fromUserId);
 
-		ServerLoginOut serverLoginOut = new ServerLoginOut();
-		serverLoginOut.setFromUserId(fromUserId);
-		serverLoginOut.setRoomId(roomId);
-		serverLoginOut.setStatus(0);
-		serverLoginOut.setToUserId(fromUserId);
-		serverLoginOut.setTransactionId(1122334455);
-
-		serverLoginOut.execPacket();
+				ServerLoginOut serverLoginOut = new ServerLoginOut();
+				serverLoginOut.setFromUserId(fromUserId);
+				serverLoginOut.setRoomId(roomId);
+				serverLoginOut.setStatus(0);
+				serverLoginOut.setToUserId(fromUserId);
+				serverLoginOut.setTransactionId(1122334455);
+		
+				serverLoginOut.execPacket();
+			}
 		} catch (Exception e) {
 			System.err.print("退出异常");
 		}

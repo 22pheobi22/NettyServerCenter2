@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.ServerManager;
+import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
 import com.sa.net.PacketType;
@@ -31,12 +32,14 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
-		ServerDataPool.TEMP_CONN_MAP.put(ctx, System.currentTimeMillis());
+//		System.out.println("channelActive:"+ctx.channel().remoteAddress());
+		ServerDataPool.TEMP_CONN_MAP.put(ctx, new ChannelExtend());
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext context, Object msg) throws Exception {
 		try {
+//			System.out.println("channelRead:"+context.channel().remoteAddress());
 			Packet packet = (Packet) msg;
 			
 			if (packet.getPacketType() == PacketType.ServerLogin) {
@@ -59,15 +62,14 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
 		System.err.println("TCP closed...");
-
-		String userId = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != userId) {
-			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(userId);
+		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+		if (null != ce && null != ce.getUserId()) {
+			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(ce.getUserId());
 
 			if (null != roomId) {
 				ClientLoginOut clientLoginOut = new ClientLoginOut();
 				clientLoginOut.setRoomId(roomId);
-				clientLoginOut.setFromUserId(userId);
+				clientLoginOut.setFromUserId(ce.getUserId());
 				clientLoginOut.execPacket();
 			}
 		}
@@ -79,14 +81,14 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		System.err.println("客户端关闭1");
-		String userId = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != userId) {
-			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(userId);
+		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+		if (null != ce && null != ce.getUserId()) {
+			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(ce.getUserId());
 
 			if (null != roomId) {
 				ClientLoginOut clientLoginOut = new ClientLoginOut();
 				clientLoginOut.setRoomId(roomId);
-				clientLoginOut.setFromUserId(userId);
+				clientLoginOut.setFromUserId(ce.getUserId());
 				clientLoginOut.execPacket();
 			}
 		}
@@ -96,14 +98,14 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 	public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise)
 			throws Exception {
 //		ServerManager.INSTANCE.ungisterUserContext(ctx);
-		String userId = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != userId) {
-			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(userId);
+		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+		if (null != ce && null != ce.getUserId()) {
+			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(ce.getUserId());
 
 			if (null != roomId) {
 				ClientLoginOut clientLoginOut = new ClientLoginOut();
 				clientLoginOut.setRoomId(roomId);
-				clientLoginOut.setFromUserId(userId);
+				clientLoginOut.setFromUserId(ce.getUserId());
 				clientLoginOut.execPacket();
 			}
 		}

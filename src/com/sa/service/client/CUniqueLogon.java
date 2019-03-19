@@ -19,6 +19,7 @@ import java.util.HashSet;
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.ServerManager;
+import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.util.Constant;
@@ -36,7 +37,7 @@ public class CUniqueLogon extends Packet {
 			ChannelHandlerContext context = ServerDataPool.TEMP_CONN_MAP2.get(this.getFromUserId());
 			/** 删除临时缓存*/
 			ServerDataPool.TEMP_CONN_MAP2.remove(this.getToUserId());
-			ServerDataPool.TEMP_CONN_MAP.remove(context);
+			ChannelExtend ce = ServerDataPool.TEMP_CONN_MAP.remove(context);
 			/** 如果状态为0*/
 			if (this.getStatus() ==0) {
 				/** 获取用户角色*/
@@ -45,7 +46,7 @@ public class CUniqueLogon extends Packet {
 				ServerManager.INSTANCE.addOnlineContext(this.getRoomId(),
 						this.getFromUserId(), (String) this.getOption(3),
 						(String) this.getOption(4), userRole,
-						ConfManager.getTalkEnable(), context);
+						ConfManager.getTalkEnable(), context, ce.getChannelType());
 				/** 实例化房间用户列表 并 赋值 并 执行*/
 				ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
 				crru.setRemoteIp(this.getRemoteIp());

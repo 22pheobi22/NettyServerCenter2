@@ -7,14 +7,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.sa.base.element.ChannelExtend;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
+import com.sa.net.codec.PacketBinEncoder;
 import com.sa.thread.MongoLogSync;
 import com.sa.util.Constant;
 import com.sa.util.StringUtil;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 
 public enum ServerManager {
 
@@ -26,13 +29,22 @@ public enum ServerManager {
 	public final AtomicBoolean lastTimelyLogThreadExecuteStatus = new AtomicBoolean(true);
 	/** 向通道写消息并发送*/
 	private void writeAndFlush(ChannelHandlerContext ctx, Packet pact) throws Exception {
-//		// 将数据包封成二进制包
-//		BinaryWebSocketFrame binaryWebSocketFrame = new PacketBinEncoder().encode(pact);
-//
-//		// 把包放进通道并发送
-//		ctx.writeAndFlush(binaryWebSocketFrame);
+		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+		if (null != ce) {
+			if (0 == ce.getChannelType()) {
+				ctx.writeAndFlush(pact);
+			} else if (1 == ce.getChannelType()) {
+				// 将数据包封成二进制包
+				BinaryWebSocketFrame binaryWebSocketFrame = new PacketBinEncoder().encode(pact);
 		
-		ctx.writeAndFlush(pact);
+				// 把包放进通道并发送
+				ctx.writeAndFlush(binaryWebSocketFrame);
+			} else {
+				System.out.println("未知类型连接");
+			}
+		} else {
+			System.out.println("通道拓展信息不存在");
+		}
 	}
 
 	/** 向单一用户发送数据包*/
@@ -247,14 +259,14 @@ public enum ServerManager {
 	/**
 	 * 登录、注册、上线、绑定
 	 */
-	public void addOnlineContext(String roomId, String userId, String name, String icon, String agoraId, HashSet<String> userRole, boolean notSpeak, ChannelHandlerContext context){
+	public void addOnlineContext(String roomId, String userId, String name, String icon, String agoraId, HashSet<String> userRole, boolean notSpeak, ChannelHandlerContext context, int channelType){
 		// 如果通道为空 则抛出空指针错误
 		if(context == null){
 			// 抛出通道为空的异常
 			throw new NullPointerException("context is null");
 		}
 		// 缓存 通道-用户信息
-		ServerDataPool.CHANNEL_USER_MAP.put(context, userId);
+		ServerDataPool.CHANNEL_USER_MAP.put(context, new ChannelExtend(userId, channelType));
 		// 缓存 用户-通道信息
 		ServerDataPool.USER_CHANNEL_MAP.put(userId,context);
 
@@ -270,7 +282,7 @@ public enum ServerManager {
 	/**
 	 * 登录、注册、上线、绑定
 	 */
-	public void addOnlineContext(String roomId, String userId, String name, String icon, HashSet<String> userRole, boolean notSpeak, ChannelHandlerContext context){
+	public void addOnlineContext(String roomId, String userId, String name, String icon, HashSet<String> userRole, boolean notSpeak, ChannelHandlerContext context, int channelType){
 		// 如果通道为空 则抛出空指针错误
 		if(context == null){
 			// 抛出通道为空的异常
@@ -280,7 +292,7 @@ public enum ServerManager {
 		// 缓存 用户-通道信息
 		ServerDataPool.USER_CHANNEL_MAP.put(userId,context);
 		// 缓存 通道-用户信息
-		ServerDataPool.CHANNEL_USER_MAP.put(context, userId);
+		ServerDataPool.CHANNEL_USER_MAP.put(context, new ChannelExtend(userId, channelType));
 		
 //		System.out.println(ServerDataPool.USER_CHANNEL_MAP.size() + "U C" + ServerDataPool.CHANNEL_USER_MAP.size());
 
@@ -328,14 +340,14 @@ public enum ServerManager {
 		// 如果通道不为空
 		if(context  != null) {
 			// 根据通道获取用户id
-			String userId = ServerDataPool.CHANNEL_USER_MAP.get(context);
+			ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(context);
 			// 如果用户id为空 则返回
-			if (null == userId) {
+			if (null == ce || null == ce.getUserId()) {
 				return;
 			}
 
 			// 注销用户
-			ungisterUserId(userId);
+			ungisterUserId(ce.getUserId());
 		}
 	}
 

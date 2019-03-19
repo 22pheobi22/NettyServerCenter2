@@ -43,7 +43,7 @@ public class ClientSocketServcer implements Runnable {
 		// 避免使用默认线程数参数
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
-		System.out.println("服务端已启动，正在监听中心的请求......");
+		System.err.println("ClientSocketServcer服务端已启动，正在监听中心的请求......");
 		try {
 			ServerBootstrap b = new ServerBootstrap();
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -20,13 +21,13 @@ public class WebSocketServer {
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup(Runtime.getRuntime()
 				.availableProcessors());
-		System.err.println("服务端已启动，正在监听用户的请求......");
+		System.err.println("WebSocketServer服务端已启动，正在监听用户的请求......");
 		try {
 			ServerBootstrap b = new ServerBootstrap();
 
 			b.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
-					// .option(ChannelOption.SO_BACKLOG, 1024)
+					.option(ChannelOption.SO_BACKLOG, 1024*10)
 					.childHandler(new ChildChannelHandler());
 
 			ChannelFuture f = b.bind(port).sync();

@@ -5,6 +5,7 @@ import com.sa.thread.AutoCancelTempConnect;
 import com.sa.thread.MongoLogSync;
 import com.sa.thread.RoomCancelSync;
 import com.sa.transport.ClientSocketServcer;
+import com.sa.transport.WebSocketServer;
 import com.sa.util.ReadConf;
 
 public class ServerStart {
@@ -36,7 +37,7 @@ public class ServerStart {
 	private static void startNetty() {
 		try {
 			new Thread(new ClientSocketServcer(ConfManager.getClientSoketServerPort())).start();
-//			new WebSocketServer().bind(ConfManager.getWebSoketServerPort());
+			new WebSocketServer().bind(ConfManager.getWebSoketServerPort());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

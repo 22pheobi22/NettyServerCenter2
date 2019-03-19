@@ -15,6 +15,7 @@ package com.sa.thread;
 import java.util.Map;
 
 import com.sa.base.ServerDataPool;
+import com.sa.base.element.ChannelExtend;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -25,17 +26,17 @@ public class AutoCancelTempConnect implements Runnable {
 		while(true) {
 //			System.out.println("回收临时连接执行开始时间 - " + System.currentTimeMillis());
 			try {
-				Map<ChannelHandlerContext, Long> map = ServerDataPool.TEMP_CONN_MAP;
+				Map<ChannelHandlerContext, ChannelExtend> map = ServerDataPool.TEMP_CONN_MAP;
 				
-				for(Map.Entry<ChannelHandlerContext, Long> entry : map.entrySet()) {
+				for(Map.Entry<ChannelHandlerContext, ChannelExtend> entry : map.entrySet()) {
 					Long curr = System.currentTimeMillis();
 					
-					if (null == entry.getValue()) {
+					if (null == entry.getValue() || null == entry.getValue().getConnBeginTime()) {
 						map.remove(entry.getKey());
 						continue;
 					}
 
-					Long tmp = curr - entry.getValue();
+					Long tmp = curr - entry.getValue().getConnBeginTime();
 					if (tmp > 10000) {
 						System.out.println("回收临时连接:"+ curr + "-" +entry.getValue() +"=" + tmp);
 						map.remove(entry.getKey());

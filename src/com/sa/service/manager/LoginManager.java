@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.ServerManager;
+import com.sa.base.element.ChannelExtend;
 import com.sa.service.client.ClientLogin;
 import com.sa.service.client.ClientMsgReceipt;
 import com.sa.service.client.ClientResponebRoomUser;
@@ -31,9 +32,9 @@ public enum LoginManager {
 		int code = 0;
 		String msg = "成功";
 		/** 获取 临时通道 状态*/
-		Long status = ServerDataPool.TEMP_CONN_MAP.get(context);
+		ChannelExtend ce = ServerDataPool.TEMP_CONN_MAP.get(context);
 		/** 如果为空*/
-		if (null == status) {
+		if (null == ce || null == ce.getConnBeginTime()) {
 			return;
 		}
 		/** 将 发信人id 和 通道信息 放入 临时通道缓存*/
@@ -44,7 +45,7 @@ public enum LoginManager {
 			ServerManager.INSTANCE.addOnlineContext(loginPact.getRoomId(),
 					loginPact.getFromUserId(), (String) loginPact.getOption(3),
 					(String) loginPact.getOption(4), new HashSet<String>(),
-					ConfManager.getValidateEnable(), context);
+					ConfManager.getValidateEnable(), context, ce.getChannelType());
 			/** 登录信息 下行 处理*/
 			clientLogin(loginPact, code, msg, "", context);
 
@@ -62,8 +63,9 @@ public enum LoginManager {
 			if ("1".equals(role) || Constant.ROLE_TEACHER.equals(role)) {
 				strUserId = strUserId.replace("APP", "");
 			}
+			String tmpUserId = strUserId.replaceAll("T", "").replaceAll("t", "");
 			/** 用户 远程校验*/
-			String remote = remoteValidate(loginPact.getRoomId(), strUserId, role, token);
+			String remote = remoteValidate(loginPact.getRoomId(), tmpUserId, role, token);
 			System.out.println(remote);
 
 			JSONObject jsonObj = JSON.parseObject(remote);
@@ -105,7 +107,7 @@ public enum LoginManager {
 					ServerManager.INSTANCE.addOnlineContext(loginPact.getRoomId(),
 							loginPact.getFromUserId(), (String) loginPact.getOption(3),
 							(String) loginPact.getOption(4),  (String) loginPact.getOption(5), userRole,
-							ConfManager.getTalkEnable(), context);
+							ConfManager.getTalkEnable(), context, ce.getChannelType());
 
 					/** 实例化 获取房间用户列表 下行 并 赋值 并 执行*/
 					int num = ServerDataPool.serverDataManager.getRoomTheSameUserCannotAccessNum(loginPact.getRoomId(), loginPact.getFromUserId());
