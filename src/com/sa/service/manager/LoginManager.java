@@ -63,10 +63,10 @@ public enum LoginManager {
 			if ("1".equals(role) || Constant.ROLE_TEACHER.equals(role)) {
 				strUserId = strUserId.replace("APP", "");
 			}
-			String tmpUserId = strUserId.replaceAll("T", "").replaceAll("t", "");
+			String tmpUserId = strUserId.replaceAll("T", "").replaceAll("t", "").replaceAll("J", "").replaceAll("j", "");
 			/** 用户 远程校验*/
 			String remote = remoteValidate(loginPact.getRoomId(), tmpUserId, role, token);
-			System.out.println(remote);
+			System.out.println("用户远程校验【 "+strUserId+" 】\t"+remote);
 
 			JSONObject jsonObj = JSON.parseObject(remote);
 			if (null == jsonObj || null == jsonObj.get("meta")) {

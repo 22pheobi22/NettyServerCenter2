@@ -38,7 +38,7 @@ public class AutoCancelTempConnect implements Runnable {
 
 					Long tmp = curr - entry.getValue().getConnBeginTime();
 					if (tmp > 10000) {
-						System.out.println("回收临时连接:"+ curr + "-" +entry.getValue() +"=" + tmp);
+						System.out.println("回收临时连接:"+ curr + "-" +entry.getValue().getConnBeginTime() +"=" + tmp);
 						map.remove(entry.getKey());
 
 						ChannelHandlerContext ctx = entry.getKey();

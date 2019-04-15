@@ -23,8 +23,10 @@ public class RoomCancelSync implements Runnable {
 					// 空闲时长，每个数代表5分钟
 					int freeNum = ServerDataPool.serverDataManager.getFreeRoom(roomId);
 					if (freeNum >= 12) {
+						System.out.println("RoomCancelSync roomId = " + roomId);
 						Boolean closeLession = closeLession(roomId);
 						if (closeLession) {
+							System.out.println("RoomCancelSync roomId = " + roomId + "remove");
 							// 销毁房间
 							/** 删除 房间 消息 缓存 */
 							ServerDataPool.serverDataManager.cleanLogs(roomId);

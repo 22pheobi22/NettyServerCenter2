@@ -21,6 +21,7 @@ import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.ServerManager;
 import com.sa.base.element.People;
+import com.sa.base.element.Room;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientMsgReceipt;
@@ -38,30 +39,45 @@ public class ServerRequestcNotGag extends Packet {
 	@Override
 	public void execPacket() {
 		/** 校验用户角色*/
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), Constant.ROLE_TEACHER);
+		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), Constant.ROLE_ASSISTANT);
 		/** 校验成功*/
 		if (0 == ((Integer) result.get("code"))) {
-			/** 移除目标用户禁言*/
-			People people = ServerDataPool.serverDataManager.speakAuth(this.getRoomId(), this.getToUserId());
-			/** 如果目标用户为空*/
-			if (null != people) {
-				/** 重写返回值*/
-				Map<String, Object> result2 = new HashMap<>();
-
-				result2.put("code", 10096);
-				result2.put("msg", Constant.ERR_CODE_10096);
-				/** 实例化消息回执 并 赋值 并 执行*/
-				ClientMsgReceipt cm = new ClientMsgReceipt(this.getPacketHead(), result2);
-				cm.setToUserId(this.getToUserId());
-				cm.execPacket();
-			/** 如果有中心 并 目标IP不是中心IP*/
-			} else if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-				/** 转发到中心*/
-				ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+			if (null == this.getToUserId() || "".equals(this.getToUserId())) {
+				all();
+			} else {
+				one(this.getToUserId());
 			}
 		}
 		/** 实例化消息回执 并 赋值 并 执行*/
 		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
 	}
 
+	private void one(String userId) {
+		/** 移除目标用户禁言*/
+		People people = ServerDataPool.serverDataManager.speakAuth(this.getRoomId(), userId);
+		/** 如果目标用户为空*/
+		if (null != people) {
+			/** 重写返回值*/
+			Map<String, Object> result2 = new HashMap<>();
+
+			result2.put("code", 10096);
+			result2.put("msg", Constant.ERR_CODE_10096);
+			/** 实例化消息回执 并 赋值 并 执行*/
+			ClientMsgReceipt cm = new ClientMsgReceipt(this.getPacketHead(), result2);
+			cm.setToUserId(userId);
+			cm.execPacket();
+		/** 如果有中心 并 目标IP不是中心IP*/
+		} else if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
+			/** 转发到中心*/
+			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+		}
+	}
+
+	private void all() {
+		Room room = ServerDataPool.serverDataManager.getRoom(this.getRoomId());
+		
+		for (Map.Entry<String, People> entry : room.getPeoples().entrySet()) {
+			one(entry.getKey());
+		}
+	}
 }

@@ -138,8 +138,9 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 		Packet packet = (Packet) (new PacketBinDecoder().decode(byteBufUtil));
 
 		String strIp = context.channel().remoteAddress().toString();
-		strIp = StringUtil.subStringIp(strIp);
-		packet.setRemoteIp(strIp);
+		System.out.println(strIp);
+//		strIp = StringUtil.subStringIp(strIp);
+//		packet.setRemoteIp(strIp);
 
 		if (packet.getPacketType() == PacketType.ServerLogin) { // 如果是登录类型
 			ServerLogin loginPact = (ServerLogin) packet; // 消息转为登录类型
