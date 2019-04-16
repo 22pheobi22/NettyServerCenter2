@@ -15,6 +15,11 @@ public class ServerStart {
 		
 		new Thread(new AutoCancelTempConnect()).start();
 
+		/** 是否 启用 mongodb*/
+		boolean mongodbEnable = ConfManager.getMongodbEnable();
+		if(mongodbEnable){
+			new Thread(new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(), ConfManager.getMongoNettyLogDBName(),ConfManager.getMongoNettyLogTableName(),ConfManager.getMongoNettyLogUserName(),ConfManager.getMongoNettyLogPassword(), ConfManager.getLogTime(),false)).start();
+		}
 		new Thread(new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(), ConfManager.getMongoNettyLogDBName(),ConfManager.getMongoNettyLogTableName(),ConfManager.getMongoNettyLogUserName(),ConfManager.getMongoNettyLogPassword(), ConfManager.getLogTime(),false)).start();
 
 		new Thread(new RoomCancelSync()).start();
