@@ -419,7 +419,7 @@ public enum ServerManager {
 		if (packet.getPacketType() != PacketType.ServerHearBeat && packet.getPacketType() != PacketType.ServerLogin){
 			ServerDataPool.log.put(System.currentTimeMillis()+ConfManager.getLogKeySplit()+packet.getTransactionId(), packet);
 			int logTotalSize = ServerDataPool.log.size();
-			if(logTotalSize > ConfManager.getTimelyDealLogMaxThreshold() && lastTimelyLogThreadExecuteStatus.get()){
+			if(ConfManager.getMongodbEnable()&&logTotalSize > ConfManager.getTimelyDealLogMaxThreshold() && lastTimelyLogThreadExecuteStatus.get()){
 				lastTimelyLogThreadExecuteStatus.set(false);
 				long nowTimestamp = System.currentTimeMillis();
 				System.out.println(nowTimestamp+"及时清理开始>>"+logTotalSize+"[ThreadName]>"+Thread.currentThread().getName());

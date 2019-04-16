@@ -305,4 +305,15 @@ public class ConfManager {
 	public static String getRemoteValidateUrl() {
 		return CONF_MAP.get("remote.validate.url");
 	}
+	
+	/** 是否启用mongodb */
+	public static Boolean getMongodbEnable() {
+		String admin = CONF_MAP.get("mongodb.enable");
+
+		if (StringUtil.isEmpty(admin)) {
+			admin = "false";
+		}
+
+		return Boolean.parseBoolean(admin);
+	}
 }
