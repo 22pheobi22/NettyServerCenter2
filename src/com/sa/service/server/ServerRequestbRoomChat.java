@@ -61,8 +61,8 @@ public class ServerRequestbRoomChat extends Packet {
 				+"\",\"userId\":\""+logs.getUserId()
 				+"\",\"name\":\""+logs.getName()
 				+"\",\"icon\":\""+logs.getIco()
-				+"\",\"chat\":\""+logs.getChat()
-				+"\",\"sendTime\":\""+logs.getSendTime());
+				+"\",\"chat\":"+logs.getChat()
+				+",\"sendTime\":\""+logs.getSendTime());
 		sb.append("\"},");
 
 		return sb.toString();
