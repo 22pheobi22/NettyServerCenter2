@@ -15,6 +15,7 @@
 package com.sa.thread;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.net.Packet;
+import com.sa.util.DateUtil;
 import com.sa.util.mongo.MongoDBConfig;
 import com.sa.util.mongo.MongoDBUtil;
 
@@ -169,7 +171,7 @@ public class MongoLogSync extends BaseSync {
 						}
 					}
 					long endTime = System.currentTimeMillis();
-					mongoUtil.saveDocs(collectionName, msgLogList);
+					mongoUtil.saveDocs(collectionName+"_"+DateUtil.format(new Date(), DateUtil.DATE_FORMAT_03), msgLogList);
 					msgLogList.clear();
 					System.out.println("插入"+currSaveSize+"条，耗时:"+(endTime-startTime)+"ms");
 				}
