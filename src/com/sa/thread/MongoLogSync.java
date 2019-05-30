@@ -139,6 +139,7 @@ public class MongoLogSync extends BaseSync {
 	 * @author bugao.gong
 	 */
 	private void saveLog(){
+		String todayDateStr =  DateUtil.format(new Date(), DateUtil.DATE_FORMAT_03);
 		synchronized (MongoLogSync.class){
 			//本次日志的总数量
 			int logTotalSize = ServerDataPool.log.size();
@@ -171,7 +172,7 @@ public class MongoLogSync extends BaseSync {
 						}
 					}
 					long endTime = System.currentTimeMillis();
-					mongoUtil.saveDocs(collectionName+"_"+DateUtil.format(new Date(), DateUtil.DATE_FORMAT_03), msgLogList);
+					mongoUtil.saveDocs(collectionName+"_"+todayDateStr, msgLogList);
 					msgLogList.clear();
 					System.out.println("插入"+currSaveSize+"条，耗时:"+(endTime-startTime)+"ms");
 				}
