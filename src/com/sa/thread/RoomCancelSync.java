@@ -22,8 +22,8 @@ public class RoomCancelSync implements Runnable {
 //				if (0 == personNum) {			// 如果房间人数是0
 					// 空闲时长，每个数代表5分钟
 					int freeNum = ServerDataPool.serverDataManager.getFreeRoom(roomId);
-					if (freeNum >= 12) {
-						System.out.println("RoomCancelSync roomId = " + roomId);
+					if (freeNum >= 18) {
+//						System.out.println("RoomCancelSync roomId = " + roomId);
 						Boolean closeLession = closeLession(roomId);
 						if (closeLession) {
 							System.out.println("RoomCancelSync roomId = " + roomId + "remove");
@@ -45,7 +45,7 @@ public class RoomCancelSync implements Runnable {
 			}
 			try {
 //				Thread.sleep(1000*15);
-				Thread.sleep(1000*60*5);
+				Thread.sleep(1000*60*10);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
