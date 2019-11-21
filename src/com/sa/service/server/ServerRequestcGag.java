@@ -41,22 +41,30 @@ public class ServerRequestcGag extends Packet {
 	public void execPacket() {
 		/** 校验用户角色*/
 		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), Constant.ROLE_ASSISTANT);
-		/** 如果校验成功*/
-		if (0 == ((Integer) result.get("code"))) {
-			if (null == this.getToUserId() || "".equals(this.getToUserId())) {
-				all();
-			} else {
-				one(this.getToUserId());
-			}
-		}
 
 		/** 实例化消息回执 并 赋值 并 执行*/
 		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
+		
+		/** 如果校验成功*/
+		if (0 == ((Integer) result.get("code"))) {
+			String[] roomIds = this.getRoomId().split(",");
+			if (null != roomIds && roomIds.length > 0) {
+				for (String rId : roomIds) {
+					if (null == this.getToUserId() || "".equals(this.getToUserId())) {
+						all(rId);
+					} else {
+						one(this.getToUserId(),rId);
+					}
+				}
+			}
+
+		}
+
 	}
 	
-	private void one(String userId) {
+	private void one(String userId,String roomId) {
 		/** 移除目标用户禁言*/
-		People people = ServerDataPool.serverDataManager.notSpeakAuth(this.getRoomId(), userId);
+		People people = ServerDataPool.serverDataManager.notSpeakAuth(roomId, userId);
 		/** 如果目标用户为空*/
 		if (null != people) {
 			/** 重写返回值*/
@@ -67,6 +75,7 @@ public class ServerRequestcGag extends Packet {
 			/** 实例化消息回执 并 赋值 并 执行*/
 			ClientMsgReceipt cm = new ClientMsgReceipt(this.getPacketHead(), result2);
 			cm.setToUserId(userId);
+			cm.setRoomId(roomId);
 			cm.execPacket();
 		/** 如果有中心 并 目标IP不是中心IP*/
 		} else if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
@@ -75,11 +84,11 @@ public class ServerRequestcGag extends Packet {
 		}
 	}
 
-	private void all() {
-		Room room = ServerDataPool.serverDataManager.getRoom(this.getRoomId());
+	private void all(String roomId) {
+		Room room = ServerDataPool.serverDataManager.getRoom(roomId);
 		
 		for (Map.Entry<String, People> entry : room.getPeoples().entrySet()) {
-			one(entry.getKey());
+			one(entry.getKey(),roomId);
 		}
 	}
 

@@ -14,7 +14,10 @@
  */
 package com.sa.service.server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
@@ -27,7 +30,8 @@ import com.sa.service.permission.Permission;
 import com.sa.util.Constant;
 
 public class ServerRequestbRoom extends Packet {
-	public ServerRequestbRoom(){}
+	public ServerRequestbRoom() {
+	}
 
 	@Override
 	public PacketType getPacketType() {
@@ -36,19 +40,42 @@ public class ServerRequestbRoom extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 校验用户权限*/
-		Map<String, Object> result = Permission.INSTANCE.checkUserAuth(this.getRoomId(), this.getFromUserId(), Constant.AUTH_SPEAK);
-		/** 如果校验合格*/
+		/** 校验用户权限 */
+		Map<String, Object> result = Permission.INSTANCE.checkUserAuth(this.getRoomId(), this.getFromUserId(),
+				Constant.AUTH_SPEAK);
+		/** 如果校验合格 */
 		if (0 == ((Integer) result.get("code"))) {
-			/** 实例化房间内发消息类型 下行 并赋值 并 执行*/
+
+			/** 实例化房间内发消息类型 下行 并赋值 并 执行 */
 			ClientResponebRoom crr = new ClientResponebRoom(this.getPacketHead(), this.getOptions());
-			crr.execPacket();
-			/** 如果有中心 且 目标IP不是中心IP*/
+			String[] roomIds = this.getRoomId().split(",");
+
+			/** 如果有中心 且 目标IP不是中心IP */
 			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-				/** 转发给中心*/
+				/** 转发给中心 */
 				ServerManager.INSTANCE.sendPacketToCenter(crr, Constant.CONSOLE_CODE_TS);
 			} else {
-				ServerDataPool.serverDataManager.setRoomChats(this.getRoomId(), System.currentTimeMillis()+","+this.getTransactionId(), this.getFromUserId(), (String) this.getOption(1));
+				if (null != roomIds && roomIds.length > 0) {
+					for (String rId : roomIds) {
+						ServerDataPool.serverDataManager.setRoomChats(rId,
+								System.currentTimeMillis() + "," + this.getTransactionId(), this.getFromUserId(),
+								(String) this.getOption(1));
+					}
+				}
+			}
+			if (null != roomIds && roomIds.length > 0) {
+				for (String rId : roomIds) {
+					ClientResponebRoom newCrr = new ClientResponebRoom(this.getPacketHead(), this.getOptions());
+					try {
+						BeanUtils.copyProperties(crr, newCrr);
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+					newCrr.setRoomId(rId);
+					newCrr.execPacket();
+				}
 			}
 		}
 

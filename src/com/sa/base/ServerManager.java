@@ -30,8 +30,13 @@ public enum ServerManager {
 	/** 向通道写消息并发送*/
 	private void writeAndFlush(ChannelHandlerContext ctx, Packet pact) throws Exception {
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+		if (null == ce) {
+			ce = ServerDataPool.TEMP_CONN_MAP.get(ctx);
+		}
+
 		if (null != ce) {
 			if (0 == ce.getChannelType()) {
+				//System.out.println("【ctx:"+ctx+"】【pack:"+pact+"】");
 				ctx.writeAndFlush(pact);
 			} else if (1 == ce.getChannelType()) {
 				// 将数据包封成二进制包
@@ -275,7 +280,13 @@ public enum ServerManager {
 		// 如果用户不是中心
 		if (!ConfManager.getCenterId().equals(userId)) {
 			// 将用户信息缓存
-			ServerDataPool.serverDataManager.setRoomUser(roomId, userId, name, icon, agoraId, userRole, notSpeak);
+			String[] roomIds = roomId.split(",");
+			if(roomIds!=null&&roomIds.length>0){
+				//循环保存房间用户信息
+				for (String rId : roomIds) {
+					ServerDataPool.serverDataManager.setRoomUser(rId, userId, name, icon, agoraId, userRole, notSpeak);
+				}
+			}
 		}
 
 	}

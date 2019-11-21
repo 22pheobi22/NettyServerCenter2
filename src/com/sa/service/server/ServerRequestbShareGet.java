@@ -31,65 +31,71 @@ public class ServerRequestbShareGet extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 如果有中心 并 目标IP不是中心IP*/
+		/** 如果有中心 并 目标IP不是中心IP */
 		if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-			/** 消息转发给中心*/
+			/** 消息转发给中心 */
 			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		} else {
-			/** 获取选项 1 的内容*/
+			/** 获取选项 1 的内容 */
 			String op1 = (String) this.getOption(1);
 			String op2 = (String) this.getOption(2);
+			String[] roomIds = this.getRoomId().split(",");
+			if (null != roomIds && roomIds.length > 0) {
+				for (String rId : roomIds) {
+					if ("1".equals(op2)) {
+						/** 根据房间id和选项1 获取 共享信息 */
+						Object share = ServerDataPool.serverDataManager.getShare(rId, op1);
+						/** 设置共享 */
+						/** 实例化获取共享类型 下行 并赋值 */
+						ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
+						clientResponebShareGet.setOptions(this.getOptions());
+						clientResponebShareGet.setOption(3, share);
+						clientResponebShareGet.setRoomId(rId);
+						/** 执行 */
+						clientResponebShareGet.execPacket();
+					} else if ("n".equals(op2)) {
+						List<Object> list = ServerDataPool.serverDataManager.getShareList(this.getRoomId(), op1);
+						/** 设置共享 */
+						/** 实例化获取共享类型 下行 并赋值 */
+						if (null != list) {
+							List<Object> temp = new ArrayList<>();
+							for (int i = 0; i < list.size(); i++) {
+								temp.add(list.get(i));
 
-			if ("1".equals(op2)) {
-				/** 根据房间id和选项1 获取 共享信息 */
-				Object share = ServerDataPool.serverDataManager.getShare(this.getRoomId(), op1);
-				/** 设置共享 */
-				/** 实例化获取共享类型 下行 并赋值*/
-				ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
-				clientResponebShareGet.setOptions(this.getOptions());
-				clientResponebShareGet.setOption(3, share);
-				
-				/** 执行*/
-				clientResponebShareGet.execPacket();
-			} else if ("n".equals(op2)) {
-				List<Object> list = ServerDataPool.serverDataManager.getShareList(this.getRoomId(), op1);
-				/** 设置共享 */
-				/** 实例化获取共享类型 下行 并赋值*/
-				if (null != list) {
-					List<Object> temp = new ArrayList<>();
-					for (int i=0; i<list.size(); i++) {
-						temp.add(list.get(i));
-						
-						if ((i+1)%51 == 0 || i+1 >= list.size()) {
+								if ((i + 1) % 51 == 0 || i + 1 >= list.size()) {
+									ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(
+											this.getPacketHead());
+									clientResponebShareGet.setOptions(this.getOptions());
+									clientResponebShareGet.setOption(3, JSON.toJSONString(temp));
+									clientResponebShareGet.setRoomId(rId);
+
+									/** 执行 */
+									clientResponebShareGet.execPacket();
+
+									temp = new ArrayList<>();
+								}
+							}
+						} else {
 							ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
 							clientResponebShareGet.setOptions(this.getOptions());
-							clientResponebShareGet.setOption(3, JSON.toJSONString(temp));
-	
-							/** 执行*/
+							clientResponebShareGet.setOption(3, "");
+							clientResponebShareGet.setRoomId(rId);
+
+							/** 执行 */
 							clientResponebShareGet.execPacket();
-	
-							temp = new ArrayList<>();
 						}
+					} else {
+						ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
+
+						clientResponebShareGet.setStatus(5001);
+						clientResponebShareGet.setOption(254, "共享类型错误[option.2]");
+						clientResponebShareGet.setRoomId(rId);
+
+						clientResponebShareGet.execPacket();
 					}
-				} else {
-					ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
-					clientResponebShareGet.setOptions(this.getOptions());
-					clientResponebShareGet.setOption(3, "");
-
-					/** 执行*/
-					clientResponebShareGet.execPacket();
 				}
-			} else {
-				ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
-
-				clientResponebShareGet.setStatus(5001);
-				clientResponebShareGet.setOption(254, "共享类型错误[option.2]");
-				
-				clientResponebShareGet.execPacket();
 			}
-
 		}
-
 	}
 
 	@Override

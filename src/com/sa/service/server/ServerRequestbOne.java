@@ -41,18 +41,26 @@ public class ServerRequestbOne extends Packet {
 		Map<String, Object> result = Permission.INSTANCE.checkUserAuth(this.getRoomId(), this.getFromUserId(), Constant.AUTH_SPEAK);
 		/** 如果校验成功*/
 		if (0 == ((Integer) result.get("code"))) {
-			/** 根据房间id 和 目标用户id 获取 人员信息*/
-			People people = ServerDataPool.serverDataManager.getRoomUesr(this.getRoomId(), this.getToUserId());
-			/** 实例化一对一消息类型 下行 并 赋值*/
-			ClientResponebOne clientResponebOne = new ClientResponebOne(this.getPacketHead(), this.getOptions());
-			/** 如果人员信息不为空*/
-			if (null != people) {
-				/** 执行 一对一消息发送 下行*/
-				clientResponebOne.execPacket();
-						/** 如果有中心 并 中心ip不是 目标ip*/
-			} else  if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-				/** 发送 下行类型 到中心*/
-				ServerManager.INSTANCE.sendPacketToCenter(clientResponebOne, Constant.CONSOLE_CODE_TS);
+			String[] roomIds = this.getRoomId().split(",");
+			if(roomIds!=null&&roomIds.length>0){
+				for (String rId : roomIds) {
+					/** 根据房间id 和 目标用户id 获取 人员信息*/
+					People people = ServerDataPool.serverDataManager.getRoomUesr(rId, this.getToUserId());
+					/** 实例化一对一消息类型 下行 并 赋值*/
+					ClientResponebOne clientResponebOne = new ClientResponebOne(this.getPacketHead(), this.getOptions());
+					/** 如果人员信息不为空*/
+					if (null != people) {
+						//设置房间id为目标房间id
+						clientResponebOne.setRoomId(rId);
+						/** 执行 一对一消息发送 下行*/
+						clientResponebOne.execPacket();
+								/** 如果有中心 并 中心ip不是 目标ip*/
+					} else  if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
+						/** 发送 下行类型 到中心*/
+						ServerManager.INSTANCE.sendPacketToCenter(clientResponebOne, Constant.CONSOLE_CODE_TS);
+						break;
+					}
+				}
 			}
 		}
 		/** 实例化 消息回执 并 赋值 并 执行*/

@@ -38,37 +38,45 @@ public class ServerRequestbRoomUser extends Packet {
 	@Override
 	public void execPacket() {
 
-		/** 如果有中心 并 目标IP不是中心IP*/
+		/** 如果有中心 并 目标IP不是中心IP */
 		if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-//			this.setOption(1, json);
-			/** 转发给中心*/
+			// this.setOption(1, json);
+			/** 转发给中心 */
 			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		} else {
-			/** 根据房间id获取房间内用户信息*/
-			Map<String, People> hm = ServerDataPool.serverDataManager.getRoomUesrs(this.getRoomId());
+			String[] roomIds = this.getRoomId().split(",");
+			if (null != roomIds && roomIds.length > 0) {
+				for (String rId : roomIds) {
+					/** 根据房间id获取房间内用户信息 */
+					Map<String, People> hm = ServerDataPool.serverDataManager.getRoomUesrs(rId);
 
-			int index = 0;
-			String json = "[";
-			/** 遍历用户信息*/
-			for (Entry<String, People> people : hm.entrySet()) {
-				if (index%Constant.PEOPLE_NUM == 0) json="[";
-				index++;
+					int index = 0;
+					String json = "[";
+					/** 遍历用户信息 */
+					for (Entry<String, People> people : hm.entrySet()) {
+						if (index % Constant.PEOPLE_NUM == 0)
+							json = "[";
+						index++;
 
-				json += toJson(people);
+						json += toJson(people);
 
-				if ((index%Constant.PEOPLE_NUM == 0 || index==hm.size()) && json.length()> 1) {
-					json = json.substring(0, json.length()-1);
+						if ((index % Constant.PEOPLE_NUM == 0 || index == hm.size()) && json.length() > 1) {
+							json = json.substring(0, json.length() - 1);
 
-					json+="]";
-					/** 实例化获取房间列表 下行 并赋值*/
-					ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
-					/** json格式的用户信息放入 选项 1 中*/
-					crru.setOption(1, json);
-					/** 执行*/
-					crru.execPacket();
+							json += "]";
+							/** 实例化获取房间列表 下行 并赋值 */
+							ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
+							/** json格式的用户信息放入 选项 1 中 */
+							crru.setOption(1, json);
+							crru.setRoomId(rId);
+							/** 执行 */
+							crru.execPacket();
+						}
+
+					}
 				}
-
 			}
+
 		}
 
 	}
@@ -76,13 +84,11 @@ public class ServerRequestbRoomUser extends Packet {
 	private String toJson(Entry<String, People> people) {
 		StringBuffer sb = new StringBuffer();
 
-		sb.append("{\"id\":\""+people.getKey()
-				+"\",\"name\":\""+people.getValue().getName()
-				+"\",\"icon\":\""+people.getValue().getIcon()
-				+"\",\"role\":[");
-		for(Iterator iter = people.getValue().getRole().iterator();iter.hasNext();){
-			sb.append("\""+(String) iter.next()).append("\",");
-        }
+		sb.append("{\"id\":\"" + people.getKey() + "\",\"name\":\"" + people.getValue().getName() + "\",\"icon\":\""
+				+ people.getValue().getIcon() + "\",\"role\":[");
+		for (Iterator iter = people.getValue().getRole().iterator(); iter.hasNext();) {
+			sb.append("\"" + (String) iter.next()).append("\",");
+		}
 
 		if (0 < people.getValue().getRole().size()) {
 			sb.deleteCharAt(sb.length() - 1);
@@ -90,9 +96,9 @@ public class ServerRequestbRoomUser extends Packet {
 
 		sb.append("],\"auth\":[");
 
-		for(Map.Entry<String, Integer> auth : people.getValue().getAuth().entrySet()){
-			sb.append("{\""+auth.getKey()).append("\":").append(auth.getValue()).append("},");
-        }
+		for (Map.Entry<String, Integer> auth : people.getValue().getAuth().entrySet()) {
+			sb.append("{\"" + auth.getKey()).append("\":").append(auth.getValue()).append("},");
+		}
 
 		if (0 < people.getValue().getAuth().size()) {
 			sb.deleteCharAt(sb.length() - 1);

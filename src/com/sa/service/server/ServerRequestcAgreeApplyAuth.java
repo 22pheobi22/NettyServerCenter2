@@ -35,23 +35,32 @@ public class ServerRequestcAgreeApplyAuth extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 校验用户角色*/
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), Constant.ROLE_TEACHER);
-		/** 如果校验成功*/
-		if (0 == ((Integer) result.get("code"))) {
-			/** 如果有中心 并 目标IP不是中心IP*/
-			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-				/** 消息转发到中心*/
-				ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
-			} else {
-				/** 实例化 开课 下行 并 赋值 并 执行*/
-				new ClientResponecAgreeApplyAuth(this.getPacketHead(), this.getOptions()).execPacket();
-			}
-		}
+		/** 校验用户角色 */
+		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(),
+				Constant.ROLE_TEACHER);
 
-		/** 实例化消息回执 并 赋值 并 执行*/
+		/** 实例化消息回执 并 赋值 并 执行 */
 		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
 
+		/** 如果校验成功 */
+		if (0 == ((Integer) result.get("code"))) {
+			/** 如果有中心 并 目标IP不是中心IP */
+			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
+				/** 消息转发到中心 */
+				ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+			} else {
+				String[] roomIds = this.getRoomId().split(",");
+				if (null != roomIds && roomIds.length > 0) {
+					for (String rId : roomIds) {
+						/** 实例化 开课 下行 并 赋值 并 执行 */
+						ClientResponecAgreeApplyAuth clientResponecAgreeApplyAuth = new ClientResponecAgreeApplyAuth(
+								this.getPacketHead(), this.getOptions());
+						clientResponecAgreeApplyAuth.setRoomId(rId);
+						clientResponecAgreeApplyAuth.execPacket();
+					}
+				}
+			}
+		}
 	}
 
 }

@@ -35,14 +35,22 @@ public enum Permission {
 		Integer code = 0;
 		String msg = "success";
 
-		HashMap<String, Integer> hm = ServerDataPool.serverDataManager.getRoomUesrAuth(roomId, userId);
-		if (null == hm) {
-			return setResult(10099, Constant.ERR_CODE_10099);
-		}
+		String[] roomIds = roomId.split(",");
+		if(roomIds!=null&&roomIds.length>0){
+			//用户同时操作多房间 须在多房间都具权限才能过校验
+			for (String rId : roomIds) {
+				HashMap<String, Integer> hm = ServerDataPool.serverDataManager.getRoomUesrAuth(rId, userId);
+				if (null == hm) {
+					return setResult(10099, Constant.ERR_CODE_10099);
+				}
 
-		if (null == hm.get(auth) || hm.get(auth) == 0) {
-			code = 10080;
-			msg = Constant.ERR_CODE_10080;
+				if (null == hm.get(auth) || hm.get(auth) == 0) {
+					code = 10080;
+					msg = Constant.ERR_CODE_10080;
+					return setResult(code, msg);
+				}
+
+			}
 		}
 
 		return setResult(code, msg);
@@ -57,19 +65,26 @@ public enum Permission {
 	public Map<String, Object> checkUserRole(String roomId, String userId, String role) {
 		Integer code = 0;
 		String msg = "success";
-		/** 获取用户角色*/
-		HashSet<String> hs = ServerDataPool.serverDataManager.getRoomUesrRole(roomId, userId);
-		/** 如果角色为空*/
-		if (null == hs) {
-			/** 设置消息*/
-			return setResult(10099, Constant.ERR_CODE_10099);
+		String[] roomIds = roomId.split(",");
+		if(roomIds!=null&&roomIds.length>0){
+			//要同时操作多个房间 须同时在多房间具有角色才能通过校验
+			for (String rId : roomIds) {
+				/** 获取用户角色*/
+				HashSet<String> hs = ServerDataPool.serverDataManager.getRoomUesrRole(rId, userId);
+				/** 如果角色为空*/
+				if (null == hs) {
+					/** 设置消息*/
+					return setResult(10099, Constant.ERR_CODE_10099);
+				}
+				/** 如果角色不包含用户角色*/
+				if (!hs.contains(role)) {
+					code = 10081;
+					msg = Constant.ERR_CODE_10081;
+					
+					return setResult(code, msg);
+				}
+			}
 		}
-		/** 如果角色不包含用户角色*/
-		if (!hs.contains(role)) {
-			code = 10081;
-			msg = Constant.ERR_CODE_10081;
-		}
-
 		return setResult(code, msg);
 	}
 }

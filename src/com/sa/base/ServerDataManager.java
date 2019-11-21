@@ -208,7 +208,6 @@ public class ServerDataManager {
 			if (null != entry.getValue().getPeoples().get(userId)) {
 				//将用户从聊天室踢出
 				removeRoomUser(entry.getKey(), userId);
-				break;
 			}
 		}
 	}
@@ -561,18 +560,16 @@ public class ServerDataManager {
 	 * 获取人员存在的房间
 	 */
 	public String getUserRoomNo(String userId) {
-		String roomId = null;
+		String roomId = "";
 		// 遍历房间信息
 		for (Entry<String, Room> entry : ROOM_INFO_MAP.entrySet()) {
 			// 如果如果用户信息不为空
 			if (null != entry.getValue().getPeoples().get(userId)) {
-				// 获取房间id
-				roomId = entry.getKey();
-				break;
+				roomId +=(entry.getKey()+",");
 			}
 		}
 
-		return roomId;
+		return roomId.equals("")?null:roomId;
 	}
 
 	/** 获取 房间id 和 每个房间人数*/
@@ -715,9 +712,9 @@ public class ServerDataManager {
 	 * 同一用户不能访问方式的数量
 	 */
 	public int getRoomTheSameUserCannotAccessNum(String roomId, String userId) {
-		if (userId.endsWith("APP")) {
+		/*if (userId.endsWith("APP")) {
 			userId = userId.replace("APP", "");
-		}
+		}*/
 
 		Map<String, People> peoples = this.getRoomUesrs(roomId);
 		int num = 0;

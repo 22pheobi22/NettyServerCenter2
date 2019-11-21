@@ -34,13 +34,23 @@ public class ClientLoginOut extends Packet {
 		try {
 			this.setToUserId(this.getFromUserId());
 			ServerManager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
+			String[] roomIds = this.getRoomId().split(",");
+			if(roomIds!=null&&roomIds.length>0){
+				for (String rId : roomIds) {
+					/** 根据roomId 和 发信人id 移除房间内用户*/
+					ServerDataPool.serverDataManager.removeRoomUser(rId, this.getFromUserId());
 
-			/** 根据roomId 和 发信人id 移除房间内用户*/
-			ServerDataPool.serverDataManager.removeRoomUser(this.getRoomId(), this.getFromUserId());
+					//重新设置房间id为要处理房间的id
+					this.setRoomId(rId);
+					noticeUser();
+				}
+			}
 			ChannelHandlerContext ctx =  ServerDataPool.USER_CHANNEL_MAP.get(this.getFromUserId());
-			ctx.close();
-
-			noticeUser();
+			if(null!=ctx){
+				ctx.close();
+			}
+			ServerDataPool.CHANNEL_USER_MAP.remove(ctx);
+			ServerDataPool.USER_CHANNEL_MAP.remove(this.getFromUserId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

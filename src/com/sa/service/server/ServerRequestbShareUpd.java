@@ -36,8 +36,9 @@ public class ServerRequestbShareUpd extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 根绝房间id 和 发信人id 校验用户角色*/
-		String userId = this.getFromUserId().replace("APP", "");
+		/** 根绝房间id 和 发信人id 校验用户角色 */
+		//String userId = this.getFromUserId().replace("APP", "");
+		String userId = this.getFromUserId();
 
 		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), userId, Constant.ROLE_TEACHER);
 		if (0 != ((Integer) result.get("code"))) {
@@ -45,27 +46,34 @@ public class ServerRequestbShareUpd extends Packet {
 		}
 
 		result.put("code", 0);
+		
+		/** 实例化消息回执 并 赋值 并 执行 */
+		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
 
-		/** 如果校验成功*/
+		/** 如果校验成功 */
 		if (0 == ((Integer) result.get("code"))) {
-			/** 如果有中心 并 目标IP不是中心IP*/
+			/** 如果有中心 并 目标IP不是中心IP */
 			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-				/** 转发消息到中心*/
+				/** 转发消息到中心 */
 				ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 			} else {
-				String shareK1 = (String) this.getOption(1);
-				if (null != shareK1 && !"".equals(shareK1)) {
-					synchronized (shareK1) {
-						setShare();
+				String[] roomIds = this.getRoomId().split(",");
+				if (null != roomIds && roomIds.length > 0) {
+					for (String rId : roomIds) {
+						String shareK1 = (String) this.getOption(1);
+						if (null != shareK1 && !"".equals(shareK1)) {
+							synchronized (shareK1) {
+								this.setRoomId(rId);
+								setShare();
+							}
+						}
+
+						/** 实例化 变更共享 下行 并 赋值 并 执行 */
+						new ClientResponebShareUpd(this.getPacketHead(), this.getOptions()).execPacket();
 					}
 				}
-
-				/** 实例化 变更共享 下行 并 赋值 并 执行*/
-				new ClientResponebShareUpd(this.getPacketHead(), this.getOptions()).execPacket();
 			}
 		}
-		/** 实例化消息回执 并 赋值 并 执行*/
-		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
 	}
 
 	private int setShare() {
@@ -83,12 +91,13 @@ public class ServerRequestbShareUpd extends Packet {
 		} else if ("remove.1".equalsIgnoreCase(shareOptType)) {
 			rs = ServerDataPool.serverDataManager.removeShare(this.getRoomId(), shareK, shareV);
 		} else if ("remove.n.len".equalsIgnoreCase(shareOptType)) {
-			rs =ServerDataPool.serverDataManager.removeShare(this.getRoomId(), shareK, Integer.parseInt(index), Integer.parseInt(len));
+			rs = ServerDataPool.serverDataManager.removeShare(this.getRoomId(), shareK, Integer.parseInt(index),
+					Integer.parseInt(len));
 		} else if ("remove.n.index".equalsIgnoreCase(shareOptType)) {
 			String[] arr = indexs.split(",");
 			ServerDataPool.serverDataManager.removeShare(this.getRoomId(), shareK, arr);
-		} else if ("upd".equalsIgnoreCase(shareOptType)){
-			/** 设置房间共享文件*/
+		} else if ("upd".equalsIgnoreCase(shareOptType)) {
+			/** 设置房间共享文件 */
 			ServerDataPool.serverDataManager.setShare(this.getRoomId(), shareK, shareV, shareType);
 		}
 

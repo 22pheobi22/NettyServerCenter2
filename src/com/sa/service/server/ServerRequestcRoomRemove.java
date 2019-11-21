@@ -55,11 +55,17 @@ public class ServerRequestcRoomRemove extends Packet {
 		/** 校验成功*/
 		if (0 == ((Integer) result.get("code"))) {
 //		if (true) {
-			/** 实例化 删除房间 下行*/
-			ClientResponecRoomRemove clientResponecRoomRemove = new ClientResponecRoomRemove(this.getPacketHead());
-			clientResponecRoomRemove.setStatus(20046);
-			clientResponecRoomRemove.setOption(1, Constant.PROMPT_CODE_20046);
-			clientResponecRoomRemove.execPacket();
+			String[] roomIds = this.getRoomId().split(",");
+			if (null != roomIds && roomIds.length > 0) {
+				for (String rId : roomIds) {
+					/** 实例化 删除房间 下行*/
+					ClientResponecRoomRemove clientResponecRoomRemove = new ClientResponecRoomRemove(this.getPacketHead());
+					clientResponecRoomRemove.setStatus(20046);
+					clientResponecRoomRemove.setOption(1, Constant.PROMPT_CODE_20046);
+					clientResponecRoomRemove.setRoomId(rId);
+					clientResponecRoomRemove.execPacket();
+				}
+			}
 
 			/** 如果有中心 并 目标IP不是中心IP*/
 			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {

@@ -3,6 +3,8 @@
  */
 package com.sa.service.server;
 
+import java.util.Objects;
+
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.ServerManager;
@@ -22,22 +24,33 @@ public class ServerLoginOut extends Packet{
 
 	@Override
 	public void execPacket() {
-		/** 根据房间id 和 发信人id 查询人员信息*/
-		People people = ServerDataPool.serverDataManager.getRoomUesr(this.getRoomId(), this.getFromUserId());
-		/** 如果人员信息为空*/
+		People people = null;
+		String[] roomIds = this.getRoomId().split(",");
+		if (null != roomIds && roomIds.length > 0) {
+			for (String rId : roomIds) {
+				/** 根据房间id 和 发信人id 查询人员信息 */
+				people = ServerDataPool.serverDataManager.getRoomUesr(rId, this.getFromUserId());
+				if(Objects.nonNull(people)){
+					break;
+				}
+			}
+		}
+
+		/** 如果人员信息为空 */
 		if (null != people)
-			/** 设置记录集选项 为 delete*/
+			/** 设置记录集选项 为 delete */
 			this.setOption(255, "deleted");
 
-		/** 如果有中心*/
+		/** 如果有中心 */
 		if (ConfManager.getIsCenter()) {
-			/** 将消息转发到中心*/
+			/** 将消息转发到中心 */
 			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		}
-		/** 实例化消息回执并执行*/
-//		new ClientMsgReceipt(this.getPacketHead()).execPacket();
-		/** 实例化登出 下行 并执行*/
-		new ClientLoginOut(this.getPacketHead(), this.getOptions()).execPacket();
+		/** 实例化消息回执并执行 */
+		// new ClientMsgReceipt(this.getPacketHead()).execPacket();
+		/** 实例化登出 下行 并执行 */
+		ClientLoginOut clientLoginOut = new ClientLoginOut(this.getPacketHead(), this.getOptions());
+		clientLoginOut.execPacket();
 	}
 
 }

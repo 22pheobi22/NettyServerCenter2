@@ -39,10 +39,10 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext context, Object msg) throws Exception {
 		try {
-//			System.out.println("channelRead:"+context.channel().remoteAddress());
+			System.out.println("channelRead:"+context.channel().remoteAddress());
 			Packet packet = (Packet) msg;
-			
 			if (packet.getPacketType() == PacketType.ServerLogin) {
+				ServerManager.INSTANCE.log(packet);
 				LoginManager.INSTANCE.login(context, (ServerLogin) packet);
 			} else if (packet.getPacketType() == PacketType.SysLoginReq) {
 				SystemLoginManager.INSTANCE.login(context, (SysLoginReq) packet);
