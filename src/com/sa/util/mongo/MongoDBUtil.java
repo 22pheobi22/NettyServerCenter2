@@ -1065,14 +1065,14 @@ public final class MongoDBUtil {
 			boolean noCursorTimeout) {
 		MongoCursor<Document> cursor = mongoDBUtil.iterator(collectionName, filter, limit, skip, noCursorTimeout);
 		List<Document> docs = new ArrayList<Document>();
-		int currCursor = 0;
-		int totalCount = mongoDBUtil.getCount(collectionName);
+		/*int currCursor = 0;
+		int totalCount = mongoDBUtil.getCount(collectionName);*/
 		while (cursor.hasNext()) {
-			currCursor++;
+			/*currCursor++;
 			if (currCursor % 100 == 0 || currCursor == totalCount) {
 				logger.info(String.format("[collectionName] %s progress : %s", collectionName,
 						currCursor + "/" + totalCount));
-			}
+			}*/
 			Document doc = cursor.next();
 			docs.add(doc);
 		}
