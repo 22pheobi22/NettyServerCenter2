@@ -140,9 +140,10 @@ public enum ServerManager {
 
 			// 获取用户通道
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(entry.getKey());
-			
-			// 向通道写数据并发送
-			writeAndFlush(ctx, pact);
+			if(null!=ctx){
+				// 向通道写数据并发送
+				writeAndFlush(ctx, pact);
+			}
 		}
 	}
 
@@ -338,9 +339,10 @@ public enum ServerManager {
 				// 删除房间内该用户信息
 				ServerDataPool.serverDataManager.removeRoomUser(userId);
 			}
-
-			// 通道关闭
-			ctx.close();
+			if(null!=ctx){
+				// 通道关闭
+				ctx.close();
+			}
 		}
 	}
 

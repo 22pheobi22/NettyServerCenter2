@@ -190,10 +190,17 @@ public class ServerDataManager {
 		for (Entry<String, People> people : peoplesMap.entrySet()) {
 			String userId = people.getKey();
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(userId);
+			
+			if(ServerDataPool.USER_CHANNEL_MAP.containsKey(userId)){
+				ServerDataPool.USER_CHANNEL_MAP.remove(userId);	
+			}
+			if(null!=ctx&&ServerDataPool.CHANNEL_USER_MAP.containsKey(ctx)){
+				ServerDataPool.CHANNEL_USER_MAP.remove(ctx);	
+			}
 
-			ServerDataPool.USER_CHANNEL_MAP.remove(userId);
-			ServerDataPool.CHANNEL_USER_MAP.remove(ctx);
-			ctx.close();
+			if(null!=ctx){
+				ctx.close();	
+			}
 		}
 		return room;
 	}
@@ -247,8 +254,8 @@ public class ServerDataManager {
 			room.getPeoples().put(userId, people);
 
 			room.getNotSpeakPeoples().put(userId, 0);
+			System.out.println("userId:"+userId+"==auth:"+people.getAuth().get(Constant.AUTH_SPEAK));
 		}
-
 		return people;
 	}
 

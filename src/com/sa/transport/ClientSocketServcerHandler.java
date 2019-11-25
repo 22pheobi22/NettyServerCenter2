@@ -80,7 +80,9 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 		System.err.println(log);
 
 //		ServerManager.INSTANCE.ungisterUserContext(ctx);
-		ctx.close(promise);
+		if(null!=ctx){
+			ctx.close(promise);			
+		}
 	}
 
 	@Override
@@ -124,7 +126,9 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 				clientLoginOut.execPacket();
 			}
 		}
-		ctx.disconnect(promise);
+		if(null!=ctx){
+			ctx.disconnect(promise);	
+		}
 		System.err.println(log);
 	}
 
@@ -148,7 +152,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 		Channel channel = ctx.channel();
 		if (cause instanceof Exception && channel.isActive()) {
 			System.err.println("simple client " + channel.remoteAddress() + " 异常");
-			ctx.close();
+			ctx.close();	
 		}
 	}
 

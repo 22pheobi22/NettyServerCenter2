@@ -54,8 +54,10 @@ public class ClientResponehRoomUser extends Packet {
 	        if (HttpHeaders.isKeepAlive(request)) {
 	            response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
 	        }
-	        ctx.write(response);
-	        ctx.flush();
+	        if(null!=ctx){
+	        	ctx.write(response);
+		        ctx.flush();
+	        }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

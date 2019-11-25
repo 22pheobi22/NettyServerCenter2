@@ -42,7 +42,9 @@ public class AutoCancelTempConnect implements Runnable {
 						map.remove(entry.getKey());
 
 						ChannelHandlerContext ctx = entry.getKey();
-						ctx.close();
+						if(null!=ctx){
+							ctx.close();
+						}
 					}
 				}
 			} catch(Exception e) {

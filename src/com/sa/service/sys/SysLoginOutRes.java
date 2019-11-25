@@ -34,8 +34,9 @@ public class SysLoginOutRes extends Packet {
 			SystemServerManager.INSTANCE.sendPacketTo(this);
 
 			ChannelHandlerContext ctx =  ServerDataPool.SYSTEM_CHANNEL_MAP.get(this.getFromUserId());
-			ctx.close();
-
+			if(null!=ctx){
+				ctx.close();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
