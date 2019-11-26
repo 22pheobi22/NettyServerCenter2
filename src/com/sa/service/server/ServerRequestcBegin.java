@@ -1,6 +1,8 @@
 package com.sa.service.server;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.sa.base.ConfManager;
 import com.sa.base.ServerManager;
@@ -20,7 +22,8 @@ public class ServerRequestcBegin extends Packet {
 	@Override
 	public void execPacket() {
 		/** 校验用户角色*/
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), Constant.ROLE_TEACHER);
+		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_TEACHER);add(Constant.ROLE_PARENT_TEACHER);}};
+		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(),checkRoleSet);
 		/** 如果校验成功*/
 		if (0 == ((Integer) result.get("code"))) {
 			/** 如果有中心 并 目标IP不是中心IP*/

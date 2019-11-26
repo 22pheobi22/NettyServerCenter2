@@ -27,6 +27,7 @@ public class Constant {
 	public final static String ROLE_ASSISTANT = "ASSISTANT";// 助教
 	public final static String ROLE_STUDENT = "STUDENT";	// 学生
 	public final static String ROLE_AUDIENCE = "AUDIENCE";	// 听众
+	public final static String ROLE_PARENT_TEACHER="PARENT_TEACHER";//主讲老师
 	// -------------------------------------------------------------
 
 	// 权限

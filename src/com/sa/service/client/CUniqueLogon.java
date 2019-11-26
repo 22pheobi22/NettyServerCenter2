@@ -77,6 +77,9 @@ public class CUniqueLogon extends Packet {
 		} else if ("4".equals(role)) {
 			userRole.add(Constant.ROLE_AUDIENCE);
 		} else if ("5".equals(role)) {
+			
+		} else if ("0".equals(role)) {
+			userRole.add(Constant.ROLE_PARENT_TEACHER);
 		} else {
 			userRole.add(role);
 		}

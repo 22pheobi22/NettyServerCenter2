@@ -1,6 +1,8 @@
 package com.sa.service.server;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
@@ -17,8 +19,8 @@ public class ServerRequestcShareRemove extends Packet {
 	@Override
 	public void execPacket() {
 		/** 根据房间id和发信人id校验用户角色 */
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(),
-				Constant.ROLE_TEACHER);
+		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_TEACHER);add(Constant.ROLE_PARENT_TEACHER);}};
+		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), checkRoleSet);
 		/** 获取序列 1 的选项 */
 		String op1 = (String) this.getOption(1);
 		/** 如果选项不空 并 角色校验合格 */

@@ -15,7 +15,9 @@
 package com.sa.service.server;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
@@ -40,7 +42,8 @@ public class ServerRequestcGag extends Packet {
 	@Override
 	public void execPacket() {
 		/** 校验用户角色*/
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), Constant.ROLE_ASSISTANT);
+		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_ASSISTANT);}};
+		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(),checkRoleSet);
 
 		/** 实例化消息回执 并 赋值 并 执行*/
 		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();

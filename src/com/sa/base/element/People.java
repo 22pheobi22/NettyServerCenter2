@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class People {
+	private String userId = "";
 	// 姓名
 	private String name = "";
 	// 头像
@@ -68,6 +69,14 @@ public class People {
 
 	public void setAgoraId(String agoraId) {
 		this.agoraId = agoraId;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 }

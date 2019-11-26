@@ -225,6 +225,9 @@ public enum LoginManager {
 		} else if ("4".equals(role)) {
 			userRole.add(Constant.ROLE_AUDIENCE);
 		} else if ("5".equals(role)) {
+			
+		} else if ("0".equals(role)) {
+			userRole.add(Constant.ROLE_PARENT_TEACHER);
 		} else {
 			userRole.add(role);
 		}
@@ -261,8 +264,8 @@ public enum LoginManager {
 		ChannelHandlerContext temp = ServerDataPool.USER_CHANNEL_MAP.get(sl.getFromUserId());
 		/** 如果 用户通道 不为空 */
 		if (null != temp) {
-			/** 如果 不是 教师 */
-			if (!userRole.contains(Constant.ROLE_TEACHER)) {
+			/** 如果 不是 教师  和主讲老师*/
+			if (!(userRole.contains(Constant.ROLE_TEACHER)||userRole.contains(Constant.ROLE_PARENT_TEACHER))) {
 				map.put("code", 0);
 				map.put("result", temp);
 			} else {
@@ -298,7 +301,7 @@ public enum LoginManager {
 				int num = ServerDataPool.serverDataManager.getRoomTheSameUserCannotAccessNum(rId,
 						loginPact.getFromUserId());
 				/** 用户不是教师 */
-				if (!(userRole.contains(Constant.ROLE_TEACHER) && num > 1)) {
+				if (!userRole.contains(Constant.ROLE_TEACHER)&&!userRole.contains(Constant.ROLE_PARENT_TEACHER) && num > 1) {
 					/** 实例化 房间用户列表 下行 */
 					ClientResponebRoomUser crru = new ClientResponebRoomUser(loginPact.getPacketHead());
 					crru.setOption(11,

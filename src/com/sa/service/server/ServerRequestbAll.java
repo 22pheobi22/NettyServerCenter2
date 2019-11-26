@@ -14,7 +14,9 @@
  */
 package com.sa.service.server;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.sa.base.ConfManager;
 import com.sa.base.ServerManager;
@@ -36,7 +38,8 @@ public class ServerRequestbAll extends Packet {
 	@Override
 	public void execPacket() {
 		/** 校验用户角色是否符合*/
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), Constant.ROLE_SYSTEM);
+		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_SYSTEM);}};
+		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), checkRoleSet);
 		/** 如果校验成功*/
 		if (0 == ((Integer) result.get("code"))) {
 			/** 实例化 发送全体消息 下行 并执行*/

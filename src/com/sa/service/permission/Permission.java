@@ -3,6 +3,7 @@ package com.sa.service.permission;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.sa.base.ServerDataPool;
 import com.sa.util.Constant;
@@ -55,14 +56,14 @@ public enum Permission {
 
 		return setResult(code, msg);
 	}
-
+	
 	/*
 	 * 判断用户角色是否存在
 	 * String roomId	房间ID
 	 * String userId	用户ID
 	 * String role		被判断角色
 	 */
-	public Map<String, Object> checkUserRole(String roomId, String userId, String role) {
+	public Map<String, Object> checkUserRole(String roomId, String userId, Set<String> role) {
 		Integer code = 0;
 		String msg = "success";
 		String[] roomIds = roomId.split(",");
@@ -77,7 +78,8 @@ public enum Permission {
 					return setResult(10099, Constant.ERR_CODE_10099);
 				}
 				/** 如果角色不包含用户角色*/
-				if (!hs.contains(role)) {
+				role.retainAll(hs);
+				if (role.isEmpty()) {
 					code = 10081;
 					msg = Constant.ERR_CODE_10081;
 					

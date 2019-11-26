@@ -485,6 +485,32 @@ public class ServerDataManager {
 
 		return room.getPeoples();
 	}
+	
+	/**
+	 * 获取普通教师列表
+	 */
+	public Map<String, People> getRoomTeachers(String roomIds) {
+		Map<String, People> teachers = new HashMap<String, People>();
+		if (null == roomIds || "".equals(roomIds)) {
+			return teachers;
+		}
+
+		String[] rooms = roomIds.split(",");
+		for (String roomId : rooms) {
+			Room room = this.getRoom(roomId);
+			Map<String, People> peoples = room.getPeoples();
+
+			for (Entry<String, People> entry : peoples.entrySet()) {
+				if(entry.getValue().getRole().contains(Constant.ROLE_TEACHER)){
+					entry.getValue().setUserId(entry.getKey());
+					teachers.put(roomId, entry.getValue());
+
+					break;
+				}
+			}
+		}
+		return teachers;
+	}
 
 	/**
 	 * 获取人员
