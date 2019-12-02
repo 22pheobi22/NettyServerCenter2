@@ -301,7 +301,7 @@ public enum LoginManager {
 				int num = ServerDataPool.serverDataManager.getRoomTheSameUserCannotAccessNum(rId,
 						loginPact.getFromUserId());
 				/** 用户不是教师 */
-				if (!userRole.contains(Constant.ROLE_TEACHER)&&!userRole.contains(Constant.ROLE_PARENT_TEACHER) && num > 1) {
+				if (!((userRole.contains(Constant.ROLE_TEACHER)||userRole.contains(Constant.ROLE_PARENT_TEACHER)) && num > 1)) {
 					/** 实例化 房间用户列表 下行 */
 					ClientResponebRoomUser crru = new ClientResponebRoomUser(loginPact.getPacketHead());
 					crru.setOption(11,
