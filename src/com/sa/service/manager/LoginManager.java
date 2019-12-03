@@ -265,12 +265,12 @@ public enum LoginManager {
 		/** 如果 用户通道 不为空 */
 		if (null != temp) {
 			/** 如果 不是 教师  和主讲老师*/
-			if (!(userRole.contains(Constant.ROLE_TEACHER)||userRole.contains(Constant.ROLE_PARENT_TEACHER))) {
+			//if (!(userRole.contains(Constant.ROLE_TEACHER)||userRole.contains(Constant.ROLE_PARENT_TEACHER))) {
 				map.put("code", 0);
 				map.put("result", temp);
-			} else {
+			/*} else {
 				map.put("code", 10093);
-			}
+			}*/
 		}
 		return map;
 	}
