@@ -50,10 +50,28 @@ public class Share {
 	 * 修改集合中某一个值
 	 */
 	public int updListContent(int index, Object obj) {
+		int rs = this.ifnull();
+
+		if (-1 == rs) {
+			this.listContent = new ArrayList<>();
+		}
+		
+		this.listContent.set(index, obj);
+		
 		return 0;
 	}
 
 	public int updListContent(Object oldObj, Object newObj) {
+		int rs = this.ifnull();
+
+		if (-1 == rs) {
+			this.listContent = new ArrayList<>();
+		}
+		for (int i = 0; i < this.listContent.size(); i++) {
+			if(this.listContent.get(i).equals(oldObj)){
+				this.listContent.set(i, newObj);
+			}
+		}
 		return 0;
 	}
 

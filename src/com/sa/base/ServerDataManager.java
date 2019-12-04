@@ -117,6 +117,30 @@ public class ServerDataManager {
 			share.add(value);
 		}
 	}
+	
+	/**
+	 * 更新共享
+	 */
+	public int updateShare(String roomId, String key, String value,int index) {
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
+
+		int rs = room.getShare().get(key).updListContent(index,value);
+
+		return rs;
+	}
+	
+	/**
+	 * 更新共享
+	 */
+	public int updateShare(String roomId, String key, String oldValue,String newValue) {
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
+
+		int rs = room.getShare().get(key).updListContent(oldValue,newValue);
+
+		return rs;
+	}
 
 	/**
 	 * 移出共享

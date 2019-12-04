@@ -86,7 +86,8 @@ public class ServerRequestbShareUpd extends Packet {
 		String index = (String) this.getOption(5); // -1:从最后数;正数：从前面数
 		String len = (String) this.getOption(6);
 		String indexs = (String) this.getOption(7);
-
+		String newShareV = (String) this.getOption(8);
+		
 		int rs = 0;
 		if ("del".equalsIgnoreCase(shareOptType)) {
 			ServerDataPool.serverDataManager.removeShare(this.getRoomId(), shareK);
@@ -101,6 +102,12 @@ public class ServerRequestbShareUpd extends Packet {
 		} else if ("upd".equalsIgnoreCase(shareOptType)) {
 			/** 设置房间共享文件 */
 			ServerDataPool.serverDataManager.setShare(this.getRoomId(), shareK, shareV, shareType);
+		} else if ("upd.index".equalsIgnoreCase(shareOptType)) {
+			/** 更新房间共享文件 */
+			ServerDataPool.serverDataManager.updateShare(this.getRoomId(), shareK, newShareV,Integer.parseInt(index));
+		} else if ("upd.value".equalsIgnoreCase(shareOptType)) {
+			/** 更新房间共享文件 */
+			ServerDataPool.serverDataManager.updateShare(this.getRoomId(), shareK, shareV,newShareV);
 		}
 
 		return rs;
