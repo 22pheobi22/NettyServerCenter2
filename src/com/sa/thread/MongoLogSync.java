@@ -140,6 +140,12 @@ public class MongoLogSync extends BaseSync {
 	 */
 	private void saveLog(){
 		String todayDateStr =  DateUtil.format(new Date(), DateUtil.DATE_FORMAT_03);
+		String[] indexFieldNames = {"fromUserId","keyPutTime","packetType","roomId"};
+		for (String indexFieldName : indexFieldNames) {
+			mongoUtil.addIndex(collectionName+"_"+todayDateStr, indexFieldName, false);
+		}
+		mongoUtil.addTextIndex(collectionName+"_"+todayDateStr, "packet", false);
+		
 		synchronized (MongoLogSync.class){
 			//本次日志的总数量
 			int logTotalSize = ServerDataPool.log.size();
