@@ -177,13 +177,28 @@ public final class MongoDBUtil {
 	 * @date: 2019年1月8日 下午5:11:33 Pursuing Excelsior!
 	 */
 	public void addIndex(MongoCollection<org.bson.Document> collection, String field, boolean isUnique) {
+		addIndex(collection, field, 1, isUnique);
+	}
+	public void addTextIndex(MongoCollection<org.bson.Document> collection, String field, boolean isUnique) {
+		addIndex(collection, field, "text", isUnique);
+	}
+	public void addIndex(MongoCollection<org.bson.Document> collection, String field,Object type, boolean isUnique) {
 		BasicDBObject fieldDBObj = new BasicDBObject();
-		fieldDBObj.put(field, 1);
+		fieldDBObj.put(field, type);
 		IndexOptions indexOptions = new IndexOptions();
 		indexOptions.unique(isUnique);
+		ListIndexesIterable<Document> indexs = collection.listIndexes();
+		for (Document document : indexs) {
+			if(document.get("key")==null){
+				continue;
+			}
+			boolean containsIndex = ((Document)document.get("key")).get(field)!=null;
+			if(containsIndex){
+				return ;
+			}
+		}
 		collection.createIndex(fieldDBObj, indexOptions);
 	}
-
 	/**
 	 * 添加索引
 	 * 
@@ -327,6 +342,11 @@ public final class MongoDBUtil {
 	public void addIndex(String collectionName, String field, boolean isUnique) {
 		MongoCollection<Document> mongoCollection = mongoDBUtil.getCollection(config.getDb(), collectionName);
 		addIndex(mongoCollection, field, isUnique);
+	}
+	
+	public void addTextIndex(String collectionName, String field, boolean isUnique) {
+		MongoCollection<Document> mongoCollection = mongoDBUtil.getCollection(config.getDb(), collectionName);
+		addTextIndex(mongoCollection, field, isUnique);
 	}
 
 	/**
