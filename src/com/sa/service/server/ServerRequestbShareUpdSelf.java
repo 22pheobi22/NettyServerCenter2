@@ -25,32 +25,32 @@ import com.sa.base.ServerManager;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientMsgReceipt;
-import com.sa.service.client.ClientResponebShareUpd;
 import com.sa.service.permission.Permission;
 import com.sa.util.Constant;
 
-public class ServerRequestbShareUpd extends Packet {
-	public ServerRequestbShareUpd(){}
+public class ServerRequestbShareUpdSelf extends Packet {
+	public ServerRequestbShareUpdSelf(){}
 
 	@Override
 	public PacketType getPacketType() {
-		return PacketType.ServerRequestbShareUpd;
+		return PacketType.ServerRequestbShareUpdSelf;
 	}
 
 	@Override
 	public void execPacket() {
 		/** 根绝房间id 和 发信人id 校验用户角色 */
 		//String userId = this.getFromUserId().replace("APP", "");
-		/*String userId = this.getFromUserId();
+/*		String userId = this.getFromUserId();
 		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_TEACHER);add(Constant.ROLE_PARENT_TEACHER);}};
 		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), userId,checkRoleSet);
 		if (0 != ((Integer) result.get("code"))) {
 			result = Permission.INSTANCE.checkUserAuth(this.getRoomId(), userId, (String) this.getOption(100));
 		}*/
+
 		Map<String, Object> result = new HashMap<>();
 		result.put("code", 0);
 		result.put("msg", "success");
-
+		
 		/** 实例化消息回执 并 赋值 并 执行 */
 		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
 
@@ -71,9 +71,6 @@ public class ServerRequestbShareUpd extends Packet {
 								setShare();
 							}
 						}
-
-						/** 实例化 变更共享 下行 并 赋值 并 执行 */
-						new ClientResponebShareUpd(this.getPacketHead(), this.getOptions()).execPacket();
 					}
 				}
 			}
