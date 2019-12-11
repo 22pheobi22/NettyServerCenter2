@@ -7,6 +7,7 @@ import java.util.Map;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sa.base.ConfManager;
+import com.sa.base.ServerDataManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.ServerManager;
 import com.sa.base.element.ChannelExtend;
@@ -91,6 +92,7 @@ public enum LoginManager {
 		} else {
 			
 			/** 校验 单点登录 判断是否是普通用户 单点登录 或 所有用户 首次登录 */
+			//判断用户是否登陆过 code=1未登录 code=0已登录
 			Map<String,Object> checkUniqueLogonResult = checkUniqueLogon(loginPact, userRole, context);
 			
 			/** 返回：code!=1 教師二次登錄 */
@@ -98,7 +100,7 @@ public enum LoginManager {
 				code = 10093;
 				msg = Constant.ERR_CODE_10093;
 			} else if("0".equals(String.valueOf(checkUniqueLogonResult.get("code")))){
-				//result 不为空是普通用户二次登录 则注销上次登录
+				//已登录则注销上次登录
 				doLogonUngister(loginPact, (ChannelHandlerContext)checkUniqueLogonResult.get("result"));
 			}
 
@@ -131,7 +133,7 @@ public enum LoginManager {
 		ClientMsgReceipt mr = new ClientMsgReceipt(sl.getTransactionId(), sl.getRoomId(), sl.getFromUserId(),
 				10098);
 		mr.setOption(254, Constant.ERR_CODE_10098);
-		/** 发送 消息回执 */
+		/** 发送 消息回执 *///给原通道
 		try {
 			ServerManager.INSTANCE.sendPacketTo(mr, temp, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
@@ -139,6 +141,7 @@ public enum LoginManager {
 		}
 		// TODO
 		//给房间用户发消息 通知用户注销
+		mr.setFromUserId(sl.getFromUserId());
 		noticeUserUngister(mr);
 
 		/** 注销通道 */
@@ -277,7 +280,12 @@ public enum LoginManager {
 
 	/** 通知房间内用户 */
 	private void noticeUserUngister(ClientMsgReceipt mr) {
-		String[] roomIds = mr.getRoomId().split(",");
+		String[] roomIds = null;
+		//向用户原来所在房间发减员消息 
+		String roomNo = ServerDataPool.serverDataManager.getUserRoomNo(mr.getFromUserId());
+		if(null!=roomNo){
+			roomIds = roomNo.split(",");
+		}
 		if (roomIds != null && roomIds.length > 0) {
 			// 循环通知每个房间的用户
 			for (String rId : roomIds) {

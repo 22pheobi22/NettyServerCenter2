@@ -124,8 +124,12 @@ public class ServerDataManager {
 	public int updateShare(String roomId, String key, String value,int index) {
 		// 根据roomid获取房间信息
 		Room room = this.getRoom(roomId);
-
-		int rs = room.getShare().get(key).updListContent(index,value);
+		int rs =0;
+				
+		Share share = room.getShare().get(key);
+		if(null!=share){
+			rs = share.updListContent(index,value);
+		}
 
 		return rs;
 	}
@@ -136,8 +140,12 @@ public class ServerDataManager {
 	public int updateShare(String roomId, String key, String oldValue,String newValue) {
 		// 根据roomid获取房间信息
 		Room room = this.getRoom(roomId);
-
-		int rs = room.getShare().get(key).updListContent(oldValue,newValue);
+		int rs =0;
+		
+		Share share = room.getShare().get(key);
+		if(null!=share){
+			rs = share.updListContent(oldValue,newValue);
+		}
 
 		return rs;
 	}

@@ -22,7 +22,7 @@ public class ServerRequestcBegin extends Packet {
 	@Override
 	public void execPacket() {
 		/** 校验用户角色*/
-		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_TEACHER);add(Constant.ROLE_PARENT_TEACHER);}};
+		Set<String> checkRoleSet = new HashSet<String>(){{add(Constant.ROLE_TEACHER);add(Constant.ROLE_PARENT_TEACHER);}};
 		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(),checkRoleSet);
 		/** 如果校验成功*/
 		if (0 == ((Integer) result.get("code"))) {
