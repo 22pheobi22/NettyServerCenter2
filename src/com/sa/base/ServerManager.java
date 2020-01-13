@@ -56,6 +56,8 @@ public enum ServerManager {
 	public void sendPacketTo(Packet pact, String consoleHead) throws Exception {
 		// 如果数据包为空 或 数据接收者是中心 返回
 		if(pact == null || "0".equals(pact.getToUserId())) return;
+		//因为是中心发消息，不会出现中心-中心循环发送的情况，故去掉此判断
+		//if(pact == null) return;
 
 		// 获取缓存的 用户-通道信息
 		Map<String, ChannelHandlerContext> contextMap  = ServerDataPool.USER_CHANNEL_MAP;
@@ -289,7 +291,6 @@ public enum ServerManager {
 				}
 			}
 		}
-
 	}
 	/**
 	 * 登录、注册、上线、绑定
@@ -313,6 +314,9 @@ public enum ServerManager {
 			// 将用户信息缓存
 			ServerDataPool.serverDataManager.setRoomUser(roomId, userId, name, icon, userRole, notSpeak);
 		}
+		/** 删除 缓存通道 */
+		ServerDataPool.TEMP_CONN_MAP2.remove(userId);
+		ServerDataPool.TEMP_CONN_MAP.remove(context);
 	}
 
 	/**
