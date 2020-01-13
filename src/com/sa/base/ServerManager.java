@@ -313,6 +313,9 @@ public enum ServerManager {
 			// 将用户信息缓存
 			ServerDataPool.serverDataManager.setRoomUser(roomId, userId, name, icon, userRole, notSpeak);
 		}
+		/** 删除 缓存通道 */
+		ServerDataPool.TEMP_CONN_MAP2.remove(userId);
+		ServerDataPool.TEMP_CONN_MAP.remove(context);
 	}
 
 	/**

@@ -21,6 +21,7 @@ import com.sa.net.codec.PacketDecoder;
 import com.sa.net.codec.PacketEncoder;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -72,6 +73,7 @@ public class ClientSocketServcer implements Runnable {
 			// 当有操作操作超出指定空闲秒数时，便会触发UserEventTriggered事件
 			pipeline.addLast("idleStateHandler", new IdleStateHandler(60, 0, 0));
 			pipeline.addLast(new ClientSocketServcerHandler());
+			//pipeline.addLast(new ClientTransportHandler());
 		}
 	}
 

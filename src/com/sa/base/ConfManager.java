@@ -8,7 +8,32 @@ import com.sa.util.StringUtil;
 public class ConfManager {
 	/** 运行配置 */
 	public static Map<String, String> CONF_MAP = new HashMap<>();
+	
+	//获取服务ip和端口
+	/** 普通服务器ip */
+	public static String[] getServerAddress() {
+		String strAddress = CONF_MAP.get("server.address");
+		String[] split = strAddress.split(";");
 
+		return  split;
+	}
+	//获取另一个中心的ip
+	/** 另一个中心的ip */
+	public static String getCenterIpAnother() {
+		String strIp = CONF_MAP.get("center.ip.another");
+		strIp = null==strIp || "".equals(strIp) ? "127.0.0.1" : strIp;
+
+		return  strIp;
+	}
+	//获取另一个中心的端口
+	/** 另一个中心的端口 */
+	public static int getCenterPortAnother() {
+		String strPort = CONF_MAP.get("center.port.another");
+		strPort = null==strPort || "".equals(strPort) ? "8080" : strPort;
+
+		return  Integer.parseInt(strPort);
+	}
+	
 	/** 服务器端口 */
 	public static int getClientSoketServerPort() {
 		String strPort = CONF_MAP.get("clientsoket.server.port");

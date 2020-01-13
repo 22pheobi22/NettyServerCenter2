@@ -9,7 +9,7 @@ public class ServerHeartBeat extends Packet{
 		this.setTransactionId(0);
 		this.setRoomId("0");
 		this.setFromUserId("0");
-		this.setToUserId("0");;
+		this.setToUserId("0");
 		this.setStatus(0);
 	}
 

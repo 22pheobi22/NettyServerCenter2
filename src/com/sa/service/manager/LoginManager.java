@@ -70,7 +70,7 @@ public enum LoginManager {
 		}
 		/** 格式化 用户角色 */
 		HashSet<String> userRole = toRole(role);
-		//进行角色校验  返回为空map 则验证失败 
+		//进行角色校验  返回非空map 则验证失败 
 		Map<String, Object> roleValidate = doRoleValidate(userRole, role);
 		if (!roleValidate.isEmpty()) {
 			code = (int) roleValidate.get("code");
@@ -114,8 +114,8 @@ public enum LoginManager {
 		clientLogin(loginPact, code, msg, role, context);
 
 		/** 删除 缓存通道 */
-		ServerDataPool.TEMP_CONN_MAP2.remove(loginPact.getFromUserId());
-		ServerDataPool.TEMP_CONN_MAP.remove(context);
+		/*ServerDataPool.TEMP_CONN_MAP2.remove(loginPact.getFromUserId());
+		ServerDataPool.TEMP_CONN_MAP.remove(context);*/
 	}
 
 	private void doLogin(ServerLogin loginPact,ChannelExtend ce,HashSet<String> userRole,ChannelHandlerContext context,String role) {

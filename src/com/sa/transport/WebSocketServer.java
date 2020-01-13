@@ -15,7 +15,12 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
-public class WebSocketServer {
+public class WebSocketServer implements Runnable{
+	private int port = 0;
+
+	public WebSocketServer(int port) {
+		this.port = port;
+	}
 	public void bind(int port) throws IOException {
 		// 避免使用默认线程数参数
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -50,6 +55,15 @@ public class WebSocketServer {
 			pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
 			pipeline.addLast("http-chunked", new ChunkedWriteHandler());
 			pipeline.addLast("handler", new WebSocketServerHandler());
+		}
+	}
+
+	@Override
+	public void run() {
+		try {
+			this.bind(port);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
