@@ -135,6 +135,18 @@ public class JedisUtil {
         }
         return null;
     }
+    
+    public Map<String, String> getHashAll(String key) {
+        Jedis jedis = jedisPool.getJedis();
+        try {
+            return jedis.hgetAll(key);
+        } catch (Exception e) {
+            logger.debug("getHashAll() key {} throws:{}", key,e.getMessage());
+        } finally {
+            close(jedis);
+        }
+        return null;
+    }
 
     public List<String> getHashValsAll(String key) {
         Jedis jedis = jedisPool.getJedis();
@@ -154,6 +166,18 @@ public class JedisUtil {
             return jedis.hkeys(key);
         } catch (Exception e) {
             logger.debug("getHashValsAll() key {} throws:{}", key,e.getMessage());
+        } finally {
+            close(jedis);
+        }
+        return null;
+    }
+    
+    public Set<String> getKeysAll(String key) {
+        Jedis jedis = jedisPool.getJedis();
+        try {
+            return jedis.keys(key);
+        } catch (Exception e) {
+            logger.debug("getValsAll() key {} throws:{}", key,e.getMessage());
         } finally {
             close(jedis);
         }

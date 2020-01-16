@@ -31,38 +31,38 @@ public class CUniqueLogon extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 如果目标地址是中心地址*/
+		/** 如果目标地址是中心地址*//*
 		if (this.getRemoteIp().equals(ConfManager.getCenterIp())) {
-			/** 从临时缓存中获取发信人通道*/
+			*//** 从临时缓存中获取发信人通道*//*
 			ChannelHandlerContext context = ServerDataPool.TEMP_CONN_MAP2.get(this.getFromUserId());
-			/** 删除临时缓存*/
+			*//** 删除临时缓存*//*
 			ServerDataPool.TEMP_CONN_MAP2.remove(this.getToUserId());
 			ChannelExtend ce = ServerDataPool.TEMP_CONN_MAP.remove(context);
-			/** 如果状态为0*/
+			*//** 如果状态为0*//*
 			if (this.getStatus() ==0) {
-				/** 获取用户角色*/
+				*//** 获取用户角色*//*
 				HashSet<String> userRole = toRole((String) this.getOption(2));
-				/** 用户注册*/
+				*//** 用户注册*//*
 				ServerManager.INSTANCE.addOnlineContext(this.getRoomId(),
 						this.getFromUserId(), (String) this.getOption(3),
 						(String) this.getOption(4), userRole,
 						ConfManager.getTalkEnable(), context, ce.getChannelType());
-				/** 实例化房间用户列表 并 赋值 并 执行*/
+				*//** 实例化房间用户列表 并 赋值 并 执行*//*
 				ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
 				crru.setRemoteIp(this.getRemoteIp());
 				crru.setOption(11, "{\"id\":\""+this.getFromUserId()+"\",\"name\":\""+this.getOption(3)+"\",\"icon\":\""+this.getOption(4)+"\",\"role\":[\""+this.getOption(2)+"\"]}");
 
 				crru.execPacket();
 			}
-			/** 实例化登录信息 下行*/
+			*//** 实例化登录信息 下行*//*
 			ClientLogin cl = new ClientLogin(this.getPacketHead(), this.getOptions());
 			try {
-				/** 发消息给发信人*/
+				*//** 发消息给发信人*//*
 				ServerManager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 
 	private HashSet<String> toRole(String role) {
