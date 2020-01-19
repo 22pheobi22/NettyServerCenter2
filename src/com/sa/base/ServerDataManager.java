@@ -65,9 +65,8 @@ public class ServerDataManager {
 	 * 获取共享
 	 */
 	public Map<String, Share> getShare(String roomId) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 
 		return room.getShare();
 	}
@@ -76,9 +75,8 @@ public class ServerDataManager {
 	 * 获取共享
 	 */
 	public Object getShare(String roomId, String key) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+				Room room = this.getRoom(roomId);
 
 		Share share = room.getShare().get(key);
 		if (null == share) {
@@ -92,10 +90,9 @@ public class ServerDataManager {
 	 * 获取共享
 	 */
 	public List<Object> getShareList(String roomId, String key) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
-
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
+		
 		Share share = room.getShare().get(key);
 		if (null == share) {
 			return null;
@@ -108,9 +105,8 @@ public class ServerDataManager {
 	 * 设置共享
 	 */
 	public void setShare(String roomId, String key, String value, String type) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 
 		Map<String, Share> shareMap = room.getShare();
 
@@ -125,25 +121,22 @@ public class ServerDataManager {
 		} else if ("n".equals(share.getType())) {
 			share.add(value);
 		}
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 	}
 
 	/**
 	 * 更新共享
 	 */
 	public int updateShare(String roomId, String key, String value, int index) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 		int rs = 0;
 
 		Share share = room.getShare().get(key);
 		if (null != share) {
 			rs = share.updListContent(index, value);
 		}
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 
 		return rs;
 	}
@@ -152,17 +145,15 @@ public class ServerDataManager {
 	 * 更新共享
 	 */
 	public int updateShare(String roomId, String key, String oldValue, String newValue) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 		int rs = 0;
 
 		Share share = room.getShare().get(key);
 		if (null != share) {
 			rs = share.updListContent(oldValue, newValue);
 		}
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 
 		return rs;
 	}
@@ -171,13 +162,11 @@ public class ServerDataManager {
 	 * 移出共享
 	 */
 	public int removeShare(String roomId, String key, String value) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 
 		int rs = room.getShare().get(key).removeListContent(value);
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 
 		return rs;
 	}
@@ -186,13 +175,11 @@ public class ServerDataManager {
 	 * 移出共享
 	 */
 	public Object removeShare(String roomId, String key) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 
 		Object obj = room.getShare().remove(key);
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 
 		return obj;
 	}
@@ -201,21 +188,18 @@ public class ServerDataManager {
 	 * 移出共享
 	 */
 	public int removeShare(String roomId, String key, int index, int len) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 
 		int rs = room.getShare().get(key).removeListContent(index, len);
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 
 		return rs;
 	}
 
 	public void removeShare(String roomId, String key, String[] arr) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 		Share share = room.getShare().get(key);
 
 		Object[] index = sort_asc(arr);
@@ -224,8 +208,7 @@ public class ServerDataManager {
 				share.removeListContent((int) index[i]);
 			}
 		}
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 
 	}
 
@@ -245,9 +228,8 @@ public class ServerDataManager {
 	 * 注销聊天室
 	 */
 	public Room removeRoom(String roomId) {
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 
 		Map<String, People> peoplesMap = room.getPeoples();
 		for (Entry<String, People> people : peoplesMap.entrySet()) {
@@ -294,17 +276,16 @@ public class ServerDataManager {
 	 */
 	public synchronized People removeRoomUser(String roomId, String userId) {
 
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
+		
 		// 获取根据userid被成功删除的人员信息
 		People people = room.getPeoples().remove(userId);
 		// 如果人员信息不为空
 		if (null != people) {
 			// 设置房间内人数-1
 			room.setPeopleNum(room.getPeopleNum() - 1);
-			roomStr = JSON.toJSONString(room);
-			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 		}
 
 		this.print("removeRoomUser");
@@ -317,9 +298,8 @@ public class ServerDataManager {
 	 */
 	public People notSpeakAuth(String roomId, String userId) {
 
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 
 		// 根据userId获取用户信息
 		People people = room.getPeoples().get(userId);
@@ -330,8 +310,8 @@ public class ServerDataManager {
 			room.getPeoples().put(userId, people);
 
 			room.getNotSpeakPeoples().put(userId, 0);
-			roomStr = JSON.toJSONString(room);
-			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
+
 			System.out.println("userId:" + userId + "==auth:" + people.getAuth().get(Constant.AUTH_SPEAK));
 		}
 		return people;
@@ -342,9 +322,8 @@ public class ServerDataManager {
 	 */
 	public People speakAuth(String roomId, String userId) {
 
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 		// 根据userId获取用户信息
 		People people = room.getPeoples().get(userId);
 		// 如果人员信息不为空
@@ -352,8 +331,7 @@ public class ServerDataManager {
 			// 设置用户禁言状态
 			people.getAuth().put(Constant.AUTH_SPEAK, 1);
 			room.getNotSpeakPeoples().remove(userId);
-			roomStr = JSON.toJSONString(room);
-			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 		}
 
 		return people;
@@ -364,9 +342,8 @@ public class ServerDataManager {
 	 */
 	public void removeRoomAuth(String roomId, HashSet<String> roomRoles) {
 
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 		// 遍历房间内人员信息Map
 		for (Map.Entry<String, People> entry : room.getPeoples().entrySet()) {
 			// 获取人员角色
@@ -383,8 +360,7 @@ public class ServerDataManager {
 		}
 		// 删除禁止操作角色权限
 		room.getNotDoRole().removeAll(roomRoles);
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 	}
 
 	/**
@@ -394,9 +370,9 @@ public class ServerDataManager {
 	 */
 	public void setRoomRole(String roomId, HashSet<String> roomRoles, boolean notSpeak) {
 
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
+		
 		// 设置初始化禁止操作角色
 		room.setNotDoRole(roomRoles);
 		// 设置初始化禁止操作角色
@@ -423,26 +399,27 @@ public class ServerDataManager {
 				room.getNotSpeakPeoples().remove(entry.getKey());
 			}
 		}
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
+
 	}
 
 	/**
 	 * 获取房间
 	 */
 	public Room getRoom(String roomId) {
-
+		Room room = null;
 		// 根据roomId获取房间信息
 		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
 		// 如果没有该房间
-		if (null == room) {
+		if (null == roomStr || "".equals(roomStr)) {
 			// 实例化一个房间
 			room = new Room();
+			// 创建房间
+			roomStr = JSON.toJSONString(room);
+			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		} else {
+			room = JSON.parseObject(roomStr, Room.class);
 		}
-		// 创建房间
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
 
 		return room;
 	}
@@ -467,9 +444,8 @@ public class ServerDataManager {
 	public synchronized void setRoomUser(String roomId, String userId, String name, String icon, String agoraId,
 			HashSet<String> userRole, boolean notSpeak) {
 
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 		// 获取房间内人员信息Map
 		Map<String, People> peopleMap = room.getPeoples();
 		// 根据userId获取用户信息
@@ -527,9 +503,8 @@ public class ServerDataManager {
 	public synchronized void setRoomUser(String roomId, String userId, String name, String icon,
 			HashSet<String> userRole, boolean notSpeak) {
 
-		// 根据roomId获取房间信息
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		Room room = JSON.parseObject(roomStr, Room.class);
+		// 根据roomid获取房间信息
+		Room room = this.getRoom(roomId);
 		// 获取房间内人员信息Map
 		Map<String, People> peopleMap = room.getPeoples();
 		// 根据userId获取用户信息
@@ -585,9 +560,8 @@ public class ServerDataManager {
 	 */
 	public Map<String, People> getRoomUesrs(String roomId) {
 
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
 		// 根据roomid获取房间信息
-		Room room = JSON.parseObject(roomStr, Room.class);
+		Room room = this.getRoom(roomId);
 
 		this.print("getRoomUesrs");
 
@@ -606,9 +580,8 @@ public class ServerDataManager {
 
 		String[] rooms = roomIds.split(",");
 		for (String roomId : rooms) {
-			String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
 			// 根据roomid获取房间信息
-			Room room = JSON.parseObject(roomStr, Room.class);
+			Room room = this.getRoom(roomId);
 			Map<String, People> peoples = room.getPeoples();
 
 			for (Entry<String, People> entry : peoples.entrySet()) {
@@ -651,9 +624,8 @@ public class ServerDataManager {
 	 */
 	public void setRoomUserDefAuth(String roomId, String userId, String roleCode, String flag, String num) {
 
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
 		// 根据roomid获取房间信息
-		Room room = JSON.parseObject(roomStr, Room.class);
+		Room room = this.getRoom(roomId);
 
 		// 获取房间内人员信息Map
 		Map<String, People> peopleMap = getRoomUesrs(roomId);
@@ -674,8 +646,8 @@ public class ServerDataManager {
 				people.getAuth().remove(roleCode);
 			}
 			room.getPeoples().put(userId, people);
-			roomStr = JSON.toJSONString(room);
-			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
+
 		}
 	}
 
@@ -700,9 +672,8 @@ public class ServerDataManager {
 	 */
 	public HashMap<String, Integer> getRoomUesrAuth(String roomId, String userId) {
 
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
 		// 根据roomid获取房间信息
-		Room room = JSON.parseObject(roomStr, Room.class);
+		Room room = this.getRoom(roomId);
 		// 获取房间内人员信息Map
 		Map<String, People> peopleMap = room.getPeoples();
 		// 根据userId获取用户信息
@@ -756,10 +727,9 @@ public class ServerDataManager {
 	 */
 	public List<Logs> getRoomChats(String roomId, String chatKey, int chatNum) {
 
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
-		boolean check = true;
 		// 根据roomid获取房间信息
-		Room room = JSON.parseObject(roomStr, Room.class);
+		Room room = this.getRoom(roomId);
+		boolean check = true;
 
 		ChatLog chatLog = room.getChatLog();
 
@@ -811,9 +781,8 @@ public class ServerDataManager {
 	/** 设置消息缓存 */
 	public synchronized void setRoomChats(String roomId, String chatKey, String userId, String msg) {
 
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
 		// 根据roomid获取房间信息
-		Room room = JSON.parseObject(roomStr, Room.class);
+		Room room = this.getRoom(roomId);
 
 		ChatLog chatLog = room.getChatLog();
 
@@ -855,17 +824,14 @@ public class ServerDataManager {
 
 		logsList.add(logs);
 
-		roomStr = JSON.toJSONString(room);
-		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+		jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 	}
 
 	/** 清除历史消息记录 */
 	public void cleanLogs(String roomId) {
 
-		String roomStr = jedisUtil.getString(ROOM_INFO_MAP_KEY + roomId);
 		// 根据roomid获取房间信息
-		Room room = JSON.parseObject(roomStr, Room.class);
-		// JSONObject roomObject = JSON.parseObject(roomStr);
+		Room room = this.getRoom(roomId);
 
 		if (null != room) {
 			ChatLog chatLog = room.getChatLog();
@@ -877,7 +843,7 @@ public class ServerDataManager {
 					chatLog.getLogPostion().clear();
 				}
 			}
-			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, roomStr);
+			jedisUtil.setString(ROOM_INFO_MAP_KEY + roomId, JSON.toJSONString(room));
 		}
 	}
 
@@ -939,7 +905,7 @@ public class ServerDataManager {
 	public void delUserServer(String userId) {
 		jedisUtil.delHash(USER_SERVERIP_MAP_KEY, userId);
 	}
-	
+
 	/** 获取用户所在服务器通道 */
 	public ChannelHandlerContext getUserServerChannel(String userId) {
 		String userServerIp = getUserServerIp(userId);
@@ -956,13 +922,13 @@ public class ServerDataManager {
 		return userServerIp;
 	}
 
-	/**根據用戶id--获取用户所在房间其他用户所在服务ip列表--若不包含发信者ip则除外*/
-	public List<ChannelHandlerContext> getChannelListOfUserRoomByUserId(String userId){
+	/** 根據用戶id--获取用户所在房间其他用户所在服务ip列表--若不包含发信者ip则除外 */
+	public List<ChannelHandlerContext> getChannelListOfUserRoomByUserId(String userId) {
 		List<ChannelHandlerContext> channelList = new ArrayList<>();
 		Set<String> serverIpList = getServerListOfUserRoomByUserId(userId);
 		for (String serverIp : serverIpList) {
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(serverIp);
-			if(null!=ctx){
+			if (null != ctx) {
 				channelList.add(ctx);
 			}
 		}

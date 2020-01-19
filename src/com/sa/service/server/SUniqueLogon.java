@@ -46,6 +46,7 @@ public class SUniqueLogon extends Packet {
 		int code = 0;
 		String msg = "成功";
 		
+		String fromServerIp = (String) this.getOption(100);
 		/** 获取 用户 角色 */
 		String role = (String) this.getOption(2);
 		/** 格式化 用户角色 */
@@ -62,10 +63,10 @@ public class SUniqueLogon extends Packet {
 			doLogonUngister((ChannelHandlerContext)checkUniqueLogonResult.get("result"));
 		}
 		//獲取最新登錄服務IP
-		if(null!=this.getRemoteIp()&&!"".equals(this.getRemoteIp())){
+		if(null==fromServerIp||"".equals(fromServerIp)){
 			return;
 		}
-		ChannelHandlerContext context = ServerDataPool.USER_CHANNEL_MAP.get(this.getRemoteIp());
+		ChannelHandlerContext context = ServerDataPool.USER_CHANNEL_MAP.get(fromServerIp);
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(context);
 		if(null==context||null == ce || null == ce.getConnBeginTime()){
 			return;
@@ -146,40 +147,43 @@ public class SUniqueLogon extends Packet {
 	}
 
 	private void doLogonUngister(ChannelHandlerContext temp) {
-		/** 实例化 消息回执 */
+		//
+		CUniqueLogon cl = new CUniqueLogon(this.getTransactionId(), this.getRoomId(), this.getFromUserId(),
+				10098);
+		/** 实例化 消息回执 *//*
 		ClientMsgReceipt mr = new ClientMsgReceipt(this.getTransactionId(), this.getRoomId(), this.getFromUserId(),
 				10098);
-		mr.setOption(254, Constant.ERR_CODE_10098);
-		/** 发送 消息回执 *///给原通道服务器
+		cl.setOption(254, Constant.ERR_CODE_10098);
+		*//** 发送 消息回执 *//*//给原通道服务器
 		try {
 			ServerManager.INSTANCE.sendPacketTo(mr, temp, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		//给房间用户发消息 通知用户注销
-		mr.setFromUserId(this.getFromUserId());
-		noticeUserUngister(mr);
+		//mr.setFromUserId(this.getFromUserId());
+		noticeUserUngister(cl);
 		
 		//注銷用戶信息
 		ServerManager.INSTANCE.ungisterUserInfo(this.getFromUserId());
 	}
 	
 	/** 通知房间内用户 */
-	private void noticeUserUngister(ClientMsgReceipt mr) {
+	private void noticeUserUngister(CUniqueLogon cl) {
 		String[] roomIds = null;
 		//向用户原来所在房间发减员消息 
-		String roomNo = ServerDataPool.serverDataManager.getUserRoomNo(mr.getFromUserId());
+		String roomNo = ServerDataPool.serverDataManager.getUserRoomNo(cl.getFromUserId());
 		if(null!=roomNo){
 			roomIds = roomNo.split(",");
 		}
 		if (roomIds != null && roomIds.length > 0) {
 			// 循环通知每个房间的用户
 			for (String rId : roomIds) {
-				ClientResponebRoomUser crru = new ClientResponebRoomUser(mr.getPacketHead());
+				ClientResponebRoomUser crru = new ClientResponebRoomUser(cl.getPacketHead());
 				crru.setFromUserId(this.getFromUserId());
 				crru.setToUserId("0");
 				crru.setStatus(0);
-				crru.setOption(12, mr.getToUserId());
+				crru.setOption(12, cl.getToUserId());
 				crru.setRoomId(rId);
 				crru.execPacket();
 			}

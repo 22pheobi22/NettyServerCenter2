@@ -3,9 +3,11 @@ package com.sa.client;
 import java.util.Objects;
 
 import com.sa.base.ServerDataPool;
+import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
 import com.sa.service.server.ServerLogin;
+import com.sa.util.StringUtil;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,14 +21,18 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 	public void channelActive(ChannelHandlerContext ctx) {
 		//此时通道已建立，保存通信人-通道信息，向通信人发送登陆消息
 		Integer transactionId = (int) (1 + Math.random()*100000000);
-		String toUserId ="";
-		if(Objects.nonNull(ctx.channel().remoteAddress())&&ctx.channel().remoteAddress().toString().length()>1){
-			toUserId = ctx.channel().remoteAddress().toString().substring(1, ctx.channel().remoteAddress().toString().length());
-		}
+		String toUserId =StringUtil.subStringIp(ctx.channel().remoteAddress().toString());
+		//if(Objects.nonNull(ctx.channel().remoteAddress())&&ctx.channel().remoteAddress().toString().length()>1){
+			//toUserId =
+		//}
 		 
 		ServerLogin serverLogin = new ServerLogin(transactionId, "", "0", toUserId, 0);
 		
+		// 缓存 用户-通道信息
 		ServerDataPool.USER_CHANNEL_MAP.put(toUserId, ctx);
+		// 缓存 通道-用户信息
+		ServerDataPool.CHANNEL_USER_MAP.put(ctx, new ChannelExtend());
+	
 		//serverLogin.execPacket();
 		serverLogin.centerExecPacket();
 	}

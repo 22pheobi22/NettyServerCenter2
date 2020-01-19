@@ -29,9 +29,17 @@ import io.netty.channel.ChannelHandlerContext;
 public class CUniqueLogon extends Packet {
 	public CUniqueLogon(){}
 
+	public CUniqueLogon(int transactionId, String roomId, String userId, int code) {
+		super(transactionId, roomId, "0", userId, code);
+	}
+	
 	@Override
 	public void execPacket() {
-		/** 如果目标地址是中心地址*//*
+	}
+
+	/*@Override
+	public void execPacket() {
+		*//** 如果目标地址是中心地址*//*
 		if (this.getRemoteIp().equals(ConfManager.getCenterIp())) {
 			*//** 从临时缓存中获取发信人通道*//*
 			ChannelHandlerContext context = ServerDataPool.TEMP_CONN_MAP2.get(this.getFromUserId());
@@ -62,8 +70,8 @@ public class CUniqueLogon extends Packet {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}*/
-	}
+		}
+	}*/
 
 	private HashSet<String> toRole(String role) {
 		HashSet<String> userRole = new HashSet<String>();
