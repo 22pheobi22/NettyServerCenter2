@@ -32,7 +32,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
-		System.out.println("channelActive:"+ctx.channel().remoteAddress());
+		System.out.println("中心channelActive:"+ctx.channel().remoteAddress());
 		ServerDataPool.TEMP_CONN_MAP.put(ctx, new ChannelExtend());
 	}
 

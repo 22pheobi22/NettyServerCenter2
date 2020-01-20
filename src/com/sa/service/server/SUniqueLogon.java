@@ -59,13 +59,14 @@ public class SUniqueLogon extends Packet {
 			code = 10093;
 			msg = Constant.ERR_CODE_10093;
 		} else if("0".equals(String.valueOf(checkUniqueLogonResult.get("code")))){
-			//已登录则注销上次登录
+			//已登录则注销上次登录--旧sever通道
 			doLogonUngister((ChannelHandlerContext)checkUniqueLogonResult.get("result"));
 		}
 		//獲取最新登錄服務IP
 		if(null==fromServerIp||"".equals(fromServerIp)){
 			return;
 		}
+		//新server通道
 		ChannelHandlerContext context = ServerDataPool.USER_CHANNEL_MAP.get(fromServerIp);
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(context);
 		if(null==context||null == ce || null == ce.getConnBeginTime()){
@@ -79,6 +80,7 @@ public class SUniqueLogon extends Packet {
 
 		/** 登录信息 下行 处理 */
 		clientLogin(code, msg, role, context);
+		
 	}
 
 	@Override
@@ -153,13 +155,15 @@ public class SUniqueLogon extends Packet {
 		/** 实例化 消息回执 *//*
 		ClientMsgReceipt mr = new ClientMsgReceipt(this.getTransactionId(), this.getRoomId(), this.getFromUserId(),
 				10098);
+		mr.*/
+		cl.setFromUserId(this.getFromUserId());
 		cl.setOption(254, Constant.ERR_CODE_10098);
-		*//** 发送 消息回执 *//*//给原通道服务器
+		/** 发送 消息回执 *///给原通道服务器
 		try {
-			ServerManager.INSTANCE.sendPacketTo(mr, temp, Constant.CONSOLE_CODE_S);
+			ServerManager.INSTANCE.sendPacketTo(cl, temp, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}*/
+		}
 		//给房间用户发消息 通知用户注销
 		//mr.setFromUserId(this.getFromUserId());
 		noticeUserUngister(cl);
@@ -195,6 +199,17 @@ public class SUniqueLogon extends Packet {
 		ServerManager.INSTANCE.addOnlineContext(this.getRoomId(), this.getFromUserId(),
 			(String) this.getOption(3), (String) this.getOption(4),
 			(String) this.getOption(5), userRole, ConfManager.getTalkEnable(), context,ce.getChannelType());
+		
+		//通知所在服务器做登录处理
+		CUniqueLogon cl = new CUniqueLogon(this.getTransactionId(), this.getRoomId(), this.getFromUserId(),
+				0);
+		cl.setFromUserId(this.getFromUserId());
+		try {
+			ServerManager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		//给房间用户发消息 通知用户注册
 		noticeUserRegister(userRole,role);
 	}

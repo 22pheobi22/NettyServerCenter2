@@ -21,6 +21,7 @@ import com.sa.base.ServerDataPool;
 import com.sa.base.ServerManager;
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
+import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
 import com.sa.util.Constant;
 
@@ -33,8 +34,18 @@ public class CUniqueLogon extends Packet {
 		super(transactionId, roomId, "0", userId, code);
 	}
 	
+	public CUniqueLogon(PacketHeadInfo packetHead) {
+		this.setPacketHead(packetHead);
+	}
+
 	@Override
 	public void execPacket() {
+		try {
+			/** 发消息给发信人*/
+			//ServerManager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*@Override
