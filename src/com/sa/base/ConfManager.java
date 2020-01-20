@@ -8,50 +8,48 @@ import com.sa.util.StringUtil;
 public class ConfManager {
 	/** 运行配置 */
 	public static Map<String, String> CONF_MAP = new HashMap<>();
-
-	// 获取服务ip和端口
+	
+	//获取服务ip和端口
 	/** 普通服务器ip */
 	public static String[] getServerAddress() {
 		String strAddress = CONF_MAP.get("server.address");
 		String[] split = strAddress.split(";");
 
-		return split;
+		return  split;
 	}
-
-	// 获取另一个中心的ip
+	//获取另一个中心的ip
 	/** 另一个中心的ip */
 	public static String getCenterIpAnother() {
 		String strIp = CONF_MAP.get("center.ip.another");
-		strIp = null == strIp || "".equals(strIp) ? "127.0.0.1" : strIp;
+		strIp = null==strIp || "".equals(strIp) ? "127.0.0.1" : strIp;
 
-		return strIp;
+		return  strIp;
 	}
-
-	// 获取另一个中心的端口
+	//获取另一个中心的端口
 	/** 另一个中心的端口 */
 	public static int getCenterPortAnother() {
 		String strPort = CONF_MAP.get("center.port.another");
-		strPort = null == strPort || "".equals(strPort) ? "8081" : strPort;
+		strPort = null==strPort || "".equals(strPort) ? "8080" : strPort;
 
-		return Integer.parseInt(strPort);
+		return  Integer.parseInt(strPort);
 	}
-
+	
 	/** 服务器端口 */
 	public static int getClientSoketServerPort() {
 		String strPort = CONF_MAP.get("clientsoket.server.port");
 
-		strPort = null == strPort || "".equals(strPort) ? "8080" : strPort;
+		strPort = null==strPort || "".equals(strPort) ? "8080" : strPort;
 
-		return Integer.parseInt(strPort);
+		return  Integer.parseInt(strPort);
 	}
-
+	
 	/** 服务器端口 */
 	public static int getWebSoketServerPort() {
 		String strPort = CONF_MAP.get("websoket.server.port");
 
-		strPort = null == strPort || "".equals(strPort) ? "8090" : strPort;
+		strPort = null==strPort || "".equals(strPort) ? "8090" : strPort;
 
-		return Integer.parseInt(strPort);
+		return  Integer.parseInt(strPort);
 	}
 
 	/** 客户端断线重连最大尝试次数 */
@@ -109,12 +107,12 @@ public class ConfManager {
 		return strCenterId;
 	}
 
-	/** 间隔同步入库地址 */
+	/** 间隔同步入库地址*/
 	public static String getLogUrl() {
 		return CONF_MAP.get("log.out.db.url");
 	}
 
-	/** 间隔同步入库时间（单位：分钟） */
+	/** 间隔同步入库时间（单位：分钟）*/
 	public static int getLogTime() {
 		String strLogTime = CONF_MAP.get("log.out.db.time.minute");
 
@@ -185,7 +183,7 @@ public class ConfManager {
 		return CONF_MAP.get("validate.url");
 	}
 
-	/** 开课前是否可以说话 */
+	/** 开课前是否可以说话*/
 	public static Boolean getTalkEnable() {
 		String talkEnable = CONF_MAP.get("talk.enable");
 		if (StringUtil.isEmpty(talkEnable)) {
@@ -194,7 +192,7 @@ public class ConfManager {
 		return Boolean.parseBoolean(talkEnable);
 	}
 
-	/** 保存 文件日志 地址 */
+	/** 保存 文件日志 地址*/
 	public static String getFileLogPath() {
 		return CONF_MAP.get("file.log.path");
 	}
@@ -209,12 +207,12 @@ public class ConfManager {
 		return Boolean.parseBoolean(strFileLogFlag);
 	}
 
-	/** 保存 文件日志 地址 */
+	/** 保存 文件日志 地址*/
 	public static String getStatisticUrl() {
 		return CONF_MAP.get("statistic.url");
 	}
 
-	/** 间隔同步入库时间（单位：分钟） */
+	/** 间隔同步入库时间（单位：分钟）*/
 	public static int getStatisticTime() {
 		String strStatisticTime = CONF_MAP.get("statistic.time");
 
@@ -247,7 +245,7 @@ public class ConfManager {
 		return Long.parseLong(strOverTime);
 	}
 
-	/** 后台 远程连接 端口 */
+	/** 后台 远程连接 端口*/
 	public static int getHttpPort() {
 		String strHttpPort = CONF_MAP.get("http.port");
 
@@ -258,7 +256,7 @@ public class ConfManager {
 		return Integer.parseInt(strHttpPort);
 	}
 
-	/** 连接 中心 的端口 */
+	/** 连接 中心 的端口*/
 	public static int getCenterPort() {
 		String strCenterPort = CONF_MAP.get("center.port");
 
@@ -279,7 +277,6 @@ public class ConfManager {
 
 		return strSignKey;
 	}
-
 	/** 日志 key的分割符 */
 	public static String getLogKeySplit() {
 		String strLogKeySplit = CONF_MAP.get("log.key.split");
@@ -291,7 +288,7 @@ public class ConfManager {
 		return strLogKeySplit;
 	}
 
-	/**
+	/** 
 	 * 自动回收时存储星星数的连接
 	 */
 	public static String getStatSaveUrl() {
@@ -301,14 +298,14 @@ public class ConfManager {
 	public static String getMongoIp() {
 		return CONF_MAP.get("mongo.ip");
 	}
-
 	public static Integer getMongoPort() {
 		return Integer.parseInt(CONF_MAP.get("mongo.port"));
 	}
-
 	public static String getMongoNettyLogDBName() {
 		return CONF_MAP.get("mongo.log.netty.dbname");
 	}
+
+	
 
 	public static String getMongoNettyLogTableName() {
 		return CONF_MAP.get("mongo.log.netty.table.name");
@@ -329,12 +326,11 @@ public class ConfManager {
 	public static int getLogBatchSaveMaxSize() {
 		return Integer.parseInt(CONF_MAP.get("mongo.log.netty.batch.save.max.size"));
 	}
-
 	/** 远程校验地址 */
 	public static String getRemoteValidateUrl() {
 		return CONF_MAP.get("remote.validate.url");
 	}
-
+	
 	/** 是否启用mongodb */
 	public static Boolean getMongodbEnable() {
 		String admin = CONF_MAP.get("mongodb.enable");
