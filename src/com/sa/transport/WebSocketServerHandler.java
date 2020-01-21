@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
@@ -32,7 +32,6 @@ import com.sa.service.server.ServerLoginOut;
 import com.sa.util.ByteBufUtil;
 import com.sa.util.Constant;
 import com.sa.util.LogOutPrint;
-import com.sa.util.StringUtil;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -157,14 +156,14 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 			if (validateSession(packet, context)) { // 验证session
 //				packet.printPacket(ConfManager.getConsoleFlag(), Constant.CONSOLE_CODE_R, ConfManager.getFileLogFlag(), ConfManager.getFileLogPath());
 
-				ServerManager.INSTANCE.log(packet);
+				Manager.INSTANCE.log(packet);
 
 				// 执行定义动作
 				PacketManager.INSTANCE.execPacket(packet);
 			} else {
 				ClientMsgReceipt cmr = new ClientMsgReceipt(packet.getTransactionId(), packet.getRoomId(), packet.getFromUserId(), 10099);
 				cmr.setOption(254, Constant.ERR_CODE_10099);
-				ServerManager.INSTANCE.sendPacketTo(packet, context, Constant.CONSOLE_CODE_S);
+				Manager.INSTANCE.sendPacketTo(packet, context, Constant.CONSOLE_CODE_S);
 			}
 		}
 	}
@@ -205,7 +204,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 			throws Exception {
 		loginOut(ctx);
 
-		ServerManager.INSTANCE.ungisterUserContext(ctx);
+		Manager.INSTANCE.ungisterUserContext(ctx);
 		System.err.println("业务逻辑出错");
 		cause.printStackTrace();
 
@@ -226,12 +225,12 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 				System.err.println("客户端读超时");
 				int overtimeTimes = clientOvertimeMap.get(ctx);
 				if (overtimeTimes < ConfManager.getMaxReconnectTimes()) {
-					ServerManager.INSTANCE.sendPacketTo(new ClientHeartBeat(), ctx, null);
+					Manager.INSTANCE.sendPacketTo(new ClientHeartBeat(), ctx, null);
 					addUserOvertime(ctx);
 				} else {
 					loginOut(ctx);
 
-					ServerManager.INSTANCE.ungisterUserContext(ctx);
+					Manager.INSTANCE.ungisterUserContext(ctx);
 				}
 			}
 		}
@@ -242,7 +241,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 			ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
 			if (null != ce) {
 				String fromUserId = ce.getUserId();
-				String roomId = ServerDataPool.serverDataManager.getUserRoomNo(fromUserId);
+				String roomId = ServerDataPool.dataManager.getUserRoomNo(fromUserId);
 
 				ServerLoginOut serverLoginOut = new ServerLoginOut();
 				serverLoginOut.setFromUserId(fromUserId);

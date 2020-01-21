@@ -20,8 +20,8 @@ import java.util.Map;
 import org.apache.commons.beanutils.BeanUtils;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientMsgReceipt;
@@ -53,11 +53,11 @@ public class ServerRequestbRoom extends Packet {
 			/** 如果有中心 且 目标IP不是中心IP */
 			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
 				/** 转发给中心 */
-				ServerManager.INSTANCE.sendPacketToCenter(crr, Constant.CONSOLE_CODE_TS);
+				Manager.INSTANCE.sendPacketToCenter(crr, Constant.CONSOLE_CODE_TS);
 			} else {
 				if (null != roomIds && roomIds.length > 0) {
 					for (String rId : roomIds) {
-						ServerDataPool.serverDataManager.setRoomChats(rId,
+						ServerDataPool.dataManager.setRoomChats(rId,
 								System.currentTimeMillis() + "," + this.getTransactionId(), this.getFromUserId(),
 								(String) this.getOption(1));
 					}

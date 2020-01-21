@@ -3,8 +3,8 @@ package com.sa.service.server;
 import java.util.List;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.Logs;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
@@ -19,7 +19,7 @@ public class ServerRequestbRoomChat extends Packet {
 		/** 如果有中心 并 目标IP不是中心IP*/
 		if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
 			/** 转发给中心*/
-			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+			Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		} else {
 			if (null == this.getOption(1)) {
 				this.setOption(1, "0");
@@ -31,7 +31,7 @@ public class ServerRequestbRoomChat extends Packet {
 			String[] roomIds = this.getRoomId().split(",");
 			if (null != roomIds && roomIds.length > 0) {
 				for (String rId : roomIds) {
-					List<Logs> logList = ServerDataPool.serverDataManager.getRoomChats(rId, (String) this.getOption(1), Integer.parseInt(this.getOption(2).toString()));
+					List<Logs> logList = ServerDataPool.dataManager.getRoomChats(rId, (String) this.getOption(1), Integer.parseInt(this.getOption(2).toString()));
 
 					String json = "[";
 					/** 遍历聊天记录*/

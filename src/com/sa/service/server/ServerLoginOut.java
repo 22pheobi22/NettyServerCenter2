@@ -6,8 +6,8 @@ package com.sa.service.server;
 import java.util.Objects;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
@@ -29,7 +29,7 @@ public class ServerLoginOut extends Packet{
 		if (null != roomIds && roomIds.length > 0) {
 			for (String rId : roomIds) {
 				/** 根据房间id 和 发信人id 查询人员信息 */
-				people = ServerDataPool.serverDataManager.getRoomUesr(rId, this.getFromUserId());
+				people = ServerDataPool.dataManager.getRoomUesr(rId, this.getFromUserId());
 				if(Objects.nonNull(people)){
 					break;
 				}
@@ -44,7 +44,7 @@ public class ServerLoginOut extends Packet{
 		/** 如果有中心 */
 		if (ConfManager.getIsCenter()) {
 			/** 将消息转发到中心 */
-			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+			Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		}
 		/** 实例化消息回执并执行 */
 		// new ClientMsgReceipt(this.getPacketHead()).execPacket();

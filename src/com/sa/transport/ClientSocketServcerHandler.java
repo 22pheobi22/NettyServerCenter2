@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
@@ -42,14 +42,14 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 			System.out.println("channelRead:"+context.channel().remoteAddress());
 			Packet packet = (Packet) msg;
 			if (packet.getPacketType() == PacketType.ServerLogin) {
-				ServerManager.INSTANCE.log(packet);
+				Manager.INSTANCE.log(packet);
 				LoginManager.INSTANCE.login(context, (ServerLogin) packet);
 			} else if (packet.getPacketType() == PacketType.SysLoginReq) {
 				SystemLoginManager.INSTANCE.login(context, (SysLoginReq) packet);
 			} else if (packet.getPacketType() == PacketType.ServerHearBeat) {
 			} else {
 				// 记录数据库日志
-				ServerManager.INSTANCE.log(packet);
+				Manager.INSTANCE.log(packet);
 				PacketManager.INSTANCE.execPacket(packet);
 			}
 	
@@ -65,7 +65,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 		
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
 		if (null != ce && null != ce.getUserId()) {
-			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(ce.getUserId());
+			String roomId = ServerDataPool.dataManager.getUserRoomNo(ce.getUserId());
 			
 			log += "["+roomId+"]("+ce.getUserId()+")";
 
@@ -91,7 +91,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
 		if (null != ce && null != ce.getUserId()) {
-			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(ce.getUserId());
+			String roomId = ServerDataPool.dataManager.getUserRoomNo(ce.getUserId());
 
 			log += "["+roomId+"]("+ce.getUserId()+")";
 			
@@ -115,7 +115,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 		
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
 		if (null != ce && null != ce.getUserId()) {
-			String roomId = ServerDataPool.serverDataManager.getUserRoomNo(ce.getUserId());
+			String roomId = ServerDataPool.dataManager.getUserRoomNo(ce.getUserId());
 
 			log += "["+roomId+"]("+ce.getUserId()+")";
 
@@ -138,7 +138,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 //		ServerManager.INSTANCE.ungisterUserContext(ctx);
 		
 //		String userId = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-//		String roomId = ServerDataPool.serverDataManager.getUserRoomNo(userId);
+//		String roomId = ServerDataPool.dataManager.getUserRoomNo(userId);
 //
 //		ClientLoginOut clientLoginOut = new ClientLoginOut();
 //		clientLoginOut.setRoomId(roomId);
@@ -166,7 +166,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 				System.err.println("客户端读超时");
 				int overtimeTimes = clientOvertimeMap.get(ctx);
 				if (overtimeTimes < ConfManager.getMaxReconnectTimes()) {
-					ServerManager.INSTANCE.sendPacketTo(new ClientHeartBeat(), ctx, null);
+					Manager.INSTANCE.sendPacketTo(new ClientHeartBeat(), ctx, null);
 					addUserOvertime(ctx);
 				} else {
 					String log = "客户端超时踢下线";
@@ -176,7 +176,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 					}
 					
 					System.err.println(log);
-					ServerManager.INSTANCE.ungisterUserContext(ctx);
+					Manager.INSTANCE.ungisterUserContext(ctx);
 					
 				}
 			}

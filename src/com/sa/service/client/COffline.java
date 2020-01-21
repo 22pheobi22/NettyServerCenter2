@@ -17,7 +17,7 @@ package com.sa.service.client;
 import java.util.TreeMap;
 
 import com.sa.base.ConfManager;
-import com.sa.base.ServerManager;
+import com.sa.base.Manager;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
@@ -38,12 +38,12 @@ public class COffline extends Packet {
 			mr.setOption(254, Constant.ERR_CODE_10098);
 
 			try {
-				ServerManager.INSTANCE.sendPacketTo(mr, Constant.CONSOLE_CODE_S);
+				Manager.INSTANCE.sendPacketTo(mr, Constant.CONSOLE_CODE_S);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			ServerManager.INSTANCE.ungisterUserId(mr.getToUserId());
+			Manager.INSTANCE.ungisterUserId(mr.getToUserId());
 		}
 	}
 

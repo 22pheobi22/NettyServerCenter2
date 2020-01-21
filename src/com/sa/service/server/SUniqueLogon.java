@@ -19,15 +19,14 @@ import java.util.HashSet;
 import java.util.Map;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
 import com.sa.service.client.CUniqueLogon;
 import com.sa.service.client.ClientLogin;
-import com.sa.service.client.ClientMsgReceipt;
 import com.sa.service.client.ClientResponebRoomUser;
 import com.sa.util.Constant;
 
@@ -98,7 +97,7 @@ public class SUniqueLogon extends Packet {
 		cl.setOption(254, msg);
 
 		try {
-			ServerManager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
+			Manager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -139,7 +138,7 @@ public class SUniqueLogon extends Packet {
 			map.put("code", 2000);
 		}
 		/** 根据 用户id 获取 用户通道 */
-		ChannelHandlerContext temp =ServerDataPool.serverDataManager.getUserServerChannel(this.getFromUserId());
+		ChannelHandlerContext temp =ServerDataPool.dataManager.getUserServerChannel(this.getFromUserId());
 		/** 如果 用户通道 不为空 */
 		if (null != temp) {
 			map.put("code", 0);
@@ -160,7 +159,7 @@ public class SUniqueLogon extends Packet {
 		cl.setOption(254, Constant.ERR_CODE_10098);
 		/** 发送 消息回执 *///给原通道服务器
 		try {
-			ServerManager.INSTANCE.sendPacketTo(cl, temp, Constant.CONSOLE_CODE_S);
+			Manager.INSTANCE.sendPacketTo(cl, temp, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -169,14 +168,14 @@ public class SUniqueLogon extends Packet {
 		noticeUserUngister(cl);
 		
 		//注銷用戶信息
-		ServerManager.INSTANCE.ungisterUserInfo(this.getFromUserId());
+		Manager.INSTANCE.ungisterUserInfo(this.getFromUserId());
 	}
 	
 	/** 通知房间内用户 */
 	private void noticeUserUngister(CUniqueLogon cl) {
 		String[] roomIds = null;
 		//向用户原来所在房间发减员消息 
-		String roomNo = ServerDataPool.serverDataManager.getUserRoomNo(cl.getFromUserId());
+		String roomNo = ServerDataPool.dataManager.getUserRoomNo(cl.getFromUserId());
 		if(null!=roomNo){
 			roomIds = roomNo.split(",");
 		}
@@ -196,7 +195,7 @@ public class SUniqueLogon extends Packet {
 	
 	private void doLogin(ChannelHandlerContext context,ChannelExtend ce,HashSet<String> userRole,String role) {
 		/** 注册用户上线信息 */
-		ServerManager.INSTANCE.addOnlineContext(this.getRoomId(), this.getFromUserId(),
+		Manager.INSTANCE.addOnlineContext(this.getRoomId(), this.getFromUserId(),
 			(String) this.getOption(3), (String) this.getOption(4),
 			(String) this.getOption(5), userRole, ConfManager.getTalkEnable(), context,ce.getChannelType());
 		
@@ -205,7 +204,7 @@ public class SUniqueLogon extends Packet {
 				0);
 		cl.setFromUserId(this.getFromUserId());
 		try {
-			ServerManager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
+			Manager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -220,7 +219,7 @@ public class SUniqueLogon extends Packet {
 		if (roomIds != null && roomIds.length > 0) {
 			for (String rId : roomIds) {
 				/** 实例化 获取房间用户列表 下行 并 赋值 并 执行 */
-				int num = ServerDataPool.serverDataManager.getRoomTheSameUserCannotAccessNum(rId,
+				int num = ServerDataPool.dataManager.getRoomTheSameUserCannotAccessNum(rId,
 						this.getFromUserId());
 				/** 用户不是教师 */
 				if (!((userRole.contains(Constant.ROLE_TEACHER)||userRole.contains(Constant.ROLE_PARENT_TEACHER)) && num > 1)) {

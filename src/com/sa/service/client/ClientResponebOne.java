@@ -14,12 +14,9 @@
  */
 package com.sa.service.client;
 
-import io.netty.channel.ChannelHandlerContext;
-
 import java.util.TreeMap;
 
-import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
+import com.sa.base.Manager;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
@@ -46,7 +43,7 @@ public class ClientResponebOne extends Packet {
 	public void execPacket() {
 		try {
 			/** 发送消息给目标用户*/
-			ServerManager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
+			Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
 
 			/*String userId = this.getToUserId();
 			if (userId.endsWith("APP")) {

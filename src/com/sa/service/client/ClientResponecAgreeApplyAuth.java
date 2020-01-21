@@ -14,12 +14,10 @@
  */
 package com.sa.service.client;
 
-import io.netty.channel.ChannelHandlerContext;
-
 import java.util.TreeMap;
 
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
@@ -51,7 +49,7 @@ public class ClientResponecAgreeApplyAuth extends Packet {
 			 * option 3 : 操作 (+：添加 -:删除)
 			 * option 4 : 多人或单人权限标识（1、n）
 			 */
-			ServerDataPool.serverDataManager.setRoomUserDefAuth(this.getRoomId(),
+			ServerDataPool.dataManager.setRoomUserDefAuth(this.getRoomId(),
 					this.getToUserId(),
 					(String) this.getOption(1),
 					(String) this.getOption(3),
@@ -59,7 +57,7 @@ public class ClientResponecAgreeApplyAuth extends Packet {
 			
 			
 			/** 发送消息给目标用户*/
-			ServerManager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
+			Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
 
 			/*String userId = this.getToUserId();
 			if (userId.endsWith("APP")) {
