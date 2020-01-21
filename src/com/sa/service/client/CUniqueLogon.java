@@ -16,16 +16,10 @@ package com.sa.service.client;
 
 import java.util.HashSet;
 
-import com.sa.base.ConfManager;
-import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
-import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
 import com.sa.util.Constant;
-
-import io.netty.channel.ChannelHandlerContext;
 
 public class CUniqueLogon extends Packet {
 	public CUniqueLogon(){}

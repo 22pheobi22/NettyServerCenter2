@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.People;
 import com.sa.base.element.Room;
 import com.sa.net.Packet;
@@ -63,7 +63,7 @@ public class ServerRequestcNotGag extends Packet {
 
 	private void one(String userId,String roomId) {
 		/** 移除目标用户禁言 */
-		People people = ServerDataPool.serverDataManager.speakAuth(roomId, userId);
+		People people = ServerDataPool.dataManager.speakAuth(roomId, userId);
 		/** 如果目标用户为空 */
 		if (null != people) {
 			/** 重写返回值 */
@@ -79,12 +79,12 @@ public class ServerRequestcNotGag extends Packet {
 			/** 如果有中心 并 目标IP不是中心IP */
 		} else if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
 			/** 转发到中心 */
-			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+			Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		}
 	}
 
 	private void all(String roomId) {
-		Room room = ServerDataPool.serverDataManager.getRoom(roomId);
+		Room room = ServerDataPool.dataManager.getRoom(roomId);
 
 		for (Map.Entry<String, People> entry : room.getPeoples().entrySet()) {
 			one(entry.getKey(),roomId);

@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sa.base.ConfManager;
-import com.sa.base.ServerManager;
+import com.sa.base.Manager;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientMsgReceipt;
@@ -48,7 +48,7 @@ public class ServerRequestbAll extends Packet {
 			/** 如果有中心 并且 中心不是目标地址*/
 			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
 				/** 转发到中心*/
-				ServerManager.INSTANCE.sendPacketToCenter(clientResponebAll, Constant.CONSOLE_CODE_TS);
+				Manager.INSTANCE.sendPacketToCenter(clientResponebAll, Constant.CONSOLE_CODE_TS);
 			}
 		}
 		/** 实例化消息回执 赋值 并 执行*/

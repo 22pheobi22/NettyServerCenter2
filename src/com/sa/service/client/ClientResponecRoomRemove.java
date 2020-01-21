@@ -14,8 +14,8 @@
  */
 package com.sa.service.client;
 
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
@@ -32,12 +32,12 @@ public class ClientResponecRoomRemove extends Packet {
 	@Override
 	public void execPacket() {
 		try {
-			ServerManager.INSTANCE.sendPacketToRoomAllUsers(this, Constant.CONSOLE_CODE_S);
+			Manager.INSTANCE.sendPacketToRoomAllUsers(this, Constant.CONSOLE_CODE_S);
 
 			/** 删除房间消息缓存*/
-			ServerDataPool.serverDataManager.cleanLogs(this.getRoomId());
+			ServerDataPool.dataManager.cleanLogs(this.getRoomId());
 			/** 删除房间缓存*/
-			ServerDataPool.serverDataManager.removeRoom(this.getRoomId());
+			ServerDataPool.dataManager.removeRoom(this.getRoomId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

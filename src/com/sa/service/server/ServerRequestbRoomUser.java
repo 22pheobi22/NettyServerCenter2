@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
@@ -42,13 +42,13 @@ public class ServerRequestbRoomUser extends Packet {
 		if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
 			// this.setOption(1, json);
 			/** 转发给中心 */
-			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+			Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		} else {
 			String[] roomIds = this.getRoomId().split(",");
 			if (null != roomIds && roomIds.length > 0) {
 				for (String rId : roomIds) {
 					/** 根据房间id获取房间内用户信息 */
-					Map<String, People> hm = ServerDataPool.serverDataManager.getRoomUesrs(rId);
+					Map<String, People> hm = ServerDataPool.dataManager.getRoomUesrs(rId);
 
 					int index = 0;
 					String json = "[";

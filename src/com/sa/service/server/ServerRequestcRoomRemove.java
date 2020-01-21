@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sa.base.ConfManager;
-import com.sa.base.ServerManager;
+import com.sa.base.Manager;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientResponecRoomRemove;
@@ -73,7 +73,7 @@ public class ServerRequestcRoomRemove extends Packet {
 			/** 如果有中心 并 目标IP不是中心IP*/
 			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
 				/** 转发到中心*/
-				ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+				Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 			}
 		}
 

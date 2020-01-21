@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
@@ -43,10 +43,10 @@ public class ServerRequestbRoomTeacher extends Packet {
 		if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
 			// this.setOption(1, json);
 			/** 转发给中心 */
-			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+			Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		} else {
 			/** 根据房间id获取房间内普通教师信息 */
-			Map<String, People> hm = ServerDataPool.serverDataManager.getRoomTeachers(this.getRoomId());
+			Map<String, People> hm = ServerDataPool.dataManager.getRoomTeachers(this.getRoomId());
 
 			int index = 0;
 			String json = "[";

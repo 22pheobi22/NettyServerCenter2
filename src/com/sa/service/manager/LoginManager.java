@@ -1,7 +1,7 @@
 package com.sa.service.manager;
 
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.ChannelExtend;
 import com.sa.service.client.ClientLogin;
 import com.sa.service.server.ServerLogin;
@@ -33,7 +33,7 @@ public enum LoginManager {
 		ServerDataPool.TEMP_CONN_MAP2.put(loginPact.getFromUserId(), context);
 
 		/** 将用户信息注册 */
-		ServerManager.INSTANCE.addOnlineContext(loginPact.getRoomId(), loginPact.getFromUserId(),context, ce.getChannelType());
+		Manager.INSTANCE.addOnlineContext(loginPact.getRoomId(), loginPact.getFromUserId(),context, ce.getChannelType());
 		/** 登录信息 下行 处理 */
 		
 		clientLogin(loginPact, code, msg, "", context);
@@ -54,7 +54,7 @@ public enum LoginManager {
 		cl.setOption(254, msg);
 
 		try {
-			ServerManager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
+			Manager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

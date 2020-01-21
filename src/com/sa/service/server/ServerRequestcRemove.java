@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
@@ -64,7 +64,7 @@ public class ServerRequestcRemove extends Packet {
 			if (null != roomIds && roomIds.length > 0) {
 				for (String rId : roomIds) {
 					/** 获取目标用户信息*/
-					People people = ServerDataPool.serverDataManager.getRoomUesr(rId, this.getToUserId());
+					People people = ServerDataPool.dataManager.getRoomUesr(rId, this.getToUserId());
 					/** 如果用户信息不为空*/
 					if (null != people)
 						/** 设置删除成功*/
@@ -78,7 +78,7 @@ public class ServerRequestcRemove extends Packet {
 			/** 如果有中心*/
 			if (ConfManager.getIsCenter()) {
 				/** 转发到中心*/
-				ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+				Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 			}
 
 		}

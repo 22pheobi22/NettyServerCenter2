@@ -19,8 +19,8 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.sa.base.ConfManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientResponebShareGet;
@@ -34,7 +34,7 @@ public class ServerRequestbShareGet extends Packet {
 		/** 如果有中心 并 目标IP不是中心IP */
 		if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
 			/** 消息转发给中心 */
-			ServerManager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
+			Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		} else {
 			/** 获取选项 1 的内容 */
 			String op1 = (String) this.getOption(1);
@@ -44,7 +44,7 @@ public class ServerRequestbShareGet extends Packet {
 				for (String rId : roomIds) {
 					if ("1".equals(op2)) {
 						/** 根据房间id和选项1 获取 共享信息 */
-						Object share = ServerDataPool.serverDataManager.getShare(rId, op1);
+						Object share = ServerDataPool.dataManager.getShare(rId, op1);
 						/** 设置共享 */
 						/** 实例化获取共享类型 下行 并赋值 */
 						ClientResponebShareGet clientResponebShareGet = new ClientResponebShareGet(this.getPacketHead());
@@ -54,7 +54,7 @@ public class ServerRequestbShareGet extends Packet {
 						/** 执行 */
 						clientResponebShareGet.execPacket();
 					} else if ("n".equals(op2)) {
-						List<Object> list = ServerDataPool.serverDataManager.getShareList(rId, op1);
+						List<Object> list = ServerDataPool.dataManager.getShareList(rId, op1);
 						/** 设置共享 */
 						/** 实例化获取共享类型 下行 并赋值 */
 						if (null != list) {
