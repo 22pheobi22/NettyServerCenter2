@@ -54,7 +54,7 @@ public enum Manager {
 
 	/** 向单一用户发送数据包*/
 	public void sendPacketTo(Packet pact, String consoleHead) throws Exception {
-		if(ConfManager.getIsCenter()){
+		if(ConfManager.getIsRedis()){
 			redisManager.sendPacketTo(pact, consoleHead);
 		}else{
 			serverManager.sendPacketTo(pact, consoleHead);
@@ -62,7 +62,7 @@ public enum Manager {
 	}
 	/** 向中心发送数据包*/
 	public void sendPacketToCenter(Packet pact, String consoleHead) {
-		/*if(ConfManager.getIsCenter()){
+		/*if(ConfManager.getIsRedis()){
 			RedisManager.INSTANCE.sendPacketToCenter(pact, consoleHead);
 		}else{*/
 			serverManager.sendPacketToCenter(pact, consoleHead);
@@ -74,7 +74,7 @@ public enum Manager {
 	 * @throws Exception
 	 */
 	public void sendPacketToRoomAllUsers(Packet pact, String consoleHead) throws Exception{
-		if(ConfManager.getIsCenter()){
+		if(ConfManager.getIsRedis()){
 			redisManager.sendPacketToRoomAllUsers(pact, consoleHead);
 		}else{
 			serverManager.sendPacketToRoomAllUsers(pact, consoleHead);
@@ -86,7 +86,7 @@ public enum Manager {
 	 * @throws Exception
 	 */
 	public void sendPacketToAllUsers(Packet pact, String consoleHead) throws Exception{
-		/*if(ConfManager.getIsCenter()){
+		/*if(ConfManager.getIsRedis()){
 			redisManager.sendPacketToAllUsers(pact, consoleHead);
 		}else{*/
 			serverManager.sendPacketToAllUsers(pact, consoleHead);
@@ -119,38 +119,23 @@ public enum Manager {
 	public Map<String, ChannelHandlerContext> getAllOnlineContext(){
 		return ServerDataPool.USER_CHANNEL_MAP;
 	}
-
+	
 	/**
-	 * 登录、注册、上线、绑定
+	 * 登录、注册、上线、绑定--非中心
 	 */
 	public void addOnlineContext(String roomId, String userId, String name, String icon, String agoraId, HashSet<String> userRole, boolean notSpeak, ChannelHandlerContext context, int channelType){
-		if(ConfManager.getIsCenter()){
-			redisManager.addOnlineContext(roomId, userId, name, icon, agoraId, userRole, notSpeak, context, channelType);
+		if(ConfManager.getIsRedis()){
+			redisManager.addOnlineContext(roomId, userId, name, icon, agoraId,userRole, notSpeak, context, channelType);
 		}else{
-			serverManager.addOnlineContext(roomId, userId, name, icon, agoraId, userRole, notSpeak, context, channelType);
+			serverManager.addOnlineContext(roomId, userId, name, icon, agoraId,userRole, notSpeak, context, channelType);
 		}
 	}
 	
 	/**
-	 * 登录、注册、上线、绑定
+	 * 登录、注册、上线、绑定--中心
 	 */
-	public void addOnlineContext(String roomId, String userId, String name, String icon, HashSet<String> userRole, boolean notSpeak, ChannelHandlerContext context, int channelType){
-		/*if(ConfManager.getIsCenter()){
-			redisManager.addOnlineContext(roomId, userId, name, icon, userRole, notSpeak, context, channelType);
-		}else{*/
-			serverManager.addOnlineContext(roomId, userId, name, icon, userRole, notSpeak, context, channelType);
-		//}
-	}
-	
-	/**
-	 * 登录、注册、上线、绑定
-	 */
-	public void addOnlineContext(String roomId, String userId, ChannelHandlerContext context, int channelType){
-		//if(ConfManager.getIsCenter()){
-			redisManager.addOnlineContext(roomId, userId, context, channelType);
-		/*}else{
-			serverManager.addOnlineContext(roomId, userId, context, channelType);
-		}*/
+	public void addOnlineContext(String userId, ChannelHandlerContext context, int channelType){
+		serverManager.addOnlineContext(userId, context, channelType);
 	}
 	
 	public void ungisterUserInfo(String userId) {
@@ -161,7 +146,7 @@ public enum Manager {
 	 *   注销用户通信渠道
 	 */
 	public void ungisterUserId(String userId) {
-		if(ConfManager.getIsCenter()){
+		if(ConfManager.getIsRedis()){
 			redisManager.ungisterUserId(userId);
 		}else{
 			serverManager.ungisterUserId(userId);
@@ -172,7 +157,7 @@ public enum Manager {
 	 *   注销用户通信渠道
 	 */
 	public void ungisterUserContext(ChannelHandlerContext context) {
-		if(ConfManager.getIsCenter()){
+		if(ConfManager.getIsRedis()){
 			redisManager.ungisterUserContext(context);
 		}else{
 			serverManager.ungisterUserContext(context);
@@ -181,7 +166,7 @@ public enum Manager {
 
 	/** 想全体用户发送消息*/
 	public void sendPacketToAllUsers(Packet pact, String consoleHead, String fromUserId) {
-		/*if(ConfManager.getIsCenter()){
+		/*if(ConfManager.getIsRedis()){
 			redisManager.sendPacketToAllUsers(pact,consoleHead,fromUserId);
 		}else{*/
 			serverManager.sendPacketToAllUsers(pact,consoleHead,fromUserId);
@@ -193,7 +178,7 @@ public enum Manager {
 	 * @throws Exception
 	 */
 	public void sendPacketToRoomAllUsers(Packet pact, String consoleHead, String fromUserId) throws Exception{
-		if(ConfManager.getIsCenter()){
+		if(ConfManager.getIsRedis()){
 			redisManager.sendPacketToRoomAllUsers(pact, consoleHead, fromUserId);
 		}else{
 			serverManager.sendPacketToRoomAllUsers(pact, consoleHead, fromUserId);

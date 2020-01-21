@@ -33,7 +33,7 @@ public enum LoginManager {
 		ServerDataPool.TEMP_CONN_MAP2.put(loginPact.getFromUserId(), context);
 
 		/** 将用户信息注册 */
-		Manager.INSTANCE.addOnlineContext(loginPact.getRoomId(), loginPact.getFromUserId(),context, ce.getChannelType());
+		Manager.INSTANCE.addOnlineContext(loginPact.getFromUserId(),context, ce.getChannelType());
 		/** 登录信息 下行 处理 */
 		
 		clientLogin(loginPact, code, msg, "", context);
