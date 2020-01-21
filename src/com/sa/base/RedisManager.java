@@ -24,7 +24,7 @@ public enum RedisManager {
 
 	INSTANCE;
 	private static ExecutorService timelyLogExecutor = Executors.newSingleThreadExecutor();
-	
+
 	private static RedisDataManager redisDataManager = new RedisDataManager();;
 	/**
 	 * 上一个达到立即保存日志线程的是否完毕 true为完毕
@@ -117,12 +117,12 @@ public enum RedisManager {
 		Set<String> ipSet = new HashSet<>();
 		// 遍历用户map
 		for (Map.Entry<String, People> entry : roomUsers.entrySet()) {
-			
+
 			// 如果当前遍历出来的用户是发消息的用户，则不发送并继续遍历 if
-			if(entry.getKey().equals(pact.getFromUserId())) { 
-				continue; 
+			if (entry.getKey().equals(pact.getFromUserId())) {
+				continue;
 			}
-			 
+
 			String serverIp = jedisUtil.getHash(USER_SERVERIP_MAP_KEY, entry.getKey());
 			if (!ipSet.contains(serverIp)) {
 				// 获取用户通道
@@ -141,8 +141,8 @@ public enum RedisManager {
 	/**
 	 * 登录、注册、上线、绑定--非中心
 	 */
-	public void addOnlineContext(String roomId, String userId, String name, String icon, String agoraId,HashSet<String> userRole,
-			boolean notSpeak, ChannelHandlerContext context, int channelType) {
+	public void addOnlineContext(String roomId, String userId, String name, String icon, String agoraId,
+			HashSet<String> userRole, boolean notSpeak, ChannelHandlerContext context, int channelType) {
 		// 如果通道为空 则抛出空指针错误
 		if (context == null) {
 			// 抛出通道为空的异常
@@ -154,44 +154,23 @@ public enum RedisManager {
 		jedisUtil.setHash(USER_SERVERIP_MAP_KEY, userId, strIp);
 		// 将用户信息缓存
 		String[] roomIds = roomId.split(",");
-		if(roomIds!=null&&roomIds.length>0){
-			//循环保存房间用户信息
+		if (roomIds != null && roomIds.length > 0) {
+			// 循环保存房间用户信息
 			for (String rId : roomIds) {
 				redisDataManager.setRoomUser(rId, userId, name, icon, agoraId, userRole, notSpeak);
 			}
 		}
 	}
-	
-	/**
-	 * 登录、注册、上线、绑定--中心
-	 */
-	public void addOnlineContext(String roomId, String userId, 
-			ChannelHandlerContext context, int channelType) {
-		// 如果通道为空 则抛出空指针错误
-		if (context == null) {
-			// 抛出通道为空的异常
-			throw new NullPointerException("context is null");
-		}
-		// 缓存 通道-用户信息
-		ServerDataPool.CHANNEL_USER_MAP.put(context, new ChannelExtend(userId, channelType));
-		// 缓存 用户-通道信息
-		ServerDataPool.USER_CHANNEL_MAP.put(userId,context);
-		// 緩存用戶-serverIp信息
-		String strIp = StringUtil.subStringIp(context.channel().remoteAddress().toString());
-		jedisUtil.setHash(USER_SERVERIP_MAP_KEY, userId, strIp);
-	}
 
-	/**注銷用戶信息--非中心*/
+	/** 注銷用戶信息--非中心 */
 	public void ungisterUserInfo(String userId) {
-		/** 刪除用戶IP信息*/
+		/** 刪除用戶IP信息 */
 		jedisUtil.delHash(USER_SERVERIP_MAP_KEY, userId);
 		// 注销用户
 		ungisterUserId(userId);
-		
+
 	}
-	
-	
-	
+
 	/**
 	 * 注销用户通信渠道
 	 */
