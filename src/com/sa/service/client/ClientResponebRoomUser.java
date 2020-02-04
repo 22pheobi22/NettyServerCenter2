@@ -54,9 +54,9 @@ public class ClientResponebRoomUser extends Packet {
 				Manager.INSTANCE.sendPacketToRoomAllUsers(this, Constant.CONSOLE_CODE_S);
 			} else {
 				/** 设置目标用户的id*/
-				this.setToUserId(this.getFromUserId());
+				//this.setToUserId(this.getFromUserId());
 				/** 发消息给目标用户*/
-				Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
+				//Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
 			}
 
 		} catch (Exception e) {
