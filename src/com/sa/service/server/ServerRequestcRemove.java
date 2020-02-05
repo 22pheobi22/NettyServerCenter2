@@ -14,22 +14,15 @@
  */
 package com.sa.service.server;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import com.sa.base.ConfManager;
-import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientResponecRemove;
-import com.sa.service.permission.Permission;
-import com.sa.util.Constant;
 
 public class ServerRequestcRemove extends Packet {
-	public ServerRequestcRemove(){}
+	public ServerRequestcRemove() {
+	}
 
 	/**
 	 * @param transactionId
@@ -38,15 +31,14 @@ public class ServerRequestcRemove extends Packet {
 	 * @param toUserId
 	 * @param status
 	 */
-	public ServerRequestcRemove(Integer transactionId, String roomId, String fromUserId, String toUserId, Integer status) {
+	public ServerRequestcRemove(Integer transactionId, String roomId, String fromUserId, String toUserId,
+			Integer status) {
 		this.setTransactionId(transactionId);
 		this.setRoomId(roomId);
 		this.setFromUserId(fromUserId);
 		this.setToUserId(toUserId);
 		this.setStatus(status);
 	}
-
-
 
 	@Override
 	public PacketType getPacketType() {
@@ -55,32 +47,21 @@ public class ServerRequestcRemove extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 校验用户角色*/
-		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_TEACHER);add(Constant.ROLE_PARENT_TEACHER);}};
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), checkRoleSet);
-		/** 校验成功*/
-		if (0 == ((Integer) result.get("code"))) {
-			String[] roomIds = this.getRoomId().split(",");
-			if (null != roomIds && roomIds.length > 0) {
-				for (String rId : roomIds) {
-					/** 获取目标用户信息*/
-					People people = ServerDataPool.dataManager.getRoomUesr(rId, this.getToUserId());
-					/** 如果用户信息不为空*/
-					if (null != people)
-						/** 设置删除成功*/
-						this.setOption(255, "deleted");
-					/** 实例化删除信息 下行 并赋值 并 执行*/
-					ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(), this.getOptions());
-					clientResponecRemove.setRoomId(rId);
-					clientResponecRemove.execPacket();
-				}
+		String[] roomIds = this.getRoomId().split(",");
+		if (null != roomIds && roomIds.length > 0) {
+			for (String rId : roomIds) {
+				/** 获取目标用户信息 */
+				People people = ServerDataPool.dataManager.getRoomUesr(rId, this.getToUserId());
+				/** 如果用户信息不为空 */
+				if (null != people)
+					/** 设置删除成功 */
+					this.setOption(255, "deleted");
+				/** 实例化删除信息 下行 并赋值 并 执行 */
+				ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(),
+						this.getOptions());
+				clientResponecRemove.setRoomId(rId);
+				clientResponecRemove.execPacket();
 			}
-			/** 如果有中心*/
-			if (ConfManager.getIsCenter()) {
-				/** 转发到中心*/
-				Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
-			}
-
 		}
 	}
 
