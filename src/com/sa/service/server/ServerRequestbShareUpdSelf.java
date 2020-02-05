@@ -14,16 +14,9 @@
  */
 package com.sa.service.server;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.sa.base.ConfManager;
-import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
-import com.sa.service.client.ClientMsgReceipt;
-import com.sa.util.Constant;
 
 public class ServerRequestbShareUpdSelf extends Packet {
 	public ServerRequestbShareUpdSelf(){}
@@ -35,29 +28,7 @@ public class ServerRequestbShareUpdSelf extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 根绝房间id 和 发信人id 校验用户角色 */
-		//String userId = this.getFromUserId().replace("APP", "");
-/*		String userId = this.getFromUserId();
-		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_TEACHER);add(Constant.ROLE_PARENT_TEACHER);}};
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), userId,checkRoleSet);
-		if (0 != ((Integer) result.get("code"))) {
-			result = Permission.INSTANCE.checkUserAuth(this.getRoomId(), userId, (String) this.getOption(100));
-		}*/
-
-		Map<String, Object> result = new HashMap<>();
-		result.put("code", 0);
-		result.put("msg", "success");
 		
-		/** 实例化消息回执 并 赋值 并 执行 */
-		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
-
-		/** 如果校验成功 */
-		if (0 == ((Integer) result.get("code"))) {
-			/** 如果有中心 并 目标IP不是中心IP */
-			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-				/** 转发消息到中心 */
-				Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
-			} else {
 				String[] roomIds = this.getRoomId().split(",");
 				if (null != roomIds && roomIds.length > 0) {
 					for (String rId : roomIds) {
@@ -70,8 +41,6 @@ public class ServerRequestbShareUpdSelf extends Packet {
 						}
 					}
 				}
-			}
-		}
 	}
 
 	private int setShare() {

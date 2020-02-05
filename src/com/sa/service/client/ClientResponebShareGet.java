@@ -14,11 +14,9 @@
  */
 package com.sa.service.client;
 
-import com.sa.base.Manager;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
-import com.sa.util.Constant;
 
 public class ClientResponebShareGet extends Packet {
 
@@ -30,15 +28,6 @@ public class ClientResponebShareGet extends Packet {
 
 	@Override
 	public void execPacket() {
-		try {
-			/** 设置目标用户*/
-			this.setToUserId(this.getFromUserId());
-			/** 向目标用户发送消息*/
-			Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override
