@@ -14,20 +14,14 @@
  */
 package com.sa.service.server;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.sa.base.ConfManager;
-import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
-import com.sa.service.client.ClientMsgReceipt;
 import com.sa.service.client.ClientResponebShareUpd;
-import com.sa.util.Constant;
 
 public class ServerRequestbShareUpd extends Packet {
-	public ServerRequestbShareUpd(){}
+	public ServerRequestbShareUpd() {
+	}
 
 	@Override
 	public PacketType getPacketType() {
@@ -36,43 +30,20 @@ public class ServerRequestbShareUpd extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 根绝房间id 和 发信人id 校验用户角色 */
-		//String userId = this.getFromUserId().replace("APP", "");
-		/*String userId = this.getFromUserId();
-		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_TEACHER);add(Constant.ROLE_PARENT_TEACHER);}};
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), userId,checkRoleSet);
-		if (0 != ((Integer) result.get("code"))) {
-			result = Permission.INSTANCE.checkUserAuth(this.getRoomId(), userId, (String) this.getOption(100));
-		}*/
-		Map<String, Object> result = new HashMap<>();
-		result.put("code", 0);
-		result.put("msg", "success");
 
-		/** 实例化消息回执 并 赋值 并 执行 */
-		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
-
-		/** 如果校验成功 */
-		if (0 == ((Integer) result.get("code"))) {
-			/** 如果有中心 并 目标IP不是中心IP */
-			if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-				/** 转发消息到中心 */
-				Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
-			} else {
-				String[] roomIds = this.getRoomId().split(",");
-				if (null != roomIds && roomIds.length > 0) {
-					for (String rId : roomIds) {
-						String shareK1 = (String) this.getOption(1);
-						if (null != shareK1 && !"".equals(shareK1)) {
-							synchronized (shareK1) {
-								this.setRoomId(rId);
-								setShare();
-							}
-						}
-
-						/** 实例化 变更共享 下行 并 赋值 并 执行 */
-						new ClientResponebShareUpd(this.getPacketHead(), this.getOptions()).execPacket();
+		String[] roomIds = this.getRoomId().split(",");
+		if (null != roomIds && roomIds.length > 0) {
+			for (String rId : roomIds) {
+				String shareK1 = (String) this.getOption(1);
+				if (null != shareK1 && !"".equals(shareK1)) {
+					synchronized (shareK1) {
+						this.setRoomId(rId);
+						setShare();
 					}
 				}
+
+				/** 实例化 变更共享 下行 并 赋值 并 执行 */
+				new ClientResponebShareUpd(this.getPacketHead(), this.getOptions()).execPacket();
 			}
 		}
 	}
@@ -86,7 +57,7 @@ public class ServerRequestbShareUpd extends Packet {
 		String len = (String) this.getOption(6);
 		String indexs = (String) this.getOption(7);
 		String oldShareV = (String) this.getOption(8);
-		
+
 		int rs = 0;
 		if ("del".equalsIgnoreCase(shareOptType)) {
 			ServerDataPool.dataManager.removeShare(this.getRoomId(), shareK);
@@ -103,10 +74,10 @@ public class ServerRequestbShareUpd extends Packet {
 			ServerDataPool.dataManager.setShare(this.getRoomId(), shareK, shareV, shareType);
 		} else if ("upd.index".equalsIgnoreCase(shareOptType)) {
 			/** 更新房间共享文件 */
-			ServerDataPool.dataManager.updateShare(this.getRoomId(), shareK, shareV,Integer.parseInt(index));
+			ServerDataPool.dataManager.updateShare(this.getRoomId(), shareK, shareV, Integer.parseInt(index));
 		} else if ("upd.value".equalsIgnoreCase(shareOptType)) {
 			/** 更新房间共享文件 */
-			ServerDataPool.dataManager.updateShare(this.getRoomId(), shareK, oldShareV,shareV);
+			ServerDataPool.dataManager.updateShare(this.getRoomId(), shareK, oldShareV, shareV);
 		}
 
 		return rs;
