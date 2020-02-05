@@ -231,6 +231,9 @@ public class RedisDataManager {
 			String userId = people.getKey();
 			jedisUtil.delHash(USER_SERVERIP_MAP_KEY, userId);
 		}
+		
+		jedisUtil.delString(ROOM_INFO_MAP_KEY + roomId);
+		//jedisUtil.delHash(ROOM_FREE_MAP_KEY, roomId);
 		return room;
 	}
 

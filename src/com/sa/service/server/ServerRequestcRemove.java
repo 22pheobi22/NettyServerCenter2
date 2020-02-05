@@ -53,14 +53,15 @@ public class ServerRequestcRemove extends Packet {
 				/** 获取目标用户信息 */
 				People people = ServerDataPool.dataManager.getRoomUesr(rId, this.getToUserId());
 				/** 如果用户信息不为空 */
-				if (null != people)
+				if (null != people) {
 					/** 设置删除成功 */
 					this.setOption(255, "deleted");
-				/** 实例化删除信息 下行 并赋值 并 执行 */
-				ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(),
-						this.getOptions());
-				clientResponecRemove.setRoomId(rId);
-				clientResponecRemove.execPacket();
+					/** 实例化删除信息 下行 并赋值 并 执行 */
+					ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(),
+							this.getOptions());
+					clientResponecRemove.setRoomId(rId);
+					clientResponecRemove.execPacket();
+				}
 			}
 		}
 	}
