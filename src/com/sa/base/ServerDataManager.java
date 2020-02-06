@@ -33,8 +33,6 @@ import com.sa.base.element.Room;
 import com.sa.base.element.Share;
 import com.sa.util.Constant;
 
-import io.netty.channel.ChannelHandlerContext;
-
 public class ServerDataManager {
 	/** 缓存房间信息 String:roomId*/
 	private Map<String, Room> ROOM_INFO_MAP  = new ConcurrentHashMap<>();
@@ -223,7 +221,7 @@ public class ServerDataManager {
 	public Room removeRoom(String roomId) {
 
 		Room room = ROOM_INFO_MAP.remove(roomId);
-
+		
 		return room;
 	}
 

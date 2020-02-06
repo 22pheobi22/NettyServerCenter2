@@ -8,6 +8,8 @@ import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.Room;
 import com.sa.base.element.Share;
+import com.sa.service.client.ClientResponecRoomRemove;
+import com.sa.util.Constant;
 import com.sa.util.HttpClientUtil;
 
 public class RoomCancelSync implements Runnable {
@@ -29,9 +31,17 @@ public class RoomCancelSync implements Runnable {
 							System.out.println("RoomCancelSync roomId = " + roomId + "remove");
 							// 销毁房间
 							/** 删除 房间 消息 缓存 */
-							ServerDataPool.dataManager.cleanLogs(roomId);
+							//ServerDataPool.dataManager.cleanLogs(roomId);
 							/** 删除 房间 缓存 */
-							ServerDataPool.dataManager.removeRoom(roomId);
+							//Room removeRoom = ServerDataPool.dataManager.removeRoom(roomId);
+							
+							ClientResponecRoomRemove clientResponecRoomRemove = new ClientResponecRoomRemove();
+							clientResponecRoomRemove.setStatus(20046);
+							clientResponecRoomRemove.setOption(1, Constant.PROMPT_CODE_20046);
+							clientResponecRoomRemove.setRoomId(roomId);
+							clientResponecRoomRemove.setFromUserId("0");
+							clientResponecRoomRemove.execPacket();
+							
 							/** 删除 房间 空闲 计数 缓存 */
 							ServerDataPool.dataManager.cancelFreeRoom(roomId);
 						}

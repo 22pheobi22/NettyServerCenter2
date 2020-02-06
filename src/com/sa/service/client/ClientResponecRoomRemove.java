@@ -14,9 +14,16 @@
  */
 package com.sa.service.client;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.alibaba.fastjson.JSON;
 import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
+import com.sa.base.element.People;
 import com.sa.base.element.Room;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
@@ -37,11 +44,26 @@ public class ClientResponecRoomRemove extends Packet {
 			/** 删除房间消息缓存*/
 			ServerDataPool.dataManager.cleanLogs(this.getRoomId());
 			
+			/** 删除房间缓存*/
 			Room removeRoom = ServerDataPool.dataManager.getRoom(this.getRoomId());
 			this.setOption(2, JSON.toJSONString(removeRoom));
 			Manager.INSTANCE.sendPacketToRoomAllUsers(this, Constant.CONSOLE_CODE_S);
 			
-			/** 删除房间缓存*/
+			//用户是否在其他房间 若在不删IP和channel
+			Map<String, People> peoplesMap = removeRoom.getPeoples();
+			for (Entry<String, People> people : peoplesMap.entrySet()) {
+				String userId = people.getKey();
+				String userRoomNo = ServerDataPool.dataManager.getUserRoomNo(userId);
+				if(null!=userRoomNo&&!"".equals(userRoomNo)){
+					List<String> list = new ArrayList<String>(Arrays.asList(userRoomNo.split(",")));
+					list.remove(this.getRoomId());
+					if(list.size()>0){
+						continue;
+					}
+				}
+				//删user-serverip
+				ServerDataPool.dataManager.delUserServer(userId);
+			}
 			ServerDataPool.dataManager.removeRoom(this.getRoomId());
 		} catch (Exception e) {
 			e.printStackTrace();
