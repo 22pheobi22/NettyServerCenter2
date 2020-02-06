@@ -36,11 +36,13 @@ public class ClientResponecRoomRemove extends Packet {
 		try {
 			/** 删除房间消息缓存*/
 			ServerDataPool.dataManager.cleanLogs(this.getRoomId());
-			/** 删除房间缓存*/
-			Room removeRoom = ServerDataPool.dataManager.removeRoom(this.getRoomId());
 			
-			this.setOption(10, removeRoom);
+			Room removeRoom = ServerDataPool.dataManager.getRoom(this.getRoomId());
+			this.setOption(2, JSON.toJSONString(removeRoom));
 			Manager.INSTANCE.sendPacketToRoomAllUsers(this, Constant.CONSOLE_CODE_S);
+			
+			/** 删除房间缓存*/
+			ServerDataPool.dataManager.removeRoom(this.getRoomId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
