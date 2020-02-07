@@ -58,6 +58,7 @@ public class SUniqueLogon extends Packet {
 			code = 10093;
 			msg = Constant.ERR_CODE_10093;
 		} else if("0".equals(String.valueOf(checkUniqueLogonResult.get("code")))){
+			/**返回code=0 已登录*/
 			//已登录则注销上次登录--旧sever通道
 			doLogonUngister((ChannelHandlerContext)checkUniqueLogonResult.get("result"));
 		}
@@ -148,23 +149,17 @@ public class SUniqueLogon extends Packet {
 	}
 
 	private void doLogonUngister(ChannelHandlerContext temp) {
-		//
+		/** 发送 消息回执 *///给原通道服务器
 		CUniqueLogon cl = new CUniqueLogon(this.getTransactionId(), this.getRoomId(), this.getFromUserId(),
 				10098);
-		/** 实例化 消息回执 *//*
-		ClientMsgReceipt mr = new ClientMsgReceipt(this.getTransactionId(), this.getRoomId(), this.getFromUserId(),
-				10098);
-		mr.*/
 		cl.setFromUserId(this.getFromUserId());
 		cl.setOption(254, Constant.ERR_CODE_10098);
-		/** 发送 消息回执 *///给原通道服务器
 		try {
 			Manager.INSTANCE.sendPacketTo(cl, temp, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		//给房间用户发消息 通知用户注销
-		//mr.setFromUserId(this.getFromUserId());
 		noticeUserUngister(cl);
 		
 		//注銷用戶信息
@@ -184,7 +179,7 @@ public class SUniqueLogon extends Packet {
 			for (String rId : roomIds) {
 				ClientResponebRoomUser crru = new ClientResponebRoomUser(cl.getPacketHead());
 				crru.setFromUserId(this.getFromUserId());
-				crru.setToUserId("0");
+				//crru.setToUserId("0");
 				crru.setStatus(0);
 				crru.setOption(12, cl.getToUserId());
 				crru.setRoomId(rId);
