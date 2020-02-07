@@ -174,7 +174,7 @@ public enum Manager {
 	}
 
 	/**
-	 *  向房间内所有用户发送数据包
+	 *  向房间内除发信人外所有用户所在服务发送数据包
 	 * @throws Exception
 	 */
 	public void sendPacketToRoomAllUsers(Packet pact, String consoleHead, String fromUserId) throws Exception{

@@ -221,7 +221,7 @@ public enum RedisManager {
 	}
 
 	/**
-	 * 向房间内所有用户发送数据包
+	 * 向房间内除发信人所有用户所在服务发送数据包
 	 * 
 	 * @throws Exception
 	 */
