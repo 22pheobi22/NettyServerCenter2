@@ -54,16 +54,12 @@ public class ServerStart {
 			//第一次启动 redis中无数据 直接写入ip角色信息
 			boolean isMasterCenter= false;
 			JedisUtil jedisUtil = new JedisUtil();
-			//JedisPoolUtil jedisPoolUtil = new JedisPoolUtil();
-			//Jedis jedis = jedisPoolUtil.getJedis();
 			List<String> hashValsAll = jedisUtil.getHashValsAll("centerRoleInfo");
 			if(hashValsAll==null||hashValsAll.size()<=0){
 				Map<String,String> centerRoleMap = new HashMap<>();
 				centerRoleMap.put("master", ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort());
 				centerRoleMap.put("slave", ConfManager.getCenterIpAnother()+":"+ConfManager.getCenterPortAnother());
-				//jedis.hmset("centerRoleInfo", centerRoleMap);
 				jedisUtil.setHashMulti("centerRoleInfo", centerRoleMap);
-				//Jedis jedis = jedisPool.getJedis();
 				isMasterCenter = true;
 			}else{
 				String masterCenterAddress = jedisUtil.getHash("centerRoleInfo", "master");
