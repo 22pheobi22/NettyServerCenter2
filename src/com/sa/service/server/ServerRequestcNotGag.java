@@ -15,23 +15,19 @@
 package com.sa.service.server;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import com.sa.base.ConfManager;
-import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.People;
 import com.sa.base.element.Room;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientMsgReceipt;
-import com.sa.service.permission.Permission;
 import com.sa.util.Constant;
 
 public class ServerRequestcNotGag extends Packet {
-	public ServerRequestcNotGag(){}
+	public ServerRequestcNotGag() {
+	}
 
 	@Override
 	public PacketType getPacketType() {
@@ -40,28 +36,20 @@ public class ServerRequestcNotGag extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 校验用户角色 */
-		Set<String> checkRoleSet = new HashSet(){{add(Constant.ROLE_ASSISTANT);}};
-		Map<String, Object> result = Permission.INSTANCE.checkUserRole(this.getRoomId(), this.getFromUserId(), checkRoleSet);
-		/** 校验成功 */
-		if (0 == ((Integer) result.get("code"))) {
-			String[] roomIds = this.getRoomId().split(",");
-			if (null != roomIds && roomIds.length > 0) {
-				for (String rId : roomIds) {
-					//this.setRoomId(rId);
-					if (null == this.getToUserId() || "".equals(this.getToUserId())) {
-						all(rId);
-					} else {
-						one(this.getToUserId(),rId);
-					}
+		String[] roomIds = this.getRoomId().split(",");
+		if (null != roomIds && roomIds.length > 0) {
+			for (String rId : roomIds) {
+				// this.setRoomId(rId);
+				if (null == this.getToUserId() || "".equals(this.getToUserId())) {
+					all(rId);
+				} else {
+					one(this.getToUserId(), rId);
 				}
 			}
 		}
-		/** 实例化消息回执 并 赋值 并 执行 */
-		new ClientMsgReceipt(this.getPacketHead(), result).execPacket();
 	}
 
-	private void one(String userId,String roomId) {
+	private void one(String userId, String roomId) {
 		/** 移除目标用户禁言 */
 		People people = ServerDataPool.dataManager.speakAuth(roomId, userId);
 		/** 如果目标用户为空 */
@@ -77,9 +65,6 @@ public class ServerRequestcNotGag extends Packet {
 			cm.setRoomId(roomId);
 			cm.execPacket();
 			/** 如果有中心 并 目标IP不是中心IP */
-		} else if (ConfManager.getIsCenter() && !ConfManager.getCenterIp().equals(this.getRemoteIp())) {
-			/** 转发到中心 */
-			Manager.INSTANCE.sendPacketToCenter(this, Constant.CONSOLE_CODE_TS);
 		}
 	}
 
@@ -87,7 +72,7 @@ public class ServerRequestcNotGag extends Packet {
 		Room room = ServerDataPool.dataManager.getRoom(roomId);
 
 		for (Map.Entry<String, People> entry : room.getPeoples().entrySet()) {
-			one(entry.getKey(),roomId);
+			one(entry.getKey(), roomId);
 		}
 	}
 }
