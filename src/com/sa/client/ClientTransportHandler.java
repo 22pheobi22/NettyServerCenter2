@@ -1,7 +1,5 @@
 package com.sa.client;
 
-import java.util.Objects;
-
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
@@ -22,9 +20,6 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 		//此时通道已建立，保存通信人-通道信息，向通信人发送登陆消息
 		Integer transactionId = (int) (1 + Math.random()*100000000);
 		String toUserId =StringUtil.subStringIp(ctx.channel().remoteAddress().toString());
-		//if(Objects.nonNull(ctx.channel().remoteAddress())&&ctx.channel().remoteAddress().toString().length()>1){
-			//toUserId =
-		//}
 		 
 		ServerLogin serverLogin = new ServerLogin(transactionId, "", "0", toUserId, 0);
 		
@@ -33,8 +28,7 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 		// 缓存 通道-用户信息
 		ServerDataPool.CHANNEL_USER_MAP.put(ctx, new ChannelExtend());
 	
-		//serverLogin.execPacket();
-		serverLogin.centerExecPacket();
+		serverLogin.execPacket();
 	}
 	
 	@Override
@@ -49,24 +43,27 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 
 	public void close(ChannelHandlerContext ctx,ChannelPromise promise){
 		System.err.println("TCP closed...");
-
-		ctx.close(promise);
+		if(null!=ctx){
+			ctx.close(promise);
+		}
 	}
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		System.err.println("客户端关闭1");
-		ctx.close();
+		System.err.println("服务端关闭channelInactive");
+		if(null!=ctx){
+			ctx.close();
+		}
 	}
 
 	public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
 		ctx.disconnect(promise);
-		System.err.println("客户端关闭2");
+		System.err.println("服务端关闭disconnect");
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		System.err.println("客户端关闭3");
+		System.err.println("服务端关闭exceptionCaught");
 //		ctx.fireExceptionCaught(cause);
 		Channel channel = ctx.channel();
 		cause.printStackTrace();

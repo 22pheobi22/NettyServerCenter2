@@ -11,7 +11,6 @@ import com.sa.net.Packet;
 import com.sa.net.PacketManager;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientHeartBeat;
-import com.sa.service.client.ClientLoginOut;
 import com.sa.service.manager.LoginManager;
 import com.sa.service.manager.SystemLoginManager;
 import com.sa.service.server.ServerLogin;
@@ -64,22 +63,13 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 		String log = "TCP closed...";
 		
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != ce && null != ce.getUserId()) {
-			String roomId = ServerDataPool.dataManager.getUserRoomNo(ce.getUserId());
-			
-			log += "["+roomId+"]("+ce.getUserId()+")";
-
-			if (null != roomId) {
-				ClientLoginOut clientLoginOut = new ClientLoginOut();
-				clientLoginOut.setRoomId(roomId);
-				clientLoginOut.setFromUserId(ce.getUserId());
-				clientLoginOut.execPacket();
-			}
+		if (null != ce) {
+			log += "("+ce.getUserId()+")";
+			Manager.INSTANCE.ungisterUserId(ce.getUserId());
 		}
 		
 		System.err.println(log);
 
-//		ServerManager.INSTANCE.ungisterUserContext(ctx);
 		if(null!=ctx){
 			ctx.close(promise);			
 		}
@@ -90,41 +80,21 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 		String log = "channelInactive客户端关闭1";
 
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != ce && null != ce.getUserId()) {
-			String roomId = ServerDataPool.dataManager.getUserRoomNo(ce.getUserId());
-
-			log += "["+roomId+"]("+ce.getUserId()+")";
-			
-			if (null != roomId) {
-				ClientLoginOut clientLoginOut = new ClientLoginOut();
-				clientLoginOut.setRoomId(roomId);
-				clientLoginOut.setFromUserId(ce.getUserId());
-				clientLoginOut.execPacket();
-			}
+		if (null != ce) {
+			log += "("+ce.getUserId()+")";
+			Manager.INSTANCE.ungisterUserId(ce.getUserId());
 		}
-
 		System.err.println(log);
-//		ServerManager.INSTANCE.ungisterUserContext(ctx);
 	}
 
 	public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise)
 			throws Exception {
-//		ServerManager.INSTANCE.ungisterUserContext(ctx);
-		
 		String log = "disconnect客户端关闭2";
 		
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != ce && null != ce.getUserId()) {
-			String roomId = ServerDataPool.dataManager.getUserRoomNo(ce.getUserId());
-
-			log += "["+roomId+"]("+ce.getUserId()+")";
-
-			if (null != roomId) {
-				ClientLoginOut clientLoginOut = new ClientLoginOut();
-				clientLoginOut.setRoomId(roomId);
-				clientLoginOut.setFromUserId(ce.getUserId());
-				clientLoginOut.execPacket();
-			}
+		if (null != ce) {
+			log += "("+ce.getUserId()+")";
+			Manager.INSTANCE.ungisterUserId(ce.getUserId());
 		}
 		if(null!=ctx){
 			ctx.disconnect(promise);	
@@ -135,16 +105,6 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-//		ServerManager.INSTANCE.ungisterUserContext(ctx);
-		
-//		String userId = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-//		String roomId = ServerDataPool.dataManager.getUserRoomNo(userId);
-//
-//		ClientLoginOut clientLoginOut = new ClientLoginOut();
-//		clientLoginOut.setRoomId(roomId);
-//		clientLoginOut.setFromUserId(userId);
-//		clientLoginOut.setOption(255, "deleted");
-//		clientLoginOut.execPacket();
 		
 		System.err.println("exceptionCaught:业务逻辑出错");
 		cause.printStackTrace();
@@ -173,11 +133,9 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 					ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
 					if (null != ce) {
 						log += "("+ce.getUserId()+")";
+						Manager.INSTANCE.ungisterUserId(ce.getUserId());
 					}
-					
 					System.err.println(log);
-					Manager.INSTANCE.ungisterUserContext(ctx);
-					
 				}
 			}
 		}
