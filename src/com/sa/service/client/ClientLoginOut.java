@@ -34,18 +34,20 @@ public class ClientLoginOut extends Packet {
 	public void execPacket() {
 		try {
 			if(!ConfManager.getCenterId().equals(this.getFromUserId())){
-				String[] roomIds = this.getRoomId().split(",");
-				if(roomIds!=null&&roomIds.length>0){
-					for (String rId : roomIds) {
-						/** 根据roomId 和 发信人id 移除房间内用户*/
-						ServerDataPool.dataManager.removeRoomUser(rId, this.getFromUserId());
-						//重新设置房间id为要处理房间的id  下边通知其他人要用
-						this.setRoomId(rId);
-						noticeUser();
+				if(null!=this.getRoomId()){
+					String[] roomIds = this.getRoomId().split(",");
+					if(roomIds!=null&&roomIds.length>0){
+						for (String rId : roomIds) {
+							/** 根据roomId 和 发信人id 移除房间内用户*/
+							ServerDataPool.dataManager.removeRoomUser(rId, this.getFromUserId());
+							//重新设置房间id为要处理房间的id  下边通知其他人要用
+							this.setRoomId(rId);
+							noticeUser();
+						}
 					}
+					//刪除user-ip信息
+					ServerDataPool.dataManager.delUserServer(this.getFromUserId());
 				}
-				//刪除user-ip信息
-				ServerDataPool.dataManager.delUserServer(this.getFromUserId());
 			}else{
 				this.setToUserId(this.getFromUserId());
 				Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
