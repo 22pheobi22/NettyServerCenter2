@@ -51,7 +51,13 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
-	private WebSocketServerHandshaker handshaker;
+
+	@Override
+	protected void channelRead0(ChannelHandlerContext paramChannelHandlerContext, Object paramI) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+	/*private WebSocketServerHandshaker handshaker;
 	// 客户端超时次数
 	private Map<ChannelHandlerContext, Integer> clientOvertimeMap = new ConcurrentHashMap<>();
 
@@ -264,5 +270,5 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 		}
 		clientOvertimeMap.put(ctx, oldTimes + 1);
 	}
-
+*/
 }
