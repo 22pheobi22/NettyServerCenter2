@@ -70,9 +70,9 @@ public class JedisPoolUtil {
             initialConfig();
             try {
                 JedisPoolConfig config = new JedisPoolConfig();
-                //config.setMaxTotal(maxTotal);
-                //config.setMaxIdle(maxIdle);
-                //config.setMaxWaitMillis(maxWaitMillis);
+                config.setMaxTotal(maxTotal);
+                config.setMaxIdle(maxIdle);
+                config.setMaxWaitMillis(maxWaitMillis);
                 //conf
                 
                 //声明一个set 存放烧饼集群的地址和端口

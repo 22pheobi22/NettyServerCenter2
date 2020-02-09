@@ -14,20 +14,10 @@
  */
 package com.sa.service.server;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-
-import org.apache.commons.beanutils.BeanUtils;
-
-import com.sa.base.ConfManager;
-import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
-import com.sa.service.client.ClientMsgReceipt;
 import com.sa.service.client.ClientResponebRoom;
-import com.sa.service.permission.Permission;
-import com.sa.util.Constant;
 
 public class ServerRequestbRoom extends Packet {
 	public ServerRequestbRoom() {
