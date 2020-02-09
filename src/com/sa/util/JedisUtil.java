@@ -75,7 +75,8 @@ public class JedisUtil {
     public String getString(String key) {
         Jedis jedis = jedisPool.getJedis();
         try {
-            return jedis.get(key);
+        	String str = jedis.get(key);
+            return str;
         } catch (Exception e) {
             logger.debug("getString() key {} throws:{}", key,e.getMessage());
             return null;
