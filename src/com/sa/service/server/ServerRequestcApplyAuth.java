@@ -35,10 +35,10 @@ public class ServerRequestcApplyAuth extends Packet {
 			for (String rId : roomIds) {
 				/** 根据房间id 和 目标用户id 获取 人员信息*/
 				People people = ServerDataPool.dataManager.getRoomUesr(rId, this.getToUserId());
-				/** 实例化一对一消息类型 下行 并 赋值*/
-				ClientResponecApplyAuth clientResponebApplyAuth = new ClientResponecApplyAuth(this.getPacketHead(), this.getOptions());
 				/** 如果人员信息不为空*/
 				if (null != people) {
+					/** 实例化一对一消息类型 下行 并 赋值*/
+					ClientResponecApplyAuth clientResponebApplyAuth = new ClientResponecApplyAuth(this.getPacketHead(), this.getOptions());
 					clientResponebApplyAuth.setRoomId(rId);
 					/** 执行 一对一消息发送 下行*/
 					clientResponebApplyAuth.execPacket();
