@@ -12,9 +12,11 @@ public class ConfManager {
 	// 获取服务ip和端口
 	/** 普通服务器ip */
 	public static String[] getServerAddress() {
+		String[] split =null;
 		String strAddress = CONF_MAP.get("server.address");
-		String[] split = strAddress.split(";");
-
+		if(null!=strAddress){
+			split = strAddress.split(";");
+		}
 		return split;
 	}
 
@@ -355,5 +357,15 @@ public class ConfManager {
 		}
 
 		return Boolean.parseBoolean(admin);
+	}
+	
+	/** 新增服务器ip */
+	public static String[] getAddAddress() {
+		String[] split =null;
+		String strAddress = CONF_MAP.get("server.add.address");
+		if(null!=strAddress){
+			split = strAddress.split(";");
+		}
+		return split;
 	}
 }

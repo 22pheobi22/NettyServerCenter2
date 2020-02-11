@@ -8,6 +8,7 @@ import com.sa.base.ConfManager;
 import com.sa.client.ChatClient;
 import com.sa.thread.AutoCancelTempConnect;
 import com.sa.thread.MongoLogSync;
+import com.sa.thread.ReConnectServer;
 import com.sa.thread.RoomCancelSync;
 import com.sa.transport.ClientSocketServcer;
 import com.sa.transport.WebSocketServer;
@@ -38,7 +39,7 @@ public class ServerStart {
 		}*/
 
 		startNetty();
-
+		new Thread(new ReConnectServer()).start();
 	}
 
 	private static void initConf() {
