@@ -1,6 +1,7 @@
 package com.sa.thread;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
@@ -11,15 +12,28 @@ import com.sa.base.element.Share;
 import com.sa.service.client.ClientResponecRoomRemove;
 import com.sa.util.Constant;
 import com.sa.util.HttpClientUtil;
+import com.sa.util.JedisUtil;
 
 public class RoomCancelSync implements Runnable {
 
 	@Override
 	public void run() {
 		while(true) {
-			Map<String, Integer> roomInfo = ServerDataPool.dataManager.getRoomInfo();
-			for (Map.Entry<String, Integer> room : roomInfo.entrySet()) {
-				String roomId = room.getKey();	// 房间id
+			//角色判断  主中心才回收
+			boolean isMasterCenter= false;
+			JedisUtil jedisUtil = new JedisUtil();
+			List<String> hashValsAll = jedisUtil.getHashValsAll("centerRoleInfo");
+			if(null!=hashValsAll){
+				String masterCenterAddress = jedisUtil.getHash("centerRoleInfo", "master");
+				if(null!=masterCenterAddress&&masterCenterAddress.equals(ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort())){
+					isMasterCenter=true;
+				}
+			}
+			if(isMasterCenter){
+				
+				Map<String, Integer> roomInfo = ServerDataPool.dataManager.getRoomInfo();
+				for (Map.Entry<String, Integer> room : roomInfo.entrySet()) {
+					String roomId = room.getKey();	// 房间id
 //				int personNum = room.getValue();// 房间人数
 //				if (0 == personNum) {			// 如果房间人数是0
 					// 空闲时长，每个数代表5分钟
@@ -52,10 +66,12 @@ public class RoomCancelSync implements Runnable {
 //				} else {
 //					ServerDataPool.dataManager.cancelFreeRoom(roomId);
 //				}
+				}
 			}
 			try {
 //				Thread.sleep(1000*15);
-				Thread.sleep(1000*60*10);
+				//Thread.sleep(1000*60*10);
+				Thread.sleep(1000*60*1);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

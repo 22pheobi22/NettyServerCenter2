@@ -50,10 +50,12 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		System.err.println("服务端关闭channelInactive");
+		String strLog = "服务端"+ctx.channel().remoteAddress()+"关闭channelInactive";
 		if(null!=ctx){
 			ctx.close();
 		}
+		//TODO 通道关闭警告
+		System.err.println(strLog);
 	}
 
 	public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
@@ -65,10 +67,14 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		System.err.println("服务端关闭exceptionCaught");
 //		ctx.fireExceptionCaught(cause);
-		Channel channel = ctx.channel();
 		cause.printStackTrace();
-		if(channel.isActive()){
-			System.err.println("simpleclient"+channel.remoteAddress()+"异常");
+		if(null!=ctx){
+			Channel channel = ctx.channel();
+			if(channel.isActive()){
+				System.err.println("simpleclient"+channel.remoteAddress()+"异常");
+			}
+			//TODO 警告
+			ctx.close();
 		}
 	}
 }

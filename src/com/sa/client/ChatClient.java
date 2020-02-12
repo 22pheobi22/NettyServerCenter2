@@ -78,8 +78,6 @@ public class ChatClient implements Runnable {
         	if (reconnectTimes < ConfManager.getMaxReconnectTimes()) {
                 reconnectTimes++;
         		reConnectServer(reconnectTimes);
-        		//TODO 每次断线重连警告
-        		//TODO 断线重连最终失败警告
         		//重连最终失败，校验自己的角色,如果是备中心，说明主中心挂掉 
         		if(!isMaster){
         			//1.去redis将自己改为主
@@ -108,8 +106,17 @@ public class ChatClient implements Runnable {
           
         try {  
             Thread.sleep(2000);
+            String logStr = "";
             //因为是中心，所以是主重连服务，或备重连主
-            System.err.println("中心第"+reconnectTimes+"次断线重连"+host+":"+port);  
+            if(host.equals(ConfManager.getCenterIpAnother())&&(port+"").equals(ConfManager.getCenterPortAnother())){
+            	//备重连主
+            	logStr ="备中心第"+reconnectTimes+"次断线重连主中心"+host+":"+port;
+            }else{
+            	//主重连服务
+            	logStr ="主中心第"+reconnectTimes+"次断线重连服务"+host+":"+port;
+            }
+            System.err.println(logStr);
+            //TODO断线重连警告
             connect(this.host, this.port);
             
         } catch (Exception e) {  
