@@ -7,7 +7,6 @@ import java.util.Map;
 import com.sa.base.ConfManager;
 import com.sa.client.ChatClient;
 import com.sa.thread.AutoCancelTempConnect;
-import com.sa.thread.MongoLogSync;
 import com.sa.thread.ReConnectServer;
 import com.sa.thread.RoomCancelSync;
 import com.sa.transport.ClientSocketServcer;
@@ -22,13 +21,6 @@ public class ServerStart {
 		
 		new Thread(new AutoCancelTempConnect()).start();
 
-		/** 是否 启用 mongodb*/
-		boolean mongodbEnable = ConfManager.getMongodbEnable();
-		if(mongodbEnable){
-			new Thread(new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(), ConfManager.getMongoNettyLogDBName(),ConfManager.getMongoNettyLogTableName(),ConfManager.getMongoNettyLogUserName(),ConfManager.getMongoNettyLogPassword(), ConfManager.getLogTime(),false)).start();
-		}
-
-		new Thread(new RoomCancelSync()).start();
 
 /*		new Thread(new HttpServer(ConfManager.getHttpPort())).start();
 		new Thread(new LogSync(ConfManager.getLogUrl(), ConfManager.getLogTime())).start();
@@ -39,7 +31,6 @@ public class ServerStart {
 		}*/
 
 		startNetty();
-		new Thread(new ReConnectServer()).start();
 	}
 
 	private static void initConf() {
@@ -71,11 +62,16 @@ public class ServerStart {
 			
 			//若是主，读取服务列表，主动连接服务
 			if(isMasterCenter){
+				//连接服务 
 				String[] address = ConfManager.getServerAddress();
 				for (int i = 0; i < address.length; i++) {
 					String[] addr = address[i].split(":");
 					new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMasterCenter)).start();
 				}
+				//开启空闲教室回收
+				new Thread(new RoomCancelSync()).start();
+				//连接新增服务线程
+				new Thread(new ReConnectServer()).start();
 			}else{
 			//若是备，监测主
 			new Thread(new ChatClient(ConfManager.getCenterIpAnother(), ConfManager.getCenterPortAnother(),isMasterCenter)).start();
