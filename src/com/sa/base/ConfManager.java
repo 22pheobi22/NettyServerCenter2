@@ -310,6 +310,13 @@ public class ConfManager {
 	public static String getStatSaveUrl() {
 		return CONF_MAP.get("stat.save.url");
 	}
+	
+	/**
+	 * 发送错误警告的连接
+	 * */
+	public static String getSendErrorMsgUrl() {
+		return CONF_MAP.get("send.error.msg.url");
+	}
 
 	public static String getMongoIp() {
 		return CONF_MAP.get("mongo.ip");
