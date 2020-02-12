@@ -7,6 +7,7 @@ import java.util.Map;
 import com.sa.base.ConfManager;
 import com.sa.net.codec.PacketDecoder;
 import com.sa.net.codec.PacketEncoder;
+import com.sa.util.HttpClientUtil;
 import com.sa.util.JedisUtil;
 
 import io.netty.bootstrap.Bootstrap;
@@ -116,6 +117,16 @@ public class ChatClient implements Runnable {
             	logStr ="主中心第"+reconnectTimes+"次断线重连服务"+host+":"+port;
             }
             System.err.println(logStr);
+        	String url = ConfManager.getSendErrorMsgUrl();
+    		if (null != url && !"".equals(url)) {
+    			try {
+    				Map<String, String> params = new HashMap<>();
+    				params.put("msg", logStr);
+    				HttpClientUtil.post(url, params);
+    			}catch (Exception e) {
+					e.printStackTrace();
+				}
+    		}
             //TODO断线重连警告
             connect(this.host, this.port);
             

@@ -1,10 +1,15 @@
 package com.sa.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
 import com.sa.service.server.ServerLogin;
+import com.sa.util.HttpClientUtil;
 import com.sa.util.StringUtil;
 
 import io.netty.channel.Channel;
@@ -56,6 +61,16 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 		}
 		//TODO 通道关闭警告
 		System.err.println(strLog);
+		String url = ConfManager.getSendErrorMsgUrl();
+		if (null != url && !"".equals(url)) {
+			try {
+				Map<String, String> params = new HashMap<>();
+				params.put("msg", strLog);
+				HttpClientUtil.post(url, params);
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
