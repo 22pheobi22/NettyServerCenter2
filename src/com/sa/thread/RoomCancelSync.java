@@ -126,5 +126,4 @@ public class RoomCancelSync implements Runnable {
 
 		return rs;
 	}
-
 }
