@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.sa.base.DataManager;
 import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.net.Packet;
@@ -46,7 +45,7 @@ public class ClientResponecRemove extends Packet {
 			noticeUser();
 			/**该用户是否还存在于其他房间*/
 			String userRoomNo = ServerDataPool.dataManager.getUserRoomNo(this.getToUserId());
-			if(null!=userRoomNo&&!"".equals(userRoomNo)){
+			if(null==userRoomNo||"".equals(userRoomNo)){
 				//若不存在  发送踢人下行消息到服务 关闭该服务上用户通道
 				Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
 				//移除user-ip信息
