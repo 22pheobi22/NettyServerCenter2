@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
@@ -25,7 +26,8 @@ import com.sa.net.PacketType;
 import com.sa.util.Constant;
 
 public class ClientResponecRemove extends Packet {
-	public ClientResponecRemove(){}
+	public ClientResponecRemove() {
+	}
 
 	public ClientResponecRemove(PacketHeadInfo packetHead, TreeMap<Integer, Object> options) {
 		this.setOptions(options);
@@ -34,12 +36,24 @@ public class ClientResponecRemove extends Packet {
 
 	@Override
 	public void execPacket() {
-		/** 发送被迫下线通知*/
-		offline();
-		/** 移除用户*/
-		ServerDataPool.dataManager.removeRoomUser(this.getRoomId(), this.getToUserId());
-		/** 通知被踢用户*/
-		noticeUser();
+		try {
+			/** 发送被迫下线通知*/
+			offline();
+			/** 移除用户*/
+			ServerDataPool.dataManager.removeRoomUser(this.getRoomId(), this.getToUserId());
+			/** 通知被踢用户*/
+			noticeUser();
+			/**该用户是否还存在于其他房间*/
+			String userRoomNo = ServerDataPool.dataManager.getUserRoomNo(this.getToUserId());
+			if(null!=userRoomNo&&!"".equals(userRoomNo)){
+				//若不存在  发送踢人下行消息到服务 关闭该服务上用户通道
+				Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
+				//移除user-ip信息
+				ServerDataPool.dataManager.delUserServer(this.getToUserId());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
