@@ -65,6 +65,8 @@ public class ClientResponecRoomRemove extends Packet {
 				ServerDataPool.dataManager.delUserServer(userId);
 			}
 			ServerDataPool.dataManager.removeRoom(this.getRoomId());
+			/** 删除 房间 空闲 计数 缓存 */
+			ServerDataPool.dataManager.cancelFreeRoom(this.getRoomId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
