@@ -57,7 +57,7 @@ public class RoomCancelSync implements Runnable {
 							clientResponecRoomRemove.execPacket();
 							
 							/** 删除 房间 空闲 计数 缓存 */
-							ServerDataPool.dataManager.cancelFreeRoom(roomId);
+							//ServerDataPool.dataManager.cancelFreeRoom(roomId);
 						}
 					} else {
 						// 空余时长➕1
@@ -70,8 +70,7 @@ public class RoomCancelSync implements Runnable {
 			}
 			try {
 //				Thread.sleep(1000*15);
-				//Thread.sleep(1000*60*10);
-				Thread.sleep(1000*60*1);
+				Thread.sleep(1000*60*10);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
