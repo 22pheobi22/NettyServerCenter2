@@ -7,8 +7,8 @@ import java.util.Map;
 import com.sa.base.ConfManager;
 import com.sa.client.ChatClient;
 import com.sa.thread.AutoCancelTempConnect;
+import com.sa.thread.DeleteRedisDataSync;
 import com.sa.thread.ReConnectServer;
-import com.sa.thread.RoomCancelSync;
 import com.sa.transport.ClientSocketServcer;
 import com.sa.transport.WebSocketServer;
 import com.sa.util.JedisUtil;
@@ -64,12 +64,16 @@ public class ServerStart {
 			if(isMasterCenter){
 				//连接服务 
 				String[] address = ConfManager.getServerAddress();
-				for (int i = 0; i < address.length; i++) {
-					String[] addr = address[i].split(":");
-					new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMasterCenter)).start();
+				if(null!=address&&address.length>0){
+					for (int i = 0; i < address.length; i++) {
+						String[] addr = address[i].split(":");
+						new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMasterCenter)).start();
+					}
 				}
 				//开启空闲教室回收
-				new Thread(new RoomCancelSync()).start();
+				//new Thread(new RoomCancelSync()).start();
+				//启动清除redis数据线程
+				new Thread(new DeleteRedisDataSync()).start();
 				//连接新增服务线程
 				new Thread(new ReConnectServer()).start();
 			}else{

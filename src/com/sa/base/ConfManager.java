@@ -375,4 +375,9 @@ public class ConfManager {
 		}
 		return split;
 	}
+	
+	/** 清除redis时间配置 */
+	public static String getDelRedisTime() {
+		return CONF_MAP.get("redis.data.del.time");
+	}
 }

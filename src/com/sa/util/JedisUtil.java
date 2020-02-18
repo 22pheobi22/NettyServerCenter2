@@ -95,6 +95,19 @@ public class JedisUtil {
             close(jedis);
         }
     }
+    
+    public boolean delHash(String key) {
+        Jedis jedis = jedisPool.getJedis();
+        try {
+            jedis.del(key);
+            return true;
+        } catch (Exception e) {
+            logger.debug("delString() key {} throws:{}", key,e.getMessage());
+            return false;
+        } finally {
+            close(jedis);
+        }
+    }
 
     public boolean delHash(String key, String mKey) {
         Jedis jedis = jedisPool.getJedis();
