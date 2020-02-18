@@ -377,6 +377,11 @@ public class DataManager {
 		}
 	}
 
+	/**遍历删除redis中所有房间信息 */
+	public Map<String, Integer> removeRoomAll() {
+		return redisDataManager.removeRoomAll();
+	}
+	
 	/**
 	 * 获取聊天记录列表 String roomId 房间id String chatKey 聊天记录key 时间+事务id 逗号分隔 int
 	 * chatNum 获取聊天记录数量

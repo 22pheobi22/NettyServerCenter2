@@ -32,10 +32,12 @@ public class ReConnectServer implements Runnable {
 					//连接服务
 					Set<String> ips = ServerDataPool.USER_CHANNEL_MAP.keySet();
 					String[] address = ConfManager.getServerAddress();
-					for (int i = 0; i < address.length; i++) {
-						String[] addr = address[i].split(":");
-						if(!ips.contains(addr[0])){
-							new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),true)).start();
+					if(null!=address&&address.length>0){
+						for (int i = 0; i < address.length; i++) {
+							String[] addr = address[i].split(":");
+							if(!ips.contains(addr[0])){
+								new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),true)).start();
+							}
 						}
 					}
 				}
