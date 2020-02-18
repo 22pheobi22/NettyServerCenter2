@@ -1,3 +1,10 @@
+package com.sa.base;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.sa.util.StringUtil;
+
 public class ConfManager {
 	/** 运行配置 */
 	public static Map<String, String> CONF_MAP = new HashMap<>();
