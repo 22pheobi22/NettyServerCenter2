@@ -719,6 +719,17 @@ public class RedisDataManager {
 		return roomInfoMap;
 	}
 
+	/**遍历删除redis中所有房间信息 */
+	public Map<String, Integer> removeRoomAll() {
+
+		Set<String> keysAll = jedisUtil.scanKeys(ROOM_INFO_MAP_KEY + "*");
+		Map<String, Integer> roomInfoMap = new HashMap<String, Integer>();
+		for (String key : keysAll) {
+			jedisUtil.delString(key);
+		}
+		return roomInfoMap;
+	}
+	
 	/**
 	 * 获取聊天记录列表 String roomId 房间id String chatKey 聊天记录key 时间+事务id 逗号分隔 int
 	 * chatNum 获取聊天记录数量
