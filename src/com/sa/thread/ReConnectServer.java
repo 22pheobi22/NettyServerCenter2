@@ -7,6 +7,7 @@ import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.client.ChatClient;
 import com.sa.util.JedisUtil;
+import com.sa.util.ReadConf;
 
 public class ReConnectServer implements Runnable {
 
@@ -31,9 +32,14 @@ public class ReConnectServer implements Runnable {
 				if(isMasterCenter){
 					//连接服务
 					Set<String> ips = ServerDataPool.USER_CHANNEL_MAP.keySet();
+					for (String p : ips) {
+						System.out.println("已连接服务："+p);
+					}
+					new ReadConf().readFileByLines();
 					String[] address = ConfManager.getServerAddress();
 					if(null!=address&&address.length>0){
 						for (int i = 0; i < address.length; i++) {
+							System.out.println("配置服务："+address[i]);
 							String[] addr = address[i].split(":");
 							if(!ips.contains(addr[0])){
 								new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),true)).start();
@@ -45,7 +51,7 @@ public class ReConnectServer implements Runnable {
 				e.printStackTrace();
 			}
 			try {
-				Thread.sleep(1000*60*4);
+				Thread.sleep(1000*60*1);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
