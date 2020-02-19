@@ -109,7 +109,7 @@ public class ChatClient implements Runnable {
             
             String logStr = "";
             //因为是中心，所以是主重连服务，或备重连主
-            if(host.equals(ConfManager.getCenterIpAnother())&&(port+"").equals(ConfManager.getCenterPortAnother())){
+            if(host.equals(ConfManager.getCenterIpAnother())&&(port+"").equals(ConfManager.getCenterPortAnother()+"")){
             	//备重连主
             	logStr ="备中心第"+reconnectTimes+"次断线重连主中心"+host+":"+port;
             }else{
