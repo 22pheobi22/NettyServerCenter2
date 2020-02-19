@@ -27,7 +27,7 @@ public class ChatClient implements Runnable {
 	private boolean isMaster=false;
 	/** 当前重接次数*/
 	private int reconnectTimes = 0;
-	
+	JedisUtil jedisUtil = new JedisUtil();
 	public ChatClient(String host,int port,boolean isMaster) {
 		this.host = host;
 		this.port = port;
@@ -85,7 +85,7 @@ public class ChatClient implements Runnable {
     				Map<String,String> centerRoleMap = new HashMap<>();
     				centerRoleMap.put("master", ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort());
     				centerRoleMap.put("slave", ConfManager.getCenterIpAnother()+":"+ConfManager.getCenterPortAnother());
-    				JedisUtil jedisUtil = new JedisUtil();
+    				//JedisUtil jedisUtil = new JedisUtil();
     				jedisUtil.setHashMulti("centerRoleInfo", centerRoleMap);
     				isMaster = true;
             		//2.主动连接服务
@@ -107,13 +107,21 @@ public class ChatClient implements Runnable {
           
         try {  
             Thread.sleep(2000);
+            
             String logStr = "";
             //因为是中心，所以是主重连服务，或备重连主
             if(host.equals(ConfManager.getCenterIpAnother())&&(port+"").equals(ConfManager.getCenterPortAnother())){
             	//备重连主
             	logStr ="备中心第"+reconnectTimes+"次断线重连主中心"+host+":"+port;
-            }else{
+            }
+            if(host.equals(ConfManager.getCenterIp())&&(port+"").equals(ConfManager.getCenterPort())){
             	//主重连服务
+            	//每次重连 校验自己的身份
+                String masterIp = jedisUtil.getHash("centerRoleInfo", "slave");
+                if(null!=masterIp&&masterIp.equals(ConfManager.getCenterIp()+":"+ConfManager.getCenterPort())){
+                	//重连中发现自己是备
+                	return;
+                }
             	logStr ="主中心第"+reconnectTimes+"次断线重连服务"+host+":"+port;
             }
             System.err.println(logStr);
