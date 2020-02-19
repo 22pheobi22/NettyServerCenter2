@@ -124,7 +124,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 			IdleStateEvent e = (IdleStateEvent) evt;
 			if (e.state() == IdleState.READER_IDLE) {
 				System.err.println("客户端读超时");
-				if(null!=ctx){
+				if(null!=ctx&&clientOvertimeMap.size()>0){
 					int overtimeTimes = clientOvertimeMap.get(ctx);
 					if (overtimeTimes < ConfManager.getMaxReconnectTimes()) {
 						Manager.INSTANCE.sendPacketTo(new ClientHeartBeat(), ctx, null);
