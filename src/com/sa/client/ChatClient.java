@@ -113,8 +113,7 @@ public class ChatClient implements Runnable {
             if(host.equals(ConfManager.getCenterIpAnother())&&(port+"").equals(ConfManager.getCenterPortAnother())){
             	//备重连主
             	logStr ="备中心第"+reconnectTimes+"次断线重连主中心"+host+":"+port;
-            }
-            if(host.equals(ConfManager.getCenterIp())&&(port+"").equals(ConfManager.getCenterPort())){
+            }else{
             	//主重连服务
             	//每次重连 校验自己的身份
                 String masterIp = jedisUtil.getHash("centerRoleInfo", "slave");
