@@ -31,6 +31,11 @@ public class ServerStart {
 		}*/
 
 		startNetty();
+		//启动清除redis数据线程
+		new Thread(new DeleteRedisDataSync()).start();
+		//连接新增服务线程
+		new Thread(new ReConnectServer()).start();
+		
 	}
 
 	private static void initConf() {
@@ -72,10 +77,7 @@ public class ServerStart {
 				}
 				//开启空闲教室回收
 				//new Thread(new RoomCancelSync()).start();
-				//启动清除redis数据线程
-				new Thread(new DeleteRedisDataSync()).start();
-				//连接新增服务线程
-				new Thread(new ReConnectServer()).start();
+
 			}else{
 			//若是备，监测主
 			new Thread(new ChatClient(ConfManager.getCenterIpAnother(), ConfManager.getCenterPortAnother(),isMasterCenter)).start();
