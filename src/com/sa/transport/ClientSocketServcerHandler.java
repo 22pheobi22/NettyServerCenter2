@@ -124,18 +124,20 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 			IdleStateEvent e = (IdleStateEvent) evt;
 			if (e.state() == IdleState.READER_IDLE) {
 				System.err.println("客户端读超时");
-				int overtimeTimes = clientOvertimeMap.get(ctx);
-				if (overtimeTimes < ConfManager.getMaxReconnectTimes()) {
-					Manager.INSTANCE.sendPacketTo(new ClientHeartBeat(), ctx, null);
-					addUserOvertime(ctx);
-				} else {
-					String log = "客户端超时踢下线";
-					ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-					if (null != ce) {
-						log += "("+ce.getUserId()+")";
-						Manager.INSTANCE.ungisterUserId(ce.getUserId());
+				if(null!=ctx){
+					int overtimeTimes = clientOvertimeMap.get(ctx);
+					if (overtimeTimes < ConfManager.getMaxReconnectTimes()) {
+						Manager.INSTANCE.sendPacketTo(new ClientHeartBeat(), ctx, null);
+						addUserOvertime(ctx);
+					} else {
+						String log = "客户端超时踢下线";
+						ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+						if (null != ce) {
+							log += "("+ce.getUserId()+")";
+							Manager.INSTANCE.ungisterUserId(ce.getUserId());
+						}
+						System.err.println(log);
 					}
-					System.err.println(log);
 				}
 			}
 		}
