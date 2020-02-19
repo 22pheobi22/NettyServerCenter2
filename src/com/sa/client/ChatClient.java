@@ -105,7 +105,7 @@ public class ChatClient implements Runnable {
     private void reConnectServer(int reconnectTimes){
           
         try {  
-            Thread.sleep(2000);
+           // Thread.sleep(2000);
             
             String logStr = "";
             //因为是中心，所以是主重连服务，或备重连主
@@ -119,6 +119,7 @@ public class ChatClient implements Runnable {
                 String slaveIp = jedisUtil.getHash("centerRoleInfo", "slave");
                 if(null!=slaveIp&&slaveIp.equals(ConfManager.getCenterIp()+":"+ConfManager.getCenterPort())){
                 	//重连中发现自己是备
+    	        	//new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMaster)).start();
                 	return;
                 }
             	logStr ="主中心第"+reconnectTimes+"次断线重连服务"+host+":"+port;
