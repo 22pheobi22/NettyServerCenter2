@@ -27,6 +27,7 @@ public class DeleteRedisDataSync implements Runnable {
 			Long delayTime = getDelayTime();
 			if(null!=delayTime){
 				try {
+					System.out.println("delay:"+delayTime);
 					Thread.sleep(delayTime);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -50,6 +51,11 @@ public class DeleteRedisDataSync implements Runnable {
 						//删除redis中用户IP信息
 						jedisUtil.delHash(USER_SERVERIP_MAP_KEY);
 					}
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}else{
 				try {
