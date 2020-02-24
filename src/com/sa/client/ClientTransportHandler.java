@@ -27,7 +27,7 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 		Integer transactionId = (int) (1 + Math.random() * 100000000);
 		String toUserId = StringUtil.subStringIp(ctx.channel().remoteAddress().toString());
 
-		ServerLogin serverLogin = new ServerLogin(transactionId, "", "0", toUserId, 0);
+		ServerLogin serverLogin = new ServerLogin(transactionId, "0", "0", toUserId, 0);
 
 		// 缓存 用户-通道信息
 		ServerDataPool.USER_CHANNEL_MAP.put(toUserId, ctx);
