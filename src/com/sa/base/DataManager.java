@@ -378,8 +378,8 @@ public class DataManager {
 	}
 
 	/**遍历删除redis中所有房间信息 */
-	public Map<String, Integer> removeRoomAll() {
-		return redisDataManager.removeRoomAll();
+	public void removeRoomAll() {
+		redisDataManager.removeRoomAll();
 	}
 	
 	/**
