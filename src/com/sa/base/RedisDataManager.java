@@ -720,14 +720,12 @@ public class RedisDataManager {
 	}
 
 	/**遍历删除redis中所有房间信息 */
-	public Map<String, Integer> removeRoomAll() {
+	public void removeRoomAll() {
 
 		Set<String> keysAll = jedisUtil.scanKeys(ROOM_INFO_MAP_KEY + "*");
-		Map<String, Integer> roomInfoMap = new HashMap<String, Integer>();
 		for (String key : keysAll) {
 			jedisUtil.delString(key);
 		}
-		return roomInfoMap;
 	}
 	
 	/**

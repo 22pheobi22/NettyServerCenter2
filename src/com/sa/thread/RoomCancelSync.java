@@ -41,6 +41,7 @@ public class RoomCancelSync implements Runnable {
 					if (freeNum >= 18) {
 //						System.out.println("RoomCancelSync roomId = " + roomId);
 						Boolean closeLession = closeLession(roomId);
+						closeLession=true;
 						if (closeLession) {
 							System.out.println("RoomCancelSync roomId = " + roomId + "remove");
 							// 销毁房间
@@ -70,7 +71,8 @@ public class RoomCancelSync implements Runnable {
 			}
 			try {
 //				Thread.sleep(1000*15);
-				Thread.sleep(1000*60*10);
+				//Thread.sleep(1000*60*10);
+				Thread.sleep(1000*60*3);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -126,5 +128,4 @@ public class RoomCancelSync implements Runnable {
 
 		return rs;
 	}
-
 }
