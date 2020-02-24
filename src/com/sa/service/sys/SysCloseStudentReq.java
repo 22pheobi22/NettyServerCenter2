@@ -37,6 +37,9 @@ public class SysCloseStudentReq extends Packet {
 				clientLoginOut.setPacketHead(this.getPacketHead());
 				clientLoginOut.setRoomId(roomId);
 				clientLoginOut.setFromUserId(tmp);
+				
+				//删除用户缓存
+				ServerDataPool.dataManager.removeRoomUser(tmp);
 
 				/** 如果人员信息为空*/
 				if (null != people)
