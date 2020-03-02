@@ -61,28 +61,26 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
 		String log = "TCP closed...";
-		
-		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != ce) {
-			log += "("+ce.getUserId()+")";
-			Manager.INSTANCE.ungisterUserId(ce.getUserId());
-		}
-		
-		System.err.println(log);
-
 		if(null!=ctx){
+			ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+			if (null != ce) {
+				log += "("+ce.getUserId()+")";
+				Manager.INSTANCE.ungisterUserId(ce.getUserId());
+			}
 			ctx.close(promise);			
 		}
+		System.err.println(log);
 	}
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		String log = "channelInactive客户端关闭1";
-
-		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != ce) {
-			log += "("+ce.getUserId()+")";
-			Manager.INSTANCE.ungisterUserId(ce.getUserId());
+		if(null!=ctx){
+			ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+			if (null != ce) {
+				log += "("+ce.getUserId()+")";
+				Manager.INSTANCE.ungisterUserId(ce.getUserId());
+			}
 		}
 		System.err.println(log);
 	}
@@ -91,12 +89,12 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 			throws Exception {
 		String log = "disconnect客户端关闭2";
 		
-		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
-		if (null != ce) {
-			log += "("+ce.getUserId()+")";
-			Manager.INSTANCE.ungisterUserId(ce.getUserId());
-		}
 		if(null!=ctx){
+			ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
+			if (null != ce) {
+				log += "("+ce.getUserId()+")";
+				Manager.INSTANCE.ungisterUserId(ce.getUserId());
+			}
 			ctx.disconnect(promise);	
 		}
 		System.err.println(log);
