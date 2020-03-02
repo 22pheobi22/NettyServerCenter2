@@ -24,6 +24,8 @@ public class SysSendMsgRoomReq extends Packet {
 						System.currentTimeMillis() + "," + this.getTransactionId(), this.getFromUserId(),
 						(String) this.getOption(1));
 				
+				System.err.println("this.getOption(1):"+this.getOption(1));
+				
 				ClientResponebRoom newCrr = new ClientResponebRoom(this.getPacketHead(), this.getOptions());
 				newCrr.setRoomId(rId);
 				newCrr.execPacket();
