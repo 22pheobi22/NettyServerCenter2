@@ -415,17 +415,6 @@ public class DataManager {
 		}
 	}
 
-	/**
-	 * 同一用户不能访问方式的数量
-	 */
-	public int getRoomTheSameUserCannotAccessNum(String roomId, String userId) {
-		if(ConfManager.getIsRedis()){
-			return redisDataManager.getRoomTheSameUserCannotAccessNum(roomId,userId);
-		}else{
-			return serverDataManager.getRoomTheSameUserCannotAccessNum(roomId,userId);
-		}	
-	}
-
 	public void print(String method) {
 	}
 

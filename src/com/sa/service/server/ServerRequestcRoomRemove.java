@@ -20,7 +20,8 @@ import com.sa.service.client.ClientResponecRoomRemove;
 import com.sa.util.Constant;
 
 public class ServerRequestcRoomRemove extends Packet {
-	public ServerRequestcRoomRemove(){}
+	public ServerRequestcRoomRemove() {
+	}
 
 	/**
 	 * @param transactionId
@@ -45,17 +46,17 @@ public class ServerRequestcRoomRemove extends Packet {
 
 	@Override
 	public void execPacket() {
-			String[] roomIds = this.getRoomId().split(",");
-			if (null != roomIds && roomIds.length > 0) {
-				for (String rId : roomIds) {
-					/** 实例化 删除房间 下行*/
-					ClientResponecRoomRemove clientResponecRoomRemove = new ClientResponecRoomRemove(this.getPacketHead());
-					clientResponecRoomRemove.setStatus(20046);
-					clientResponecRoomRemove.setOption(1, Constant.PROMPT_CODE_20046);
-					clientResponecRoomRemove.setRoomId(rId);
-					clientResponecRoomRemove.execPacket();
-				}
+		String[] roomIds = this.getRoomId().split(",");
+		if (null != roomIds && roomIds.length > 0) {
+			for (String rId : roomIds) {
+				/** 实例化 删除房间 下行 */
+				ClientResponecRoomRemove clientResponecRoomRemove = new ClientResponecRoomRemove(this.getPacketHead());
+				clientResponecRoomRemove.setStatus(20046);
+				clientResponecRoomRemove.setOption(1, Constant.PROMPT_CODE_20046);
+				clientResponecRoomRemove.setRoomId(rId);
+				clientResponecRoomRemove.execPacket();
 			}
+		}
 	}
 
 }

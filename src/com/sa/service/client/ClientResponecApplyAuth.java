@@ -44,17 +44,6 @@ public class ClientResponecApplyAuth extends Packet {
 		try {
 			/** 发送消息给目标用户*/
 			Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
-
-			/*String userId = this.getToUserId();
-			if (userId.endsWith("APP")) {
-				userId = userId.replace("APP", "");
-			} else {
-				userId += "APP";
-			}
-			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(userId);
-			if (null != ctx) {
-				ServerManager.INSTANCE.sendPacketTo(this, ctx, Constant.CONSOLE_CODE_S);
-			}*/
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -33,16 +33,15 @@ public class ClientLoginOut extends Packet {
 	@Override
 	public void execPacket() {
 		try {
+			//非中心登出
 			if(!ConfManager.getCenterId().equals(this.getFromUserId())){
 				if(null!=this.getRoomId()){
 					String[] roomIds = this.getRoomId().split(",");
-					if(roomIds!=null&&roomIds.length>0){
+					if(null!=roomIds&&roomIds.length>0){
 						for (String rId : roomIds) {
 							/** 根据roomId 和 发信人id 移除房间内用户*/
 							ServerDataPool.dataManager.removeRoomUser(rId, this.getFromUserId());
-							//重新设置房间id为要处理房间的id  下边通知其他人要用
-							this.setRoomId(rId);
-							noticeUser();
+							noticeUser(rId);
 						}
 					}
 					//刪除user-ip信息
@@ -66,10 +65,10 @@ public class ClientLoginOut extends Packet {
 	}
 
 	/** 通知房间内用户*/
-	private void noticeUser() {
+	private void noticeUser(String rId) {
 		ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
 		crru.setOption(12, this.getFromUserId());
-
+		crru.setRoomId(rId);
 		crru.execPacket();
 	}
 }

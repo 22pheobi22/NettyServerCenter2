@@ -4,8 +4,9 @@ import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.util.ByteBufUtil;
 
-public class ClientHeartBeat extends Packet{
-	public ClientHeartBeat(){}
+public class ClientHeartBeat extends Packet {
+	public ClientHeartBeat() {
+	}
 
 	@Override
 	public void writePacketBody(ByteBufUtil buf) {
@@ -22,7 +23,7 @@ public class ClientHeartBeat extends Packet{
 
 	@Override
 	public void execPacket() {
-System.out.println("心跳client");
+		System.out.println("心跳client");
 	}
 
 	@Override

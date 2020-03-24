@@ -1,14 +1,13 @@
 package com.sa.base;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.sa.base.element.ChannelExtend;
-import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.net.codec.PacketBinEncoder;
@@ -42,7 +41,6 @@ public enum RedisManager {
 
 		if (null != ce) {
 			if (0 == ce.getChannelType()) {
-				// System.out.println("【ctx:"+ctx+"】【pack:"+pact+"】");
 				ctx.writeAndFlush(pact);
 			} else if (1 == ce.getChannelType()) {
 				// 将数据包封成二进制包
@@ -95,46 +93,24 @@ public enum RedisManager {
 	 * @throws Exception
 	 */
 	// 原逻辑：遍历房间内所有用户，除发送者及中心外均发送消息
-	// 现逻辑:查找房间内用户来源ip 中心IP除外 发消息 对于发送者所在ip 依旧发消息 在服务中判断
+	// 现逻辑:向所有服務發消息，中心除外，在服務端進行發送用戶判斷
 	public void sendPacketToRoomAllUsers(Packet pact, String consoleHead) throws Exception {
 		// 如果数据包为空 则返回
 		if (pact == null)
 			return;
-
-		// 获取房间内所有用户信息
-		Map<String, People> roomUsers = redisDataManager.getRoomUesrs(pact.getRoomId());
-		// 如果房间内没有用户 则返回
-		if (null == roomUsers || 0 == roomUsers.size())
-			return;
-
 		// 在控制台打印消息头
 		pact.printPacket(ConfManager.getConsoleFlag(), consoleHead, ConfManager.getFileLogFlag(),
-				ConfManager.getFileLogPath());
-		// 缓存消息日志
-		// this.log(pact);
-
-		// 存储房间用户所在服务ip
-		Set<String> ipSet = new HashSet<>();
-		// 遍历用户map
-		for (Map.Entry<String, People> entry : roomUsers.entrySet()) {
-
-			// 如果当前遍历出来的用户是发消息的用户，则不发送并继续遍历 if
-			/*if (entry.getKey().equals(pact.getFromUserId())) {
-				continue;
-			}*/
-
-			String serverIp = jedisUtil.getHash(USER_SERVERIP_MAP_KEY, entry.getKey());
-			if (!ipSet.contains(serverIp)) {
-				// 获取用户通道
-				ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(serverIp);
-				ipSet.add(serverIp);
-
-				if (null != ctx) {
-					// 向通道写数据并发送
-					writeAndFlush(ctx, pact);
-				}
-			}
-
+						ConfManager.getFileLogPath());
+		
+		//備中心通道
+		ChannelHandlerContext centerCtx = ServerDataPool.USER_CHANNEL_MAP.get("0");
+		Collection<ChannelHandlerContext> values = ServerDataPool.USER_CHANNEL_MAP.values();
+		if(null!=centerCtx){
+			values.remove(centerCtx);
+		}
+		for (ChannelHandlerContext ctx : values) {
+			// 向通道写数据并发送
+			writeAndFlush(ctx, pact);
 		}
 	}
 
@@ -201,7 +177,6 @@ public enum RedisManager {
 			}
 		}
 	}
-
 	/**
 	 * 注销用户通信渠道
 	 */
@@ -221,55 +196,27 @@ public enum RedisManager {
 	}
 
 	/**
-	 * 向房间内除发信人所有用户所在服务发送数据包
+	 * 向所有服务器发送房间内消息 
 	 * 
 	 * @throws Exception
 	 */
-	// 在中心 向房间所有用户所在的服务的ip对应通道发下行消息
+	// 在中心 向除中心外所有服务器发送房间内消息  在服务端判断具体通知用户
 	public void sendPacketToRoomAllUsers(Packet pact, String consoleHead, String fromUserId) throws Exception {
 		// 如果数据包为空 则返回
 		if (pact == null)
 			return;
-
-		// 获取房间内所有用户信息
-		Map<String, People> roomUsers = redisDataManager.getRoomUesrs(pact.getRoomId());
-		// 如果房间内没有用户 则返回
-		if (null == roomUsers || 0 == roomUsers.size())
-			return;
-
+		
 		// 在控制台打印消息头
 		pact.printPacket(ConfManager.getConsoleFlag(), consoleHead, ConfManager.getFileLogFlag(),
-				ConfManager.getFileLogPath());
-
-		// this.log(pact);
-
-		// 存放房间用户所在ip集合（过滤发送人）
-		Set<String> ipSet = new HashSet<>();
-
-		// 遍历用户map
-		for (Map.Entry<String, People> entry : roomUsers.entrySet()) {
-			// 如果当前遍历出来的用户是发消息的用户，则不发送并继续遍历
-			if (entry.getKey().equals(fromUserId) || "0".equals(entry.getKey())) {
-				continue;
-			}
-
-			// System.out.println(entry.getKey() + " " + pact.getPacketType());
-
-			// 获取用户对应的ip
-			String userServerIp = jedisUtil.getHash(USER_SERVERIP_MAP_KEY, entry.getKey());
-
-			// 获取用户通道
-			// 首先判断ip是否已存在集合 已存在则已发不再发
-			if (ipSet.contains(userServerIp)) {
-				continue;
-			}
-			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(userServerIp);
-			ipSet.add(userServerIp);
-			// 如果通道不为空
-			if (null == ctx) {
-				continue;
-			}
-
+								ConfManager.getFileLogPath());
+		
+		//備中心通道
+		ChannelHandlerContext centerCtx = ServerDataPool.USER_CHANNEL_MAP.get("0");
+		Collection<ChannelHandlerContext> values = ServerDataPool.USER_CHANNEL_MAP.values();
+		if(null!=centerCtx){
+			values.remove(centerCtx);
+		}		
+		for (ChannelHandlerContext ctx : values) {
 			// 向通道写数据并发送
 			writeAndFlush(ctx, pact);
 		}

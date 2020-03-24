@@ -116,11 +116,9 @@ public enum ServerManager {
 
 		// 遍历用户map
 		for (Map.Entry<String, People> entry : roomUsers.entrySet()) {
-			// 如果当前遍历出来的用户是发消息的用户，则不发送并继续遍历
-			/*if (entry.getKey().equals(pact.getFromUserId())) {
+			if ("0".equals(entry.getKey())) {
 				continue;
-			}*/
-
+			}
 			// 获取用户通道
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(entry.getKey());
 			if(null!=ctx){

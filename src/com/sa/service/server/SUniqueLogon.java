@@ -33,7 +33,8 @@ import com.sa.util.Constant;
 import io.netty.channel.ChannelHandlerContext;
 
 public class SUniqueLogon extends Packet {
-	public SUniqueLogon(){}
+	public SUniqueLogon() {
+	}
 
 	public SUniqueLogon(PacketHeadInfo packetHead) {
 		this.setPacketHead(packetHead);
@@ -41,53 +42,49 @@ public class SUniqueLogon extends Packet {
 
 	@Override
 	public void execPacket() {
-		
+
 		int code = 0;
 		String msg = "成功";
-		
+
 		String fromServerIp = (String) this.getOption(100);
 		/** 获取 用户 角色 */
 		String role = (String) this.getOption(2);
 		/** 格式化 用户角色 */
 		HashSet<String> userRole = toRole(role);
 		/** 判断用户是否登陆过 code=1未登录 code=0已登录 */
-		Map<String,Object> checkUniqueLogonResult = checkUniqueLogon(userRole);
-		
-		/** 返回：code!=1 教師二次登錄 */
-		if((!"1".equals(String.valueOf(checkUniqueLogonResult.get("code"))))&&(!"0".equals(String.valueOf(checkUniqueLogonResult.get("code"))))){
-			code = 10093;
-			msg = Constant.ERR_CODE_10093;
-		} else if("0".equals(String.valueOf(checkUniqueLogonResult.get("code")))){
-			/**返回code=0 已登录*/
-			//已登录则注销上次登录--旧sever通道
-			doLogonUngister((ChannelHandlerContext)checkUniqueLogonResult.get("result"));
+		Map<String, Object> checkUniqueLogonResult = checkUniqueLogon(userRole);
+
+		if ("0".equals(String.valueOf(checkUniqueLogonResult.get("code")))) {
+			/** 返回code=0 已登录 */
+			// 已登录则注销上次登录--旧sever通道
+			doLogonUngister((ChannelHandlerContext) checkUniqueLogonResult.get("result"));
 		}
-		//獲取最新登錄服務IP
-		if(null==fromServerIp||"".equals(fromServerIp)){
+		// 獲取最新登錄服務IP
+		if (null == fromServerIp || "".equals(fromServerIp)) {
 			return;
 		}
-		//新server通道
+		// 新server通道
 		ChannelHandlerContext context = ServerDataPool.USER_CHANNEL_MAP.get(fromServerIp);
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(context);
-		if(null==context||null == ce || null == ce.getConnBeginTime()){
+		if (null == context || null == ce || null == ce.getConnBeginTime()) {
 			return;
 		}
-			
+
 		if (10093 != code) {
-			/**注册登录*/
-			doLogin(context,ce,userRole,role);
+			/** 注册登录 */
+			doLogin(context, ce, userRole, role);
 		}
 
 		/** 登录信息 下行 处理 */
 		clientLogin(code, msg, role, context);
-		
+
 	}
 
 	@Override
 	public PacketType getPacketType() {
 		return PacketType.SUniqueLogon;
 	}
-	
+
 	private void clientLogin(int code, String msg, String role, ChannelHandlerContext context) {
 		ClientLogin cl = new ClientLogin(this.getPacketHead());
 
@@ -103,7 +100,7 @@ public class SUniqueLogon extends Packet {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/*
 	 * 格式化 用户角色
 	 */
@@ -119,7 +116,7 @@ public class SUniqueLogon extends Packet {
 		} else if ("4".equals(role)) {
 			userRole.add(Constant.ROLE_AUDIENCE);
 		} else if ("5".equals(role)) {
-			
+
 		} else if ("0".equals(role)) {
 			userRole.add(Constant.ROLE_PARENT_TEACHER);
 		} else {
@@ -128,18 +125,15 @@ public class SUniqueLogon extends Packet {
 
 		return userRole;
 	}
-	
+
 	/** 校验 单点登录 */
-	public Map<String,Object> checkUniqueLogon(HashSet<String> userRole) {
-		Map<String,Object> map = new HashMap<>();
+	public Map<String, Object> checkUniqueLogon(HashSet<String> userRole) {
+		Map<String, Object> map = new HashMap<>();
 		map.put("code", 1);
 		map.put("result", null);
 
-		if ("".equals(this.getFromUserId())) {
-			map.put("code", 2000);
-		}
 		/** 根据 用户id 获取 用户通道 */
-		ChannelHandlerContext temp =ServerDataPool.dataManager.getUserServerChannel(this.getFromUserId());
+		ChannelHandlerContext temp = ServerDataPool.dataManager.getUserServerChannel(this.getFromUserId());
 		/** 如果 用户通道 不为空 */
 		if (null != temp) {
 			map.put("code", 0);
@@ -149,9 +143,8 @@ public class SUniqueLogon extends Packet {
 	}
 
 	private void doLogonUngister(ChannelHandlerContext temp) {
-		/** 发送 消息回执 *///给原通道服务器
-		CUniqueLogon cl = new CUniqueLogon(this.getTransactionId(), this.getRoomId(), this.getFromUserId(),
-				10098);
+		/** 发送 消息回执 */// 给原通道服务器
+		CUniqueLogon cl = new CUniqueLogon(this.getTransactionId(), this.getRoomId(), this.getFromUserId(), 10098);
 		cl.setFromUserId(this.getFromUserId());
 		cl.setOption(254, Constant.ERR_CODE_10098);
 		try {
@@ -159,19 +152,19 @@ public class SUniqueLogon extends Packet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//给房间用户发消息 通知用户注销
+		// 给房间用户发消息 通知用户注销
 		noticeUserUngister(cl);
-		
-		//注銷用戶信息
+
+		// 注銷用戶信息
 		Manager.INSTANCE.ungisterUserInfo(this.getFromUserId());
 	}
-	
+
 	/** 通知房间内用户 */
 	private void noticeUserUngister(CUniqueLogon cl) {
 		String[] roomIds = null;
-		//向用户原来所在房间发减员消息 
+		// 向用户原来所在房间发减员消息
 		String roomNo = ServerDataPool.dataManager.getUserRoomNo(cl.getFromUserId());
-		if(null!=roomNo){
+		if (null != roomNo) {
 			roomIds = roomNo.split(",");
 		}
 		if (roomIds != null && roomIds.length > 0) {
@@ -179,7 +172,6 @@ public class SUniqueLogon extends Packet {
 			for (String rId : roomIds) {
 				ClientResponebRoomUser crru = new ClientResponebRoomUser(cl.getPacketHead());
 				crru.setFromUserId(this.getFromUserId());
-				//crru.setToUserId("0");
 				crru.setStatus(0);
 				crru.setOption(12, cl.getToUserId());
 				crru.setRoomId(rId);
@@ -187,46 +179,39 @@ public class SUniqueLogon extends Packet {
 			}
 		}
 	}
-	
-	private void doLogin(ChannelHandlerContext context,ChannelExtend ce,HashSet<String> userRole,String role) {
+
+	private void doLogin(ChannelHandlerContext context, ChannelExtend ce, HashSet<String> userRole, String role) {
 		/** 注册用户上线信息 */
-		Manager.INSTANCE.addOnlineContext(this.getRoomId(), this.getFromUserId(),
-			(String) this.getOption(3), (String) this.getOption(4),
-			(String) this.getOption(5), userRole, ConfManager.getTalkEnable(), context,ce.getChannelType());
-		
-		//通知所在服务器做登录处理
-		CUniqueLogon cl = new CUniqueLogon(this.getTransactionId(), this.getRoomId(), this.getFromUserId(),
-				0);
+		Manager.INSTANCE.addOnlineContext(this.getRoomId(), this.getFromUserId(), (String) this.getOption(3),
+				(String) this.getOption(4), (String) this.getOption(5), userRole, ConfManager.getTalkEnable(), context,
+				ce.getChannelType());
+
+		// 通知所在服务器做登录处理
+		CUniqueLogon cl = new CUniqueLogon(this.getTransactionId(), this.getRoomId(), this.getFromUserId(), 0);
 		cl.setFromUserId(this.getFromUserId());
 		try {
 			Manager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		//给房间用户发消息 通知用户注册
-		noticeUserRegister(userRole,role);
+
+		// 给房间用户发消息 通知用户注册
+		noticeUserRegister(userRole, role);
 	}
-	
+
 	/** 通知房间内用户 */
-	private void noticeUserRegister(HashSet<String> userRole,String role) {
+	private void noticeUserRegister(HashSet<String> userRole, String role) {
 		String[] roomIds = this.getRoomId().split(",");
 		if (roomIds != null && roomIds.length > 0) {
 			for (String rId : roomIds) {
-				/** 实例化 获取房间用户列表 下行 并 赋值 并 执行 */
-				int num = ServerDataPool.dataManager.getRoomTheSameUserCannotAccessNum(rId,
-						this.getFromUserId());
-				/** 用户不是教师 */
-				if (!((userRole.contains(Constant.ROLE_TEACHER)||userRole.contains(Constant.ROLE_PARENT_TEACHER)) && num > 1)) {
-					/** 实例化 房间用户列表 下行 */
-					ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
-					crru.setOption(11,
-							"{\"id\":\"" + this.getFromUserId() + "\",\"name\":\"" + this.getOption(3)
-									+ "\",\"icon\":\"" + this.getOption(4) + "\",\"role\":[\"" + role
-									+ "\"],\"agoraId\":\"" + this.getOption(5) + "\"}");
-					crru.setRoomId(rId);
-					crru.execPacket();
-				}
+				/** 实例化 房间用户列表 下行 */
+				ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
+				crru.setOption(11,
+						"{\"id\":\"" + this.getFromUserId() + "\",\"name\":\"" + this.getOption(3) + "\",\"icon\":\""
+								+ this.getOption(4) + "\",\"role\":[\"" + role + "\"],\"agoraId\":\""
+								+ this.getOption(5) + "\"}");
+				crru.setRoomId(rId);
+				crru.execPacket();
 			}
 		}
 	}

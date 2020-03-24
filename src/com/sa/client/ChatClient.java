@@ -60,9 +60,6 @@ public class ChatClient implements Runnable {
                 }  
                   
             });  
-//            ChannelFuture f = b.connect(new InetSocketAddress(host, port),  
-//                    new InetSocketAddress(ClientConfigs.LOCAL_SERVER_IP, ClientConfigs.LOCAL_SERVER_PORT))  
-//                    .sync();
             ChannelFuture f = b.connect(new InetSocketAddress(host, port)).sync();
             //重连成功，重置重连次数
             if(f.channel().isActive()){
