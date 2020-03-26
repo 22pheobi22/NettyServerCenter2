@@ -11,7 +11,6 @@ import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.net.codec.PacketBinEncoder;
-import com.sa.thread.MongoLogSync;
 import com.sa.util.Constant;
 import com.sa.util.JedisUtil;
 import com.sa.util.StringUtil;
@@ -233,22 +232,6 @@ public enum RedisManager {
 		if (packet.getPacketType() != PacketType.ServerHearBeat && packet.getPacketType() != PacketType.ServerLogin) {
 			ServerDataPool.log
 					.put(System.currentTimeMillis() + ConfManager.getLogKeySplit() + packet.getTransactionId(), packet);
-			int logTotalSize = ServerDataPool.log.size();
-			if (ConfManager.getMongodbEnable() && logTotalSize > ConfManager.getTimelyDealLogMaxThreshold()
-					&& lastTimelyLogThreadExecuteStatus.get()) {
-				lastTimelyLogThreadExecuteStatus.set(false);
-				long nowTimestamp = System.currentTimeMillis();
-				System.out.println(
-						nowTimestamp + "及时清理开始>>" + logTotalSize + "[ThreadName]>" + Thread.currentThread().getName());
-				Thread timelyLogThread = new Thread(
-						new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(),
-								ConfManager.getMongoNettyLogDBName(), ConfManager.getMongoNettyLogTableName(),
-								ConfManager.getMongoNettyLogUserName(), ConfManager.getMongoNettyLogPassword(),
-								ConfManager.getLogTime(), true, lastTimelyLogThreadExecuteStatus));
-				timelyLogExecutor.submit(timelyLogThread);
-				System.out.println(
-						nowTimestamp + "及时清理结束>>" + logTotalSize + "[ThreadName]>" + Thread.currentThread().getName());
-			}
 		}
 	}
 }

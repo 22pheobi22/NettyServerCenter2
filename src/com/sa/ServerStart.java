@@ -10,32 +10,22 @@ import com.sa.thread.AutoCancelTempConnect;
 import com.sa.thread.DeleteRedisDataSync;
 import com.sa.thread.ReConnectServer;
 import com.sa.transport.ClientSocketServcer;
-import com.sa.transport.WebSocketServer;
 import com.sa.util.JedisUtil;
 import com.sa.util.ReadConf;
 
 public class ServerStart {
 
 	public static void main(String[] args) {
+		//初始化配置
 		initConf();
-		
+		//開啓自動回收臨時鏈接綫程
 		new Thread(new AutoCancelTempConnect()).start();
-
-
-/*		new Thread(new HttpServer(ConfManager.getHttpPort())).start();
-		new Thread(new LogSync(ConfManager.getLogUrl(), ConfManager.getLogTime())).start();
-		if (!ConfManager.getIsCenter()) {
-			new Thread(new StatisticRoomInfoSync(ConfManager.getStatisticUrl(), ConfManager.getStatisticTime())).start();
-		} else {
-			new Thread(new ClientSocketServcer(ConfManager.getCenterPort())).start();
-		}*/
-
+		//啓動netty服務端
 		startNetty();
 		//启动清除redis数据线程
 		new Thread(new DeleteRedisDataSync()).start();
 		//连接新增服务线程
 		new Thread(new ReConnectServer()).start();
-		
 	}
 
 	private static void initConf() {
@@ -45,7 +35,6 @@ public class ServerStart {
 	private static void startNetty() {
 		try {
 			new Thread(new ClientSocketServcer(ConfManager.getClientSoketServerPort())).start();
-			new Thread(new WebSocketServer(ConfManager.getWebSoketServerPort())).start();
 			//Thread.sleep(5000);
 			//中心启动时，校验自己的角色
 			//第一次启动 redis中无数据 直接写入ip角色信息
@@ -75,9 +64,6 @@ public class ServerStart {
 						new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMasterCenter)).start();
 					}
 				}
-				//开启空闲教室回收
-				//new Thread(new RoomCancelSync()).start();
-
 			}else{
 			//若是备，监测主
 			new Thread(new ChatClient(ConfManager.getCenterIpAnother(), ConfManager.getCenterPortAnother(),isMasterCenter)).start();

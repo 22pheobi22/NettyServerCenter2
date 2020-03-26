@@ -1,5 +1,6 @@
 package com.sa.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.ListPosition;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 import redis.clients.jedis.Tuple;
@@ -291,6 +293,211 @@ public class JedisUtil {
         return null;
     }
 
+    //about redis list
+    //獲取集合中指定索引元素
+	public String getEleOfListByIndex(String key, int index) {
+    	Jedis jedis = jedisPool.getJedis();
+        try {
+            return jedis.lindex(key, index);
+        } catch (Exception e) {
+            logger.debug("getEleOfListByIndex() key {} index {} throws:{}", key,index,e.getMessage());
+            return "";
+        } finally {
+            close(jedis);
+        }
+    }
+	
+	//在列表的元素前插入元素
+	public long insertEleIntoList(String key, String pivot,String insertValue) {
+    	long rs=-1l;
+		Jedis jedis = jedisPool.getJedis();
+    	try {
+    		//-1 未找到元素 0key 不存在或列表爲空
+            rs = jedis.linsert(key, ListPosition.BEFORE, pivot, insertValue);
+            return rs;
+        } catch (Exception e) {
+            logger.debug("insertEleIntoList() key {} pivot {} insertValue {} throws:{}", key,pivot,insertValue,e.getMessage());
+            return rs;
+        } finally {
+            close(jedis);
+        }
+    }
+	
+	//在列表的元素前插入元素
+	public long updateEleInList(String key, String pivot,String insertValue) {
+    	long rs=-1l;
+		Jedis jedis = jedisPool.getJedis();
+    	try {
+    		//-1 未找到元素 0key 不存在或列表爲空
+            rs = jedis.linsert(key, ListPosition.BEFORE, pivot, insertValue);
+            return rs;
+        } catch (Exception e) {
+            logger.debug("insertEleIntoList() key {} pivot {} insertValue {} throws:{}", key,pivot,insertValue,e.getMessage());
+            return rs;
+        } finally {
+            close(jedis);
+        }
+    }
+	
+	//替換list中元素
+	public void replaceEleInList(String key, String oldValue,String newValue){
+		Jedis jedis = jedisPool.getJedis();
+		try {
+    		while(true){
+    			Long insertResult = jedis.linsert(key, ListPosition.BEFORE, oldValue, newValue);
+    			if(insertResult<=0){
+    				break;
+    			}
+    			jedis.lrem(key, 1, oldValue);
+    		}
+        } catch (Exception e) {
+            logger.debug("replaceEleInList() key {} oldValue {} newValue {} throws:{}", key,oldValue,newValue,e.getMessage());
+        } finally {
+            close(jedis);
+        }
+	}
+	
+	//通過索引設置列表元素值
+	//当索引参数超出范围，或对一个空列表进行 LSET 时，返回一个错误。
+	public int setEleOfListByIndex(String key, int index,String value) {
+    	Jedis jedis = jedisPool.getJedis();
+    	try {
+            jedis.lset(key, index, value);
+            return 0;
+        } catch (Exception e) {
+            logger.debug("setEleOfListByIndex() key {} index {} value {} throws:{}", key,index,value,e.getMessage());
+            return -1;
+        } finally {
+            close(jedis);
+        }
+    }
+    
+	//在列表中添加一個或多個值
+	public void addEleIntoList(String key, String value) {
+	   Jedis jedis = jedisPool.getJedis();
+	   try {
+	       jedis.rpush(key, value);
+	   	} catch (Exception e) {
+	       logger.debug("addEleIntoList() key {} value {} throws:{}", key,value,e.getMessage());
+	   	} finally {
+	       close(jedis); 
+	   	}
+	}
+		
+	//獲取列表中指定範圍的數據
+	public List<String> getRangeOfList(String key, int start,int end) {
+		Jedis jedis = jedisPool.getJedis();
+		List<String> list = new ArrayList<>();
+		try {
+		    list = jedis.lrange(key, start, end);
+		} catch (Exception e) {
+		    logger.debug("getRangeOfList() key {} start {} end:{}", key,start,end,e.getMessage());
+		} finally {
+		    close(jedis); 
+		}
+		return list;
+	}
+	
+	//向set集合中添加元素
+	public void sadd(String key, String value) {
+		Jedis jedis = jedisPool.getJedis();
+		try {
+		  jedis.sadd(key, value);
+		} catch (Exception e) {
+			logger.debug("sadd() key {} value {}", key,value,e.getMessage());
+		} finally {
+			close(jedis); 
+		}
+	}
+	
+	//判断集合中是否包含指定元素
+	public boolean setContain(String key, String value) {
+		Jedis jedis = jedisPool.getJedis();
+		try {
+			return jedis.sismember(key, value);
+		} catch (Exception e) {
+			logger.debug("setContain() key {} value {}", key,value,e.getMessage());
+		} finally {
+			close(jedis); 
+		}
+		return false;
+	}
+
+	//移除列表元素
+	public long removeEleFromList(String key, int count, String value) {
+		long rs = -1;
+		Jedis jedis = jedisPool.getJedis();
+		try {
+			rs = jedis.lrem(key, count, value);
+			return rs;
+		} catch (Exception e) {
+			logger.debug("setContain() key {} value {}", key,value,e.getMessage());
+			return rs;
+		} finally {
+			close(jedis); 
+		}
+	}
+	
+	//獲取列表長度
+	public long getLengthOfList(String key) {
+		Jedis jedis = jedisPool.getJedis();
+		Long llen =0l;
+		try {
+			llen = jedis.llen(key);
+		} catch (Exception e) {
+			logger.debug("setContain() key {} ", key,e.getMessage());
+		} finally {
+			close(jedis); 
+		}
+		return llen;
+	}
+	
+	@SuppressWarnings("resource")
+	public static void main(String[] args) {
+	    JedisPoolUtil jedisPool = new JedisPoolUtil();
+		Jedis jedis = jedisPool.getJedis();
+		jedis.rpush("www", "000");
+		jedis.rpush("www", "222");
+		jedis.rpush("www", "111");
+		jedis.rpush("www", "444");
+		jedis.rpush("www", "222");
+		jedis.rpush("www", "222");
+		jedis.rpush("www", "333");
+		List<String> lrange = jedis.lrange("www", 0, -1);
+		for (String string : lrange) {
+			System.out.println(string);
+		}
+		System.out.println("=======put========");
+		/*jedis.linsert("www", ListPosition.BEFORE, "222", "666");
+		List<String> lrange2 = jedis.lrange("www", 0, -1);
+		for (String string : lrange2) {
+			System.out.println(string);
+		}
+		System.out.println("=======insert========");
+		jedis.lrem("www", 0, "222");
+		*/
+		//remove(jedis);
+		while(true){
+			Long insertResult = jedis.linsert("www", ListPosition.BEFORE, "222", "666");
+			if(insertResult<=0){
+				break;
+			}
+			Long lrem = jedis.lrem("www", 1, "222");
+		}
+		List<String> lrange3 = jedis.lrange("www", 0, -1);
+		for (String string : lrange3) {
+			System.out.println(string);
+		}
+		
+		System.out.println("=======remove========");
+		/*	jedis.rpush("www", "111");
+		List<String> lrange2 = jedis.lrange("www", 0, -1);
+		for (String string : lrange2) {
+			System.out.println(string);
+		}*/
+	}
+
+    //
     public boolean getDistributedLock(String lockKey, String requestId, int expireTime) {
         Jedis jedis = jedisPool.getJedis();
         try {
