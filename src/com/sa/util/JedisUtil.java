@@ -452,51 +452,6 @@ public class JedisUtil {
 		return llen;
 	}
 	
-	@SuppressWarnings("resource")
-	public static void main(String[] args) {
-	    JedisPoolUtil jedisPool = new JedisPoolUtil();
-		Jedis jedis = jedisPool.getJedis();
-		jedis.rpush("www", "000");
-		jedis.rpush("www", "222");
-		jedis.rpush("www", "111");
-		jedis.rpush("www", "444");
-		jedis.rpush("www", "222");
-		jedis.rpush("www", "222");
-		jedis.rpush("www", "333");
-		List<String> lrange = jedis.lrange("www", 0, -1);
-		for (String string : lrange) {
-			System.out.println(string);
-		}
-		System.out.println("=======put========");
-		/*jedis.linsert("www", ListPosition.BEFORE, "222", "666");
-		List<String> lrange2 = jedis.lrange("www", 0, -1);
-		for (String string : lrange2) {
-			System.out.println(string);
-		}
-		System.out.println("=======insert========");
-		jedis.lrem("www", 0, "222");
-		*/
-		//remove(jedis);
-		while(true){
-			Long insertResult = jedis.linsert("www", ListPosition.BEFORE, "222", "666");
-			if(insertResult<=0){
-				break;
-			}
-			Long lrem = jedis.lrem("www", 1, "222");
-		}
-		List<String> lrange3 = jedis.lrange("www", 0, -1);
-		for (String string : lrange3) {
-			System.out.println(string);
-		}
-		
-		System.out.println("=======remove========");
-		/*	jedis.rpush("www", "111");
-		List<String> lrange2 = jedis.lrange("www", 0, -1);
-		for (String string : lrange2) {
-			System.out.println(string);
-		}*/
-	}
-
     //
     public boolean getDistributedLock(String lockKey, String requestId, int expireTime) {
         Jedis jedis = jedisPool.getJedis();

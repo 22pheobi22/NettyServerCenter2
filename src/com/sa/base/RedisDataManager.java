@@ -91,12 +91,6 @@ public class RedisDataManager {
 		return share.getContent();
 	}
 
-	public static void main(String[] args) {
-
-		JedisPoolUtil jedisPool = new JedisPoolUtil();
-		Jedis jedis = jedisPool.getJedis();
-	}
-
 	/**
 	 * 获取共享
 	 */
