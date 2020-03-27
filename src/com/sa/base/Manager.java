@@ -195,7 +195,8 @@ public enum Manager {
 		// 缓存消息日志
 		if (packet.getPacketType() != PacketType.ServerHearBeat && packet.getPacketType() != PacketType.ServerLogin){
 			ServerDataPool.log.put(System.currentTimeMillis()+ConfManager.getLogKeySplit()+packet.getTransactionId(), packet);
-			int logTotalSize = ServerDataPool.log.size();
+			//中心不向mongo保存數據
+			/*int logTotalSize = ServerDataPool.log.size();
 			if(ConfManager.getMongodbEnable()&&logTotalSize > ConfManager.getTimelyDealLogMaxThreshold() && lastTimelyLogThreadExecuteStatus.get()){
 				lastTimelyLogThreadExecuteStatus.set(false);
 				long nowTimestamp = System.currentTimeMillis();
@@ -203,7 +204,7 @@ public enum Manager {
 				Thread timelyLogThread = new Thread(new MongoLogSync(ConfManager.getMongoIp(), ConfManager.getMongoPort(), ConfManager.getMongoNettyLogDBName(),ConfManager.getMongoNettyLogTableName(),ConfManager.getMongoNettyLogUserName(),ConfManager.getMongoNettyLogPassword(), ConfManager.getLogTime(),true,lastTimelyLogThreadExecuteStatus));
 				timelyLogExecutor.submit(timelyLogThread);
 				System.out.println(nowTimestamp+"及时清理结束>>"+logTotalSize+"[ThreadName]>"+Thread.currentThread().getName());
-			}
+			}*/
 		}
 	}
 }

@@ -44,6 +44,8 @@ public class DeleteRedisDataSync implements Runnable {
 					if(isMasterCenter){
 						//遍历删除redis中所有房间信息
 						ServerDataPool.dataManager.removeRoomAll();
+						//遍歷刪除redis中所有共享信息
+						ServerDataPool.dataManager.removeRoomShareList();
 						//删除redis中房间空闲时长信息
 						jedisUtil.delHash(ROOM_FREE_MAP_KEY);
 						//删除redis种中主备信息

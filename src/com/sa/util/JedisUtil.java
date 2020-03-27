@@ -286,7 +286,7 @@ public class JedisUtil {
                 return jedis.zrevrangeWithScores(key, start, end);
             }
         } catch (Exception e) {
-            logger.debug("listScoreSetString() key {} throws:{}", key,e.getMessage());
+            logger.debug("listScoreSetTuple() key {} start {} end {} asc{} throws:{}", key,e.getMessage());
         } finally {
             close(jedis);
         }
@@ -294,52 +294,57 @@ public class JedisUtil {
     }
 
     //about redis list
-    //獲取集合中指定索引元素
-	public String getEleOfListByIndex(String key, int index) {
-    	Jedis jedis = jedisPool.getJedis();
-        try {
-            return jedis.lindex(key, index);
-        } catch (Exception e) {
-            logger.debug("getEleOfListByIndex() key {} index {} throws:{}", key,index,e.getMessage());
-            return "";
-        } finally {
-            close(jedis);
-        }
-    }
-	
-	//在列表的元素前插入元素
-	public long insertEleIntoList(String key, String pivot,String insertValue) {
-    	long rs=-1l;
+    /**
+	 * 獲取集合中指定索引元素
+	 * @return  如果指定索引值不在列表的区间范围内，返回 nil 
+	 * @param key
+	 * @param index
+	 * @return
+	 */
+	public Object getEleOfListByIndex(String key, int index) {
 		Jedis jedis = jedisPool.getJedis();
-    	try {
-    		//-1 未找到元素 0key 不存在或列表爲空
-            rs = jedis.linsert(key, ListPosition.BEFORE, pivot, insertValue);
-            return rs;
-        } catch (Exception e) {
-            logger.debug("insertEleIntoList() key {} pivot {} insertValue {} throws:{}", key,pivot,insertValue,e.getMessage());
-            return rs;
-        } finally {
-            close(jedis);
-        }
-    }
-	
-	//在列表的元素前插入元素
-	public long updateEleInList(String key, String pivot,String insertValue) {
-    	long rs=-1l;
+		try {
+			return jedis.lindex(key, index);
+		} catch (Exception e) {
+			logger.debug("getEleOfListByIndex() key {} index {} throws:{}", key, index, e.getMessage());
+			return null;
+		} finally {
+			close(jedis);
+		}
+	}
+
+	/**
+	 * 將value 插入列表key當中，位於值pivot之前
+	 * @param key
+	 * @param pivot
+	 * @param insertValue
+	 * @return 成功返回列表長度；未找到返回-1；key不存在或為空列表返回0
+	 */ 
+	public boolean insertEleIntoList(String key, String pivot, String insertValue) {
 		Jedis jedis = jedisPool.getJedis();
-    	try {
-    		//-1 未找到元素 0key 不存在或列表爲空
-            rs = jedis.linsert(key, ListPosition.BEFORE, pivot, insertValue);
-            return rs;
-        } catch (Exception e) {
-            logger.debug("insertEleIntoList() key {} pivot {} insertValue {} throws:{}", key,pivot,insertValue,e.getMessage());
-            return rs;
-        } finally {
-            close(jedis);
-        }
-    }
+		boolean result = false;
+		try {
+			Long rs = jedis.linsert(key, ListPosition.BEFORE, pivot, insertValue);
+			if (rs > 0) {
+				result = true;
+			}
+			return result;
+		} catch (Exception e) {
+			logger.debug("insertEleIntoList() key {} pivot {} insertValue {} throws:{}", key, pivot, insertValue,
+					e.getMessage());
+			return false;
+		} finally {
+			close(jedis);
+		}
+	}
 	
-	//替換list中元素
+	/**
+	 * 替換集合中指定元素
+	 * @param key
+	 * @param oldValue
+	 * @param newValue
+	 * @remark 在被替換值之前插入替換元素 根據插入結果（>0表示插入成功，説明集合中仍存在被替換值） 進行一次移除操作 否則，集合已不存在需要替換元素
+	 */
 	public void replaceEleInList(String key, String oldValue,String newValue){
 		Jedis jedis = jedisPool.getJedis();
 		try {
@@ -356,103 +361,133 @@ public class JedisUtil {
             close(jedis);
         }
 	}
-	
-	//通過索引設置列表元素值
-	//当索引参数超出范围，或对一个空列表进行 LSET 时，返回一个错误。
-	public int setEleOfListByIndex(String key, int index,String value) {
-    	Jedis jedis = jedisPool.getJedis();
-    	try {
-            jedis.lset(key, index, value);
-            return 0;
-        } catch (Exception e) {
-            logger.debug("setEleOfListByIndex() key {} index {} value {} throws:{}", key,index,value,e.getMessage());
-            return -1;
-        } finally {
-            close(jedis);
-        }
-    }
-    
-	//在列表中添加一個或多個值
-	public void addEleIntoList(String key, String value) {
-	   Jedis jedis = jedisPool.getJedis();
-	   try {
-	       jedis.rpush(key, value);
-	   	} catch (Exception e) {
-	       logger.debug("addEleIntoList() key {} value {} throws:{}", key,value,e.getMessage());
-	   	} finally {
-	       close(jedis); 
-	   	}
+
+	/**
+	 * 通過索引設置元素值
+	 * @param key
+	 * @param index
+	 * @param value
+	 * @return 当索引参数超出范围，或对一个空列表进行 LSET 时，返回一个错误。
+	 */
+	public boolean setEleOfListByIndex(String key, int index, String value) {
+		Jedis jedis = jedisPool.getJedis();
+		try {
+			jedis.lset(key, index, value);
+			return true;
+		} catch (Exception e) {
+			logger.debug("setEleOfListByIndex() key {} index {} value {} throws:{}", key, index, value, e.getMessage());
+			return false;
+		} finally {
+			close(jedis);
+		}
 	}
-		
-	//獲取列表中指定範圍的數據
-	public List<String> getRangeOfList(String key, int start,int end) {
+
+	/**
+	 * 向列表中加入元素
+	 * @param key
+	 * @param value
+	 * @return 如果列表不存在，一个空列表会被创建并执行 RPUSH 操作。 当列表存在但不是列表类型时，返回一个错误。
+	 */
+	public void addEleIntoList(String key, String value) {
+		Jedis jedis = jedisPool.getJedis();
+		try {
+			jedis.rpush(key, value);
+		} catch (Exception e) {
+			logger.debug("addEleIntoList() key {} value {} throws:{}", key, value, e.getMessage());
+		} finally {
+			close(jedis);
+		}
+	}
+
+	/**
+	 * 獲取指定範圍内元素
+	 * @param key
+	 * @param start 0表示第一個
+	 * @param end -1表示最後一個
+	 * @return 若key不存在或指定索引區間不存在 返回空列表
+	 */
+	public List<String> getRangeOfList(String key, int start, int end) {
 		Jedis jedis = jedisPool.getJedis();
 		List<String> list = new ArrayList<>();
 		try {
-		    list = jedis.lrange(key, start, end);
+			list = jedis.lrange(key, start, end);
 		} catch (Exception e) {
-		    logger.debug("getRangeOfList() key {} start {} end:{}", key,start,end,e.getMessage());
+			logger.debug("getRangeOfList() key {} start {} end:{}", key, start, end, e.getMessage());
 		} finally {
-		    close(jedis); 
+			close(jedis);
 		}
 		return list;
 	}
-	
-	//向set集合中添加元素
-	public void sadd(String key, String value) {
+
+	/**
+	 * 向set集合中添加元素
+	 * @param key
+	 * @param value
+	 */
+	public void addEleIntoSet(String key, String value) {
 		Jedis jedis = jedisPool.getJedis();
 		try {
-		  jedis.sadd(key, value);
+			jedis.sadd(key, value);
 		} catch (Exception e) {
-			logger.debug("sadd() key {} value {}", key,value,e.getMessage());
+			logger.debug("sadd() key {} value {}", key, value, e.getMessage());
 		} finally {
-			close(jedis); 
+			close(jedis);
 		}
 	}
-	
-	//判断集合中是否包含指定元素
+
+	/**
+	 * 判断set中是否包含指定元素
+	 * @param key
+	 * @param value
+	 * @return 元素存在返回1 元素不存在或key不存在返回0
+	 */
 	public boolean setContain(String key, String value) {
 		Jedis jedis = jedisPool.getJedis();
 		try {
 			return jedis.sismember(key, value);
 		} catch (Exception e) {
-			logger.debug("setContain() key {} value {}", key,value,e.getMessage());
+			logger.debug("setContain() key {} value {}", key, value, e.getMessage());
+			return false;
 		} finally {
-			close(jedis); 
+			close(jedis);
 		}
-		return false;
 	}
 
-	//移除列表元素
+	/**從列表中移除count個指定元素
+	 * @param key
+	 * @param count
+	 * @param value
+	 * @return 被移除元素的数量。 列表不存在时返回 0 。
+	 */
 	public long removeEleFromList(String key, int count, String value) {
-		long rs = -1;
 		Jedis jedis = jedisPool.getJedis();
 		try {
-			rs = jedis.lrem(key, count, value);
-			return rs;
+			return jedis.lrem(key, count, value);
 		} catch (Exception e) {
-			logger.debug("setContain() key {} value {}", key,value,e.getMessage());
-			return rs;
+			logger.debug("removeEleFromList() key {} count{} value {}", key, count, value, e.getMessage());
+			return -1;
 		} finally {
-			close(jedis); 
+			close(jedis);
 		}
 	}
-	
-	//獲取列表長度
+
+	/**
+	 * 獲取列表長度
+	 * @param key
+	 * @return 返回列表長度，key不存在返回0
+	 */
 	public long getLengthOfList(String key) {
 		Jedis jedis = jedisPool.getJedis();
-		Long llen =0l;
 		try {
-			llen = jedis.llen(key);
+			return jedis.llen(key);
 		} catch (Exception e) {
-			logger.debug("setContain() key {} ", key,e.getMessage());
+			logger.debug("setContain() key {} ", key, e.getMessage());
+			return -1;
 		} finally {
-			close(jedis); 
+			close(jedis);
 		}
-		return llen;
 	}
 	
-    //
     public boolean getDistributedLock(String lockKey, String requestId, int expireTime) {
         Jedis jedis = jedisPool.getJedis();
         try {
