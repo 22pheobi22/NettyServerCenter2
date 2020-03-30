@@ -65,8 +65,9 @@ public class SUniqueLogon extends Packet {
 		}
 		// 新server通道
 		ChannelHandlerContext context = ServerDataPool.USER_CHANNEL_MAP.get(fromServerIp);
+		if(null == context) return;
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(context);
-		if (null == context || null == ce || null == ce.getConnBeginTime()) {
+		if (null == ce || null == ce.getConnBeginTime()) {
 			return;
 		}
 
