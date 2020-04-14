@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ListPosition;
+import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 import redis.clients.jedis.Tuple;
@@ -398,6 +399,23 @@ public class JedisUtil {
 			close(jedis);
 		}
 	}
+	
+	/**
+	 * 向列表中批量加入元素
+	 * @param key
+	 * @param values
+	 * @return 如果列表不存在，一个空列表会被创建并执行 RPUSH 操作。 当列表存在但不是列表类型时，返回一个错误。
+	 */
+	public void addEleIntoList(String key, String[] values) {
+		Jedis jedis = jedisPool.getJedis();
+		try {
+			jedis.rpush(key, values);
+		} catch (Exception e) {
+			logger.debug("addEleIntoList() key {} values {} throws:{}", key, values, e.getMessage());
+		} finally {
+			close(jedis);
+		}
+	}
 
 	/**
 	 * 獲取指定範圍内元素
@@ -418,6 +436,60 @@ public class JedisUtil {
 		}
 		return list;
 	}
+	public static void main(String[] args) {
+	    JedisPoolUtil jedisPool = new JedisPoolUtil();
+		Jedis jedis = jedisPool.getJedis();
+/*		int a = 0;
+		for (int i = 0; i < 100; i++) {
+			long t1 = System.currentTimeMillis();
+			//List<String> list = jedis.lrange("lll", 0, -1);
+			//String s = "{'command':'trail','content':{'color':0,'trail':[{'x':1.280263,'y':0.521127},{'x':1.236842,'y':0.542254},{'x':1.189474,'y':0.568662},{'x':1.148684,'y':0.586268},{'x':1.106579,'y':0.603873},{'x':1.052632,'y':0.619718},{'x':1.001316,'y':0.630282},{'x':0.960526,'y':0.639085},{'x':0.940789,'y':0.640845},{'x':0.935526,'y':0.642606},{'x':0.934211,'y':0.642606},{'x':0.944737,'y':0.635563},{'x':0.972368,'y':0.612676},{'x':1.006579,'y':0.588028},{'x':1.056579,'y':0.551056},{'x':1.107895,'y':0.514085},{'x':1.167105,'y':0.477113}],'type':'pencil','width':'0.0035','widthType':'1'},'domain':'draw','domain_id':2,'user_id':842}";
+			StringBuilder str = new StringBuilder();
+		for (int i = 0; i < 5000; i++) {
+			str.append(s);
+			jedis.lpush("ggg", s);
+		}
+			//jedis.lpush("lll", s);
+			long t2 = System.currentTimeMillis();
+			//System.out.println(str);
+			System.out.println(t2-t1);
+			System.out.println(list.size());
+			a+=(t2-t1);
+		}
+		
+		System.out.println((a/100+a%100));*/
+		
+        long start = System.currentTimeMillis();
+		String s = "{'command':'trail','content':{'color':0,'trail':[{'x':1.280263,'y':0.521127},{'x':1.236842,'y':0.542254},{'x':1.189474,'y':0.568662},{'x':1.148684,'y':0.586268},{'x':1.106579,'y':0.603873},{'x':1.052632,'y':0.619718},{'x':1.001316,'y':0.630282},{'x':0.960526,'y':0.639085},{'x':0.940789,'y':0.640845},{'x':0.935526,'y':0.642606},{'x':0.934211,'y':0.642606},{'x':0.944737,'y':0.635563},{'x':0.972368,'y':0.612676},{'x':1.006579,'y':0.588028},{'x':1.056579,'y':0.551056},{'x':1.107895,'y':0.514085},{'x':1.167105,'y':0.477113}],'type':'pencil','width':'0.0035','widthType':'1'},'domain':'draw','domain_id':2,'user_id':842}";
+		Pipeline pip = jedis.pipelined();
+		for (int i = 0; i < 10000; i++) {
+			String[] arr1= new String[50];
+        	for (int j = 0; j < 50; j++) {
+        		arr1[j]=s;	
+        	}
+			pip.lpush("mmm", s);
+		}
+		pip.sync();// 同步获取所有的回应
+
+        System.out.println(System.currentTimeMillis() - start);
+/*        start = System.currentTimeMillis();
+        for (int i = 0; i < 1000; i++) {
+        	for (int j = 0; j < 50; j++) {
+        		//jedis.set(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        		jedis.lpush("nnn", s);
+        	}
+		}
+        System.out.println(System.currentTimeMillis() - start);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < 1000; i++) {
+        	String[] arr1= new String[50];
+        	for (int j = 0; j < 50; j++) {
+        		arr1[j]=s;	
+        	}
+        	jedis.lpush("ooo", arr1);
+		}
+        System.out.println(System.currentTimeMillis() - start);*/
+    }
 
 	/**
 	 * 向set集合中添加元素
