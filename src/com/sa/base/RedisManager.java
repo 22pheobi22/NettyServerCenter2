@@ -161,17 +161,19 @@ public enum RedisManager {
 			// 获取用户通道信息
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(userId);
 
-			// 删除用户-通道缓存
-			ServerDataPool.USER_CHANNEL_MAP.remove(userId);
-			System.out.println("用户【 " + userId + " 】注销");
 			// 如果通道不为空
 			if (null == ctx) {
 				return;
 			}
+			System.out.println("用户【 " + userId + " 】注销");
 			// 删除通道-用户缓存
 			ServerDataPool.CHANNEL_USER_MAP.remove(ctx);
-			// 通道关闭
-			ctx.close();
+			// 删除用户-通道缓存
+			ServerDataPool.USER_CHANNEL_MAP.remove(userId);
+			if (null != ctx) {
+				// 通道关闭
+				ctx.close();
+			}
 		}
 	}
 	/**

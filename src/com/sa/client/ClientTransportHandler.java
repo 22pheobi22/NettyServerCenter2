@@ -56,18 +56,16 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		if(null==ctx){
-			System.err.println("channelInactive ctx is null");
-			return;
-		}
 		String strLog = "服务端" + ctx.channel().remoteAddress() + "关闭channelInactive";
-		ctx.close();
-		// 移除 通道-用户信息
-		ServerDataPool.CHANNEL_USER_MAP.remove(ctx);
+		if (null != ctx) {
+			ctx.close();
+		}
 		String userId = StringUtil.subStringIp(ctx.channel().remoteAddress().toString());
 		if (null != userId) {
 			// 移除 用户-通道信息
 			ServerDataPool.USER_CHANNEL_MAP.remove(userId);
+			// 移除 通道-用户信息
+			ServerDataPool.CHANNEL_USER_MAP.remove(ctx);
 		}
 		// TODO 通道关闭警告
 		System.err.println(strLog);
