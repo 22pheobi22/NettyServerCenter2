@@ -14,6 +14,7 @@ public class ServerDataPool {
 	public static Map<String, ChannelHandlerContext> USER_CHANNEL_MAP  = new ConcurrentHashMap<>();
 	/** 缓存通信上下文环境对应的登录用户（主要用于服务） */
 	public static Map<ChannelHandlerContext, ChannelExtend> CHANNEL_USER_MAP  = new ConcurrentHashMap<>();
+	/**缓存与服务及中心连接线程信息*/
 	public static Map<String, Thread> NAME_THREAD_MAP = new ConcurrentHashMap<>();
 	/** 房间信息及相关处理*/
 	//public static ServerDataManager serverDataManager = new ServerDataManager();

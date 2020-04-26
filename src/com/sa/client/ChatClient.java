@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sa.base.ConfManager;
+import com.sa.base.ServerDataPool;
 import com.sa.net.codec.PacketDecoder;
 import com.sa.net.codec.PacketEncoder;
 import com.sa.util.HttpClientUtil;
@@ -88,8 +89,25 @@ public class ChatClient implements Runnable {
         	        String[] address = ConfManager.getServerAddress();
         	        for (int i = 0; i < address.length; i++) {
         	        	String[] addr = address[i].split(":");
-        	        	new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMaster)).start();
+        	        	Thread thread = new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMaster));
+        	        	thread.setName("centerToServer"+addr[0]);
+        	        	thread.start();
+        	        	//存储连接线程
+        	        	ServerDataPool.NAME_THREAD_MAP.put("centerToServer"+addr[0], thread);
         	       }
+        	        //3.关闭并删除备主链接线程
+        	        Thread centerToServer = ServerDataPool.NAME_THREAD_MAP.get("centerToCenter");
+    	        	if(null!=centerToServer){
+    	        		centerToServer.interrupt();
+    	        	}
+    	        	ServerDataPool.NAME_THREAD_MAP.remove("centerToCenter");
+        		}else{
+        			//若主三次重连服务失败，将中心服务线程关闭并删除
+        			Thread centerToServer = ServerDataPool.NAME_THREAD_MAP.get("centerToServer"+host);
+    	        	if(null!=centerToServer){
+    	        		centerToServer.interrupt();
+    	        	}
+    	        	ServerDataPool.NAME_THREAD_MAP.remove("centerToServer"+host);
         		}
         	}
 
