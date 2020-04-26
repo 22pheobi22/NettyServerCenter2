@@ -10,6 +10,8 @@ import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.util.JedisUtil;
 
+import io.netty.channel.ChannelHandlerContext;
+
 public class ServerHeartBeat extends Packet{
 
 	public ServerHeartBeat() {
@@ -30,6 +32,10 @@ public class ServerHeartBeat extends Packet{
 	public void execPacket() {
 		System.err.println("收到客户端心跳事件！");
 		//中心监测到已与服务无连接  通知备机进行主备切换
+		//关闭现有中心链接
+		ChannelHandlerContext context = ServerDataPool.USER_CHANNEL_MAP.get(ConfManager.getCenterIpAnother());
+		context.close();
+
 		//1.去redis将自己改为主
 		Map<String,String> centerRoleMap = new HashMap<>();
 		centerRoleMap.put("master", ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort());
