@@ -35,6 +35,9 @@ public class ServerHeartBeat extends Packet{
 		//关闭现有中心链接
 		ChannelHandlerContext context = ServerDataPool.USER_CHANNEL_MAP.get(ConfManager.getCenterIpAnother());
 		context.close();
+		ServerDataPool.USER_CHANNEL_MAP.remove(ConfManager.getCenterIpAnother());
+		ServerDataPool.CHANNEL_USER_MAP.remove(context);
+		
 
 		//1.去redis将自己改为主
 		Map<String,String> centerRoleMap = new HashMap<>();
