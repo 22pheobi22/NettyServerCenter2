@@ -9,6 +9,7 @@ import com.sa.base.ConfManager;
 import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.ChannelExtend;
+import com.sa.client.ChatClient;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
 import com.sa.net.PacketType;
@@ -54,6 +55,14 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 					//给客户端发主备切换心跳消息
 					packet.setOption(1, "lostServer");
 					context.writeAndFlush(packet);
+					//连接备并存储线程信息
+					//若是备，监测主
+					Thread centerToCenter = new Thread(new ChatClient(ConfManager.getCenterIpAnother(), ConfManager.getCenterPortAnother(),false));
+					centerToCenter.setName("centerToCenter");
+					centerToCenter.start();
+					//存储线程信息
+					ServerDataPool.NAME_THREAD_MAP.put("centerToCenter", centerToCenter);
+					
 				}
 			} else {
 				// 记录数据库日志
