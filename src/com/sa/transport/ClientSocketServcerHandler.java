@@ -56,13 +56,16 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 					packet.setOption(1, "lostServer");
 					context.writeAndFlush(packet);
 					//连接备并存储线程信息
-					//若是备，监测主
 					Thread centerToCenter = new Thread(new ChatClient(ConfManager.getCenterIpAnother(), ConfManager.getCenterPortAnother(),false));
 					centerToCenter.setName("centerToCenter");
 					centerToCenter.start();
+					//移除并关闭备与原主连接
+					ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get("0");
+					ctx.close();
+					ServerDataPool.USER_CHANNEL_MAP.remove("0");
+					ServerDataPool.CHANNEL_USER_MAP.remove(ctx);
 					//存储线程信息
 					ServerDataPool.NAME_THREAD_MAP.put("centerToCenter", centerToCenter);
-					
 				}
 			} else {
 				// 记录数据库日志

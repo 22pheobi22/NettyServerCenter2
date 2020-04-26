@@ -108,6 +108,7 @@ public class ChatClient implements Runnable {
     	        		centerToServer.interrupt();
     	        	}
     	        	ServerDataPool.NAME_THREAD_MAP.remove("centerToServer"+host);
+    	        	System.out.println(ServerDataPool.NAME_THREAD_MAP);
         		}
         	}
 
