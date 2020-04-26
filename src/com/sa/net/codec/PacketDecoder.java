@@ -58,7 +58,7 @@ public class PacketDecoder extends LengthFieldBasedFrameDecoder{
 		packet.readPacketBody(frame);
 		
 		ReferenceCountUtil.release(frame);
-
+		in.release();
 		return packet;
 	}
 

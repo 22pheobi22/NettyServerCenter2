@@ -42,7 +42,10 @@ public class ReConnectServer implements Runnable {
 							System.out.println("配置服务："+address[i]);
 							String[] addr = address[i].split(":");
 							if(!ips.contains(addr[0])){
-								new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),true)).start();
+								Thread serverToCenter = new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),true));
+								serverToCenter.setName("severToCenter"+addr[0]);
+								serverToCenter.start();
+								ServerDataPool.NAME_THREAD_MAP.put("severToCenter"+addr[0], serverToCenter);
 							}
 						}
 					}

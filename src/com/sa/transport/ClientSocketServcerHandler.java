@@ -1,6 +1,8 @@
 package com.sa.transport;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sa.base.ConfManager;
@@ -31,14 +33,14 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
-		//System.out.println("中心channelActive:"+ctx.channel().remoteAddress());
+		System.out.println("中心channelActive:"+ctx.channel().remoteAddress());
 		ServerDataPool.TEMP_CONN_MAP.put(ctx, new ChannelExtend());
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext context, Object msg) throws Exception {
 		try {
-			//System.out.println("channelRead:"+context.channel().remoteAddress());
+			System.out.println("channelRead:"+context.channel().remoteAddress());
 			Packet packet = (Packet) msg;
 			if (packet.getPacketType() == PacketType.ServerLogin) {
 				Manager.INSTANCE.log(packet);
@@ -46,7 +48,13 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 			} else if (packet.getPacketType() == PacketType.SysLoginReq) {
 				SystemLoginManager.INSTANCE.login(context, (SysLoginReq) packet);
 			} else if (packet.getPacketType() == PacketType.ServerHearBeat) {
-				
+				System.out.println(packet.getPacketHead().toString());
+				//已与所有服务失去连接
+				if(ServerDataPool.NAME_THREAD_MAP.size()<=0){
+					//给客户端发主备切换心跳消息
+					packet.setOption(1, "lostServer");
+					context.writeAndFlush(packet);
+				}
 			} else {
 				// 记录数据库日志
 				Manager.INSTANCE.log(packet);

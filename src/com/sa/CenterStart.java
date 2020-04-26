@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.sa.base.ConfManager;
+import com.sa.base.ServerDataManager;
+import com.sa.base.ServerDataPool;
 import com.sa.client.ChatClient;
 import com.sa.thread.AutoCancelTempConnect;
 import com.sa.thread.DeleteRedisDataSync;
@@ -61,12 +63,20 @@ public class CenterStart {
 				if(null!=address&&address.length>0){
 					for (int i = 0; i < address.length; i++) {
 						String[] addr = address[i].split(":");
-						new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMasterCenter)).start();
+						Thread centerToServer = new Thread(new ChatClient(addr[0], Integer.valueOf(addr[1]),isMasterCenter));
+						centerToServer.setName("centerToServer"+addr[0]);
+						centerToServer.start();
+						//存储线程信息
+						ServerDataPool.NAME_THREAD_MAP.put("centerToServer"+addr[0], centerToServer);
 					}
 				}
 			}else{
 			//若是备，监测主
-			new Thread(new ChatClient(ConfManager.getCenterIpAnother(), ConfManager.getCenterPortAnother(),isMasterCenter)).start();
+			Thread centerToCenter = new Thread(new ChatClient(ConfManager.getCenterIpAnother(), ConfManager.getCenterPortAnother(),isMasterCenter));
+			centerToCenter.setName("centerToCenter");
+			centerToCenter.start();
+			//存储线程信息
+			ServerDataPool.NAME_THREAD_MAP.put("centerToCenter", centerToCenter);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
