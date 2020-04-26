@@ -31,14 +31,14 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
-		System.out.println("中心channelActive:"+ctx.channel().remoteAddress());
+		//System.out.println("中心channelActive:"+ctx.channel().remoteAddress());
 		ServerDataPool.TEMP_CONN_MAP.put(ctx, new ChannelExtend());
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext context, Object msg) throws Exception {
 		try {
-			System.out.println("channelRead:"+context.channel().remoteAddress());
+			//System.out.println("channelRead:"+context.channel().remoteAddress());
 			Packet packet = (Packet) msg;
 			if (packet.getPacketType() == PacketType.ServerLogin) {
 				Manager.INSTANCE.log(packet);
@@ -46,6 +46,7 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 			} else if (packet.getPacketType() == PacketType.SysLoginReq) {
 				SystemLoginManager.INSTANCE.login(context, (SysLoginReq) packet);
 			} else if (packet.getPacketType() == PacketType.ServerHearBeat) {
+				
 			} else {
 				// 记录数据库日志
 				Manager.INSTANCE.log(packet);

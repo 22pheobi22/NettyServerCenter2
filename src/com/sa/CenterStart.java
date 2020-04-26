@@ -13,7 +13,7 @@ import com.sa.transport.ClientSocketServcer;
 import com.sa.util.JedisUtil;
 import com.sa.util.ReadConf;
 
-public class ServerStart {
+public class CenterStart {
 
 	public static void main(String[] args) {
 		//初始化配置

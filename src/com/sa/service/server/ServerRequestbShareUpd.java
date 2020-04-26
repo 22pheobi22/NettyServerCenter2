@@ -40,12 +40,11 @@ public class ServerRequestbShareUpd extends Packet {
 						setShare(rId);
 					}
 				}
-
-				/** 实例化 变更共享 下行 并 赋值 并 执行 */
-				ClientResponebShareUpd clientResponebShareUpd = new ClientResponebShareUpd(this.getPacketHead(), this.getOptions());
-				clientResponebShareUpd.setRoomId(rId);
-				clientResponebShareUpd.execPacket();
 			}
+			/** 实例化 变更共享 下行 并 赋值 并 执行 */
+			ClientResponebShareUpd clientResponebShareUpd = new ClientResponebShareUpd(this.getPacketHead(), this.getOptions());
+			clientResponebShareUpd.setRoomId(this.getRoomId());
+			clientResponebShareUpd.execPacket();
 		}
 	}
 

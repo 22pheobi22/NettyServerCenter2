@@ -42,7 +42,7 @@ public class SUniqueLogon extends Packet {
 
 	@Override
 	public void execPacket() {
-
+		System.err.println("中心收到："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		int code = 0;
 		String msg = "成功";
 
@@ -54,10 +54,12 @@ public class SUniqueLogon extends Packet {
 		/** 判断用户是否登陆过 code=1未登录 code=0已登录 */
 		Map<String, Object> checkUniqueLogonResult = checkUniqueLogon(userRole);
 
+		System.err.println("中心校验完单点登录："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		if ("0".equals(String.valueOf(checkUniqueLogonResult.get("code")))) {
 			/** 返回code=0 已登录 */
 			// 已登录则注销上次登录--旧sever通道
 			doLogonUngister((ChannelHandlerContext) checkUniqueLogonResult.get("result"));
+			System.err.println("中心注销上次登录："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		}
 		// 獲取最新登錄服務IP
 		if (null == fromServerIp || "".equals(fromServerIp)) {
@@ -73,11 +75,12 @@ public class SUniqueLogon extends Packet {
 		if (10093 != code) {
 			/** 注册登录 */
 			doLogin(context, ce, userRole, role);
+			System.err.println("中心注册登录："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		}
 
 		/** 登录信息 下行 处理 */
 		clientLogin(code, msg, role, context);
-
+		System.err.println("中心发送登录下行："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 	}
 
 	@Override
@@ -143,6 +146,8 @@ public class SUniqueLogon extends Packet {
 	}
 
 	private void doLogonUngister(ChannelHandlerContext temp) {
+		System.err.println("中心进入doLogonUngister："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
+
 		/** 发送 消息回执 */// 给原通道服务器
 		CUniqueLogon cl = new CUniqueLogon(this.getTransactionId(), this.getRoomId(), this.getFromUserId(), 10098);
 		cl.setFromUserId(this.getFromUserId());
@@ -152,18 +157,23 @@ public class SUniqueLogon extends Packet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.err.println("中心发出doLogonUngister--CUniqueLogon："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		// 给房间用户发消息 通知用户注销
 		noticeUserUngister(cl);
 
 		// 注銷用戶信息
 		Manager.INSTANCE.ungisterUserInfo(this.getFromUserId());
+		System.err.println("中心出doLogonUngister："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
+
 	}
 
 	/** 通知房间内用户 */
 	private void noticeUserUngister(CUniqueLogon cl) {
+		System.err.println("中心进入noticeUserUngister："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		String[] roomIds = null;
 		// 向用户原来所在房间发减员消息
 		String roomNo = ServerDataPool.dataManager.getUserRoomNo(cl.getFromUserId());
+		System.err.println("中心获取到房间号："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		if (null != roomNo) {
 			roomIds = roomNo.split(",");
 		}
@@ -178,9 +188,11 @@ public class SUniqueLogon extends Packet {
 				crru.execPacket();
 			}
 		}
+		System.err.println("中心出noticeUserUngister："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 	}
 
 	private void doLogin(ChannelHandlerContext context, ChannelExtend ce, HashSet<String> userRole, String role) {
+		System.err.println("中心发送进入doLogin："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		/** 注册用户上线信息 */
 		Manager.INSTANCE.addOnlineContext(this.getRoomId(), this.getFromUserId(), (String) this.getOption(3),
 				(String) this.getOption(4), (String) this.getOption(5), userRole, ConfManager.getTalkEnable(), context,
@@ -191,12 +203,14 @@ public class SUniqueLogon extends Packet {
 		cl.setFromUserId(this.getFromUserId());
 		try {
 			Manager.INSTANCE.sendPacketTo(cl, context, Constant.CONSOLE_CODE_S);
+			System.err.println("中心发送CUniqueLogon："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// 给房间用户发消息 通知用户注册
 		noticeUserRegister(userRole, role);
+		System.err.println("中心结束doLogin："+this.getFromUserId()+"  时间 ："+System.currentTimeMillis());
 	}
 
 	/** 通知房间内用户 */
