@@ -15,6 +15,8 @@ package com.sa.base;
 import com.sa.client.ChatClient;
 import com.sa.client.MonitorClient;
 
+import io.netty.channel.ChannelHandlerContext;
+
 public class CenterManager {
 	private String CENTER_LINK_SERVER_NAME = "CENTER-LINK-SERVER-";
 	private String CENTER_MASTER_SLAVE_MONITOR = "CENTER-MASTER-SLAVE-MONITOR-";
@@ -56,12 +58,19 @@ public class CenterManager {
 	 */
 	public void activeStandbySwitching() {
 		// TODO: 改redis中主信息
-		
+		String masterAddr = ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort();
+		String slaveAddr = ConfManager.getCenterIpAnother()+":"+ConfManager.getCenterPortAnother();
+		ServerDataPool.redisDataManager.modifyMasterSlave(masterAddr, slaveAddr);
 		
 		// 启动连接server服务
 		this.centerLinkServer();
 		
 		// TODO:关闭原监控通道
+		ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(ConfManager.getCenterIpAnother());
+		if(null!=ctx){
+			ctx.close();
+		}
+		
 		// 关闭监控线程 
 		String key = CENTER_MASTER_SLAVE_MONITOR+ConfManager.getCenterIpAnother();
 		ServerDataPool.threadManager.close(key);

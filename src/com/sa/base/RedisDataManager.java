@@ -1083,4 +1083,11 @@ public class RedisDataManager {
 
 		return localServerIsMaster;
 	}
+	
+	public void modifyMasterSlave(String masterAddr,String slaveAddr){
+		Map<String,String> centerRoleMap = new HashMap<>();
+		centerRoleMap.put("master", masterAddr);
+		centerRoleMap.put("slave", slaveAddr);
+		jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, centerRoleMap);
+	}
 }

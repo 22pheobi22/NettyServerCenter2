@@ -27,12 +27,12 @@ public class ServerHeartBeat extends Packet{
 
 	@Override
 	public void execPacket() {
-		ClientHeartBeat clientHeartBeat = new ClientHeartBeat();
-
-		clientHeartBeat.setPacketHead(this.getPacketHead());
 		boolean check = new CenterManager().checkServerLink();
 
 		if (!check) {
+			ClientHeartBeat clientHeartBeat = new ClientHeartBeat();
+			
+			clientHeartBeat.setPacketHead(this.getPacketHead());
 			clientHeartBeat.setOption(1, String.valueOf(check));
 			ChannelHandlerContext bakCtx = ServerDataPool.USER_CHANNEL_MAP.get("0");
 			bakCtx.writeAndFlush(clientHeartBeat);
