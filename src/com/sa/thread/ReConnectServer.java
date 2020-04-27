@@ -15,7 +15,7 @@ public class ReConnectServer implements Runnable {
 	public void run() {
 		while(true) {
 			try {
-				Thread.sleep(1000*60*1);
+				Thread.sleep(1000*30);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -54,7 +54,7 @@ public class ReConnectServer implements Runnable {
 				e.printStackTrace();
 			}
 			try {
-				Thread.sleep(1000*60*1);
+				Thread.sleep(1000*30);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

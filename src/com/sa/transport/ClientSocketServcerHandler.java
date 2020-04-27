@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.sa.base.ConfManager;
 import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
+import com.sa.base.ServerManager;
 import com.sa.base.element.ChannelExtend;
 import com.sa.client.ChatClient;
 import com.sa.net.Packet;
@@ -49,7 +50,9 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 			} else if (packet.getPacketType() == PacketType.SysLoginReq) {
 				SystemLoginManager.INSTANCE.login(context, (SysLoginReq) packet);
 			} else if (packet.getPacketType() == PacketType.ServerHearBeat) {
-				System.out.println(packet.getPacketHead().toString());
+				System.out.println(packet.getOption(1));
+				System.out.println(ServerDataPool.NAME_THREAD_MAP);
+				System.out.println(ServerDataPool.NAME_THREAD_MAP);
 				//已与所有服务失去连接
 				if(ServerDataPool.NAME_THREAD_MAP.size()<=0){
 					//给客户端发主备切换心跳消息
@@ -60,10 +63,12 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 					centerToCenter.setName("centerToCenter");
 					centerToCenter.start();
 					//移除并关闭备与原主连接
-					ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get("0");
-					ctx.close();
-					ServerDataPool.USER_CHANNEL_MAP.remove("0");
-					ServerDataPool.CHANNEL_USER_MAP.remove(ctx);
+					ChannelExtend channelExtend = ServerDataPool.CHANNEL_USER_MAP.get(context);
+					if(null!=channelExtend&&null!=channelExtend.getUserId()){
+						ServerDataPool.USER_CHANNEL_MAP.remove(channelExtend.getUserId());
+						ServerDataPool.CHANNEL_USER_MAP.remove(context);
+						context.close();
+					}
 					//存储线程信息
 					ServerDataPool.NAME_THREAD_MAP.put("centerToCenter", centerToCenter);
 				}

@@ -1,5 +1,6 @@
 package com.sa.service.manager;
 
+import com.sa.base.DataManager;
 import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.ChannelExtend;
@@ -28,6 +29,9 @@ public enum LoginManager {
 		if (null == ce || null == ce.getConnBeginTime()) {
 			return;
 		}
+		
+		//注销原通道
+		Manager.INSTANCE.ungisterUserContext(context);
 
 		/** 将 发信人id 和 通道信息 放入 临时通道缓存 */
 		ServerDataPool.TEMP_CONN_MAP2.put(loginPact.getFromUserId(), context);
