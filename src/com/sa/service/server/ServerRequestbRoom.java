@@ -35,8 +35,8 @@ public class ServerRequestbRoom extends Packet {
 
 		if (null != roomIds && roomIds.length > 0) {
 			for (String rId : roomIds) {
-				ServerDataPool.dataManager.setRoomChats(rId, System.currentTimeMillis() + "," + this.getTransactionId(),
-						this.getFromUserId(), (String) this.getOption(1));
+				/*ServerDataPool.dataManager.setRoomChats(rId, System.currentTimeMillis() + "," + this.getTransactionId(),
+						this.getFromUserId(), (String) this.getOption(1));*/
 				
 				ClientResponebRoom newCrr = new ClientResponebRoom(this.getPacketHead(), this.getOptions());
 				newCrr.setRoomId(rId);
