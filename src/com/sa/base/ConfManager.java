@@ -40,9 +40,9 @@ public class ConfManager {
 
 	/** 服务器端口 */
 	public static int getClientSoketServerPort() {
-		String strPort = CONF_MAP.get("clientsoket.server.port");
+		String strPort = CONF_MAP.get("monitor.server.port");
 
-		strPort = null == strPort || "".equals(strPort) ? "8080" : strPort;
+		strPort = null == strPort || "".equals(strPort) ? "8180" : strPort;
 
 		return Integer.parseInt(strPort);
 	}

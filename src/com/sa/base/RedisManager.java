@@ -3,9 +3,6 @@ package com.sa.base;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
@@ -21,13 +18,7 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 public enum RedisManager {
 
 	INSTANCE;
-	private static ExecutorService timelyLogExecutor = Executors.newSingleThreadExecutor();
 
-	private static RedisDataManager redisDataManager = new RedisDataManager();;
-	/**
-	 * 上一个达到立即保存日志线程的是否完毕 true为完毕
-	 */
-	public final AtomicBoolean lastTimelyLogThreadExecuteStatus = new AtomicBoolean(true);
 	private JedisUtil jedisUtil = new JedisUtil();
 	private String USER_SERVERIP_MAP_KEY = "USER_SERVERIP_MAP";
 
@@ -132,7 +123,7 @@ public enum RedisManager {
 		if (roomIds != null && roomIds.length > 0) {
 			// 循环保存房间用户信息
 			for (String rId : roomIds) {
-				redisDataManager.setRoomUser(rId, userId, name, icon, agoraId, userRole, notSpeak);
+				ServerDataPool.redisDataManager.setRoomUser(rId, userId, name, icon, agoraId, userRole, notSpeak);
 			}
 		}
 	}
@@ -155,7 +146,7 @@ public enum RedisManager {
 			// 如果不是中心用户id
 			if (!ConfManager.getCenterId().equals(userId)) {
 				// 删除房间内该用户信息
-				redisDataManager.removeRoomUser(userId);
+				ServerDataPool.redisDataManager.removeRoomUser(userId);
 				return;
 			}
 			// 获取用户通道信息

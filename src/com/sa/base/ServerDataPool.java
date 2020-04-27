@@ -18,12 +18,12 @@ public class ServerDataPool {
 /*	public static Map<String, Thread> SERVER_NAME_THREAD_MAP = new ConcurrentHashMap<>();
 	*//**缓存与中心连接线程信息*//*
 	public static Map<String, Thread> CENTER_NAME_THREAD_MAP = new ConcurrentHashMap<>();*/
-	public static Map<String, Thread> NAME_THREAD_MAP = new ConcurrentHashMap<>();
+	public static ThreadManager threadManager = new ThreadManager();
 
 	/** 房间信息及相关处理*/
-	//public static ServerDataManager serverDataManager = new ServerDataManager();
+	public static ServerDataManager serverDataManager = new ServerDataManager();
 	/** 房间信息及相关处理*/
-	//public static RedisDataManager redisDataManager = new RedisDataManager();
+	public static RedisDataManager redisDataManager = new RedisDataManager();
 	/** 房间信息及相关处理*/
 	public static DataManager dataManager = new DataManager();
 

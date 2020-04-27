@@ -1,16 +1,12 @@
 package com.sa.transport;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sa.base.ConfManager;
 import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
-import com.sa.base.ServerManager;
 import com.sa.base.element.ChannelExtend;
-import com.sa.client.ChatClient;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
 import com.sa.net.PacketType;
@@ -49,29 +45,6 @@ public class ClientSocketServcerHandler extends ChannelInboundHandlerAdapter {
 				LoginManager.INSTANCE.login(context, (ServerLogin) packet);
 			} else if (packet.getPacketType() == PacketType.SysLoginReq) {
 				SystemLoginManager.INSTANCE.login(context, (SysLoginReq) packet);
-			} else if (packet.getPacketType() == PacketType.ServerHearBeat) {
-				System.out.println(packet.getOption(1));
-				System.out.println(ServerDataPool.NAME_THREAD_MAP);
-				System.out.println(ServerDataPool.NAME_THREAD_MAP);
-				//已与所有服务失去连接
-				if(ServerDataPool.NAME_THREAD_MAP.size()<=0){
-					//给客户端发主备切换心跳消息
-					packet.setOption(1, "lostServer");
-					context.writeAndFlush(packet);
-					//连接备并存储线程信息
-					Thread centerToCenter = new Thread(new ChatClient(ConfManager.getCenterIpAnother(), ConfManager.getCenterPortAnother(),false));
-					centerToCenter.setName("centerToCenter");
-					centerToCenter.start();
-					//移除并关闭备与原主连接
-					ChannelExtend channelExtend = ServerDataPool.CHANNEL_USER_MAP.get(context);
-					if(null!=channelExtend&&null!=channelExtend.getUserId()){
-						ServerDataPool.USER_CHANNEL_MAP.remove(channelExtend.getUserId());
-						ServerDataPool.CHANNEL_USER_MAP.remove(context);
-						context.close();
-					}
-					//存储线程信息
-					ServerDataPool.NAME_THREAD_MAP.put("centerToCenter", centerToCenter);
-				}
 			} else {
 				// 记录数据库日志
 				Manager.INSTANCE.log(packet);

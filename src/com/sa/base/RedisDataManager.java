@@ -33,11 +33,9 @@ import com.sa.base.element.People;
 import com.sa.base.element.Room;
 import com.sa.base.element.Share;
 import com.sa.util.Constant;
-import com.sa.util.JedisPoolUtil;
 import com.sa.util.JedisUtil;
 
 import io.netty.channel.ChannelHandlerContext;
-import redis.clients.jedis.Jedis;
 
 public class RedisDataManager {
 	private JedisUtil jedisUtil = new JedisUtil();
@@ -47,6 +45,7 @@ public class RedisDataManager {
 	private String USER_SERVERIP_MAP_KEY = "USER_SERVERIP_MAP";
 	private String SHARE_LIST_KEY = "SHARE_KEY_LIST";
 	private String ROOM_SHARE_KEY = "ROOM_SHARE_";
+	private final String CENTER_MASTER_SLAVE_INFO = "CENTER_MASTER_SLAVE_INFO";
 
 	/**
 	 * 系统管理员
@@ -1055,5 +1054,33 @@ public class RedisDataManager {
 		people.setIcon("");
 
 		return people;
+	}
+	
+	/**
+	 * 判断且设置中心主备信息
+	 * @return true：本机本服务是主中心；false：本机本服务是备中心
+	 */
+	public boolean setMasterSlave() {
+		boolean localServerIsMaster = false;
+		List<String> hashValsAll = jedisUtil.getHashValsAll(CENTER_MASTER_SLAVE_INFO);
+
+		if(null == hashValsAll ||  0 >= hashValsAll.size()) {
+			Map<String,String> centerRoleMap = new HashMap<>();
+
+			centerRoleMap.put("master", ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort());
+			centerRoleMap.put("slave", ConfManager.getCenterIpAnother()+":"+ConfManager.getCenterPortAnother());
+
+			jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, centerRoleMap);
+			localServerIsMaster = true;
+		}else{
+			String masterCenterAddress = jedisUtil.getHash(CENTER_MASTER_SLAVE_INFO, "master");
+
+			String strCenterAddress = ConfManager.getCenterIp() + ":" + ConfManager.getClientSoketServerPort();
+			if(null != masterCenterAddress && masterCenterAddress.equals(strCenterAddress)){
+				localServerIsMaster = true;
+			}
+		}
+
+		return localServerIsMaster;
 	}
 }

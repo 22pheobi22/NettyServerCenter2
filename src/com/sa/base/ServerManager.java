@@ -3,9 +3,6 @@ package com.sa.base;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.sa.base.element.ChannelExtend;
 import com.sa.base.element.People;
@@ -21,13 +18,7 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 public enum ServerManager {
 
 	INSTANCE;
-	private static ExecutorService timelyLogExecutor = Executors.newSingleThreadExecutor();
-	 
-	private static ServerDataManager serverDataManager = new ServerDataManager();
-	/**
-	 * 上一个达到立即保存日志线程的是否完毕 true为完毕 
-	 */
-	public final AtomicBoolean lastTimelyLogThreadExecuteStatus = new AtomicBoolean(true);
+
 	/** 向通道写消息并发送*/
 	private void writeAndFlush(ChannelHandlerContext ctx, Packet pact) throws Exception {
 		ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
@@ -104,7 +95,7 @@ public enum ServerManager {
 		if(pact == null ) return;
 
 		// 获取房间内所有用户信息
-		Map<String, People> roomUsers = serverDataManager.getRoomUesrs(pact.getRoomId());
+		Map<String, People> roomUsers = ServerDataPool.serverDataManager.getRoomUesrs(pact.getRoomId());
 		// 如果房间内没有用户 则返回
 		if (null == roomUsers || 0 == roomUsers.size()) return;
 
@@ -174,7 +165,7 @@ public enum ServerManager {
 			if(roomIds!=null&&roomIds.length>0){
 				//循环保存房间用户信息
 				for (String rId : roomIds) {
-					serverDataManager.setRoomUser(rId, userId, name, icon, agoraId, userRole, notSpeak);
+					ServerDataPool.serverDataManager.setRoomUser(rId, userId, name, icon, agoraId, userRole, notSpeak);
 				}
 			}
 		}
@@ -223,7 +214,7 @@ public enum ServerManager {
 			// 如果不是中心用户id
 			if (!ConfManager.getCenterId().equals(userId)) {
 				// 删除房间内该用户信息
-				serverDataManager.removeRoomUser(userId);
+				ServerDataPool.serverDataManager.removeRoomUser(userId);
 			}
 			if(null!=ctx){
 				// 通道关闭
@@ -277,7 +268,7 @@ public enum ServerManager {
 		if(pact == null ) return;
 
 		// 获取房间内所有用户信息
-		Map<String, People> roomUsers = serverDataManager.getRoomUesrs(pact.getRoomId());
+		Map<String, People> roomUsers = ServerDataPool.serverDataManager.getRoomUesrs(pact.getRoomId());
 		// 如果房间内没有用户 则返回
 		if (null == roomUsers || 0 == roomUsers.size()) return;
 

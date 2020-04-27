@@ -1,5 +1,6 @@
 package com.sa.service.client;
 
+import com.sa.base.CenterManager;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.util.ByteBufUtil;
@@ -23,12 +24,10 @@ public class ClientHeartBeat extends Packet {
 
 	@Override
 	public void execPacket() {
-		System.out.println("心跳client");
-	}
-
-	@Override
-	public String toString() {
-		return null;
+		String temp = String.valueOf(this.getOption(1));
+		if ("false".equals(temp)) {
+			new CenterManager().activeStandbySwitching();
+		}
 	}
 
 }
