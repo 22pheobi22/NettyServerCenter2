@@ -43,17 +43,32 @@ public class ClientResponecAgreeApplyAuth extends Packet {
 	@Override
 	public void execPacket() {
 		try {
-			/**
-			 * option 1 : 权限CODE
-			 * option 2 : 权限名称
-			 * option 3 : 操作 (+：添加 -:删除)
-			 * option 4 : 多人或单人权限标识（1、n）
-			 */
-			ServerDataPool.dataManager.setRoomUserDefAuth(this.getRoomId(),
-					this.getToUserId(),
-					(String) this.getOption(1),
-					(String) this.getOption(3),
-					(String) this.getOption(4));
+			
+			String[] roomIds = this.getRoomId().split(",");
+			if (null != roomIds && roomIds.length > 0) {
+				for (String rId : roomIds) {
+					/**
+					 * option 1 : 权限CODE
+					 * option 2 : 权限名称
+					 * option 3 : 操作 (+：添加 -:删除)
+					 * option 4 : 多人或单人权限标识（1、n）
+					 */
+					ServerDataPool.dataManager.setRoomUserDefAuth(rId,
+							this.getToUserId(),
+							(String) this.getOption(1),
+							(String) this.getOption(3),
+							(String) this.getOption(4));
+				}
+				boolean b = ServerDataPool.dataManager.checkSourceAndTargetServer(this.getFromUserId(),this.getToUserId());
+				if(!b){
+					//發送者和接收者不在一臺服務
+					/** 实例化 开课 下行 并 赋值 并 执行 */
+					ClientResponecAgreeApplyAuth clientResponecAgreeApplyAuth = new ClientResponecAgreeApplyAuth(
+							this.getPacketHead(), this.getOptions());
+					clientResponecAgreeApplyAuth.execPacket();
+				}
+			}
+		
 			
 			
 			/** 发送消息给目标用户*/

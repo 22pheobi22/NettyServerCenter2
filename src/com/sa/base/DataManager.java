@@ -14,6 +14,7 @@
  */
 package com.sa.base;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -454,7 +455,7 @@ public class DataManager {
 	}
 
 	/** 根據用戶id--获取用户所在房间其他用户所在服务ip列表--若不包含发信者ip则除外 */
-	public List<ChannelHandlerContext> getChannelListOfUserRoomByUserId(String userId) {
+	public Set<ChannelHandlerContext> getChannelListOfUserRoomByUserId(String userId) {
 		if(ConfManager.getIsRedis()){
 			return ServerDataPool.redisDataManager.getChannelListOfUserRoomByUserId(userId);
 		}else{
@@ -482,4 +483,13 @@ public class DataManager {
 		}
 		return null;
 	}
+	
+	public Collection<ChannelHandlerContext> listOtherServerChannlByUserId(String userId) {
+		return ServerDataPool.redisDataManager.listOtherServerChannlByUserId(userId);
+	}
+
+	public boolean checkSourceAndTargetServer(String fromUserId, String toUserId) {
+		return ServerDataPool.redisDataManager.checkSourceAndTargetServer(fromUserId,toUserId);
+	}
+
 }

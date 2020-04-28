@@ -45,7 +45,6 @@ public class ClientResponecApplyAuth extends Packet {
 			/** 发送消息给目标用户*/
 			Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

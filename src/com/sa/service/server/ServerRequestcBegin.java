@@ -14,15 +14,8 @@ public class ServerRequestcBegin extends Packet {
 
 	@Override
 	public void execPacket() {
-		String[] roomIds = this.getRoomId().split(",");
-		if (null != roomIds && roomIds.length > 0) {
-			for (String rId : roomIds) {
-				/** 实例化 开课 下行 并 赋值 并 执行 */
-				ClientResponecBegin clientResponecBegin = new ClientResponecBegin(this.getPacketHead());
-				clientResponecBegin.setRoomId(rId);
-				clientResponecBegin.execPacket();
-			}
-		}
+		ClientResponecBegin clientResponecBegin = new ClientResponecBegin(this.getPacketHead());
+		clientResponecBegin.execPacket();
 	}
 
 	@Override

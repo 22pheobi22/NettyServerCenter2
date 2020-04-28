@@ -10,15 +10,18 @@ public class ServerRequestcShareRemove extends Packet {
 
 	@Override
 	public void execPacket() {
+		ClientResponecShareRemove clientResponecShareRemove = new ClientResponecShareRemove(this.getPacketHead(), this.getOptions());
+		clientResponecShareRemove.execPacket();
+		
 		/** 获取序列 1 的选项 */
 		String op1 = (String) this.getOption(1);
 		String[] roomIds = this.getRoomId().split(",");
 		if (null != roomIds && roomIds.length > 0) {
 			for (String rId : roomIds) {
 				/** 实例化共享删除 下行 并赋值 并 执行 */
-				ClientResponecShareRemove clientResponecShareRemove = new ClientResponecShareRemove(this.getPacketHead(), this.getOptions());
+/*				ClientResponecShareRemove clientResponecShareRemove = new ClientResponecShareRemove(this.getPacketHead(), this.getOptions());
 				clientResponecShareRemove.setRoomId(rId);
-				clientResponecShareRemove.execPacket();
+				clientResponecShareRemove.execPacket();*/
 				/** 删除共享 */
 				ServerDataPool.dataManager.removeShare(rId, op1);
 			}

@@ -14,8 +14,6 @@
  */
 package com.sa.service.server;
 
-import com.sa.base.ServerDataPool;
-import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
 import com.sa.service.client.ClientResponebOne;
@@ -31,22 +29,9 @@ public class ServerRequestbOne extends Packet {
 
 	@Override
 	public void execPacket() {
-		String[] roomIds = this.getRoomId().split(",");
-		if (roomIds != null && roomIds.length > 0) {
-			for (String rId : roomIds) {
-				/** 根据房间id 和 目标用户id 获取 人员信息 */
-				People people = ServerDataPool.dataManager.getRoomUesr(rId, this.getToUserId());
-				/** 实例化一对一消息类型 下行 并 赋值 */
-				ClientResponebOne clientResponebOne = new ClientResponebOne(this.getPacketHead(),
-						this.getOptions());
-				/** 如果人员信息不为空 */
-				if (null != people) {
-					// 设置房间id为目标房间id
-					clientResponebOne.setRoomId(rId);
-					/** 执行 一对一消息发送 下行 */
-					clientResponebOne.execPacket();
-				}
-			}
-		}
+		/** 实例化一对一消息类型 下行 并 赋值 */
+		ClientResponebOne clientResponebOne = new ClientResponebOne(this.getPacketHead(), this.getOptions());
+		/** 执行 一对一消息发送 下行 */
+		clientResponebOne.execPacket();
 	}
 }

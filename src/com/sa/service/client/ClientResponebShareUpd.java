@@ -34,7 +34,7 @@ public class ClientResponebShareUpd extends Packet {
 	public void execPacket() {
 		try {
 			/** 发送消息给房间内所有用户*/
-			Manager.INSTANCE.sendPacketToRoomAllUsers(this, Constant.CONSOLE_CODE_S, this.getFromUserId());
+			Manager.INSTANCE.sendPacketToRoomServerExpectSourse(this, Constant.CONSOLE_CODE_S, this.getFromUserId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

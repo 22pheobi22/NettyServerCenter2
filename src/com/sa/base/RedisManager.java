@@ -3,6 +3,7 @@ package com.sa.base;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
@@ -184,7 +185,6 @@ public enum RedisManager {
 			ungisterUserId(ce.getUserId());
 		}
 	}
-
 	/**
 	 * 向所有服务器发送房间内消息 
 	 * 
@@ -211,6 +211,44 @@ public enum RedisManager {
 			writeAndFlush(ctx, pact);
 		}
 	}
+
+	/**
+	 * 向所有服务器发送房间内消息 
+	 * 
+	 * @throws Exception
+	 */
+	// 在中心 向除中心及源服务外所有服务器发送房间内消息
+	public void sendPacketToServerExpectSourse(Packet pact, String consoleHead, String fromUserId) throws Exception {
+		// 如果数据包为空 则返回
+		if (pact == null)
+			return;
+		
+		// 在控制台打印消息头
+		pact.printPacket(ConfManager.getConsoleFlag(), consoleHead, ConfManager.getFileLogFlag(),
+								ConfManager.getFileLogPath());
+		Collection<ChannelHandlerContext> list = ServerDataPool.redisDataManager.listOtherServerChannlByUserId(fromUserId);
+		for (ChannelHandlerContext ctx : list) {
+			// 向通道写数据并发送
+			writeAndFlush(ctx, pact);
+		}
+	}
+	
+	// 在中心 向除中心及源服务外所有房間用戶服务器发送房间内消息
+	public void sendPacketToRoomServerExpectSourse(Packet pact, String consoleHead, String fromUserId) throws Exception {
+		// 如果数据包为空 则返回
+		if (pact == null)
+			return;
+		
+		// 在控制台打印消息头
+		pact.printPacket(ConfManager.getConsoleFlag(), consoleHead, ConfManager.getFileLogFlag(),
+								ConfManager.getFileLogPath());
+		Collection<ChannelHandlerContext> list = ServerDataPool.redisDataManager.getChannelListOfRoomByUserId(fromUserId);
+		for (ChannelHandlerContext ctx : list) {
+			// 向通道写数据并发送
+			writeAndFlush(ctx, pact);
+		}
+	}
+	
 
 	public synchronized void log(Packet packet) {
 		Boolean consoleFlag = ConfManager.getConsoleFlag();

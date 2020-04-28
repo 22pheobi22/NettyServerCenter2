@@ -15,6 +15,7 @@
 package com.sa.base;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,6 +35,7 @@ import com.sa.base.element.Room;
 import com.sa.base.element.Share;
 import com.sa.util.Constant;
 import com.sa.util.JedisUtil;
+import com.sa.util.StringUtil;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -990,8 +992,8 @@ public class RedisDataManager {
 	}
 
 	/** 根據用戶id--获取用户所在房间其他用户所在服务ip列表--若不包含发信者ip则除外 */
-	public List<ChannelHandlerContext> getChannelListOfUserRoomByUserId(String userId) {
-		List<ChannelHandlerContext> channelList = new ArrayList<>();
+	public Set<ChannelHandlerContext> getChannelListOfUserRoomByUserId(String userId) {
+		Set<ChannelHandlerContext> channelList = new HashSet<>();
 		Set<String> serverIpList = getServerListOfUserRoomByUserId(userId);
 		for (String serverIp : serverIpList) {
 			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(serverIp);
@@ -1001,13 +1003,26 @@ public class RedisDataManager {
 		}
 		return channelList;
 	}
+	
+	/** 根據用戶id--获取用户所在房间其他用户所在服务ip列表--发信者ip除外 */
+	public Set<ChannelHandlerContext> getChannelListOfRoomByUserId(String userId) {
+		Set<ChannelHandlerContext> channelList = new HashSet<>();
+		Set<String> serverIpList = getServerListOfUserRoomByUserId(userId);
+		for (String serverIp : serverIpList) {
+			ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(serverIp);
+			if (null != ctx) {
+				channelList.add(ctx);
+			}
+		}
+		ChannelHandlerContext uChannel = getUserServerChannel(userId);
+		channelList.remove(uChannel);
+		return channelList;
+	}
 
 	/** 根據用戶id--获取用户所在房间其他用户所在服务ip列表--若不包含发信者ip则除外 */
 	public Set<String> getServerListOfUserRoomByUserId(String userId) {
-		Set<String> serverList = new HashSet<>();
 		String userRoomNo = getUserRoomNo(userId);
-		getServerListOfUserRoomByRoomId(userRoomNo, userId);
-		return serverList;
+		return getServerListOfUserRoomByRoomId(userRoomNo, userId);
 	}
 
 	/** 根據房間id--获取用户所在房间其他用户所在服务ip列表--若不包含发信者ip则除外 */
@@ -1025,6 +1040,15 @@ public class RedisDataManager {
 			}
 		}
 		return serverList;
+	}
+	/**獲取除中心及用戶所在服務外 其他服務通道*/
+	public Collection<ChannelHandlerContext> listOtherServerChannlByUserId(String userId) {
+		ChannelHandlerContext uChannel = getUserServerChannel(userId);
+		ChannelHandlerContext cChannel = getUserServerChannel(ConfManager.getCenterId());
+		Collection<ChannelHandlerContext> values = ServerDataPool.USER_CHANNEL_MAP.values();
+		values.remove(uChannel);
+		values.remove(cChannel);
+		return values;
 	}
 
 	/**
@@ -1083,11 +1107,24 @@ public class RedisDataManager {
 
 		return localServerIsMaster;
 	}
-	
+	/**更改redis種主備角色信息*/
 	public void modifyMasterSlave(String masterAddr,String slaveAddr){
 		Map<String,String> centerRoleMap = new HashMap<>();
 		centerRoleMap.put("master", masterAddr);
 		centerRoleMap.put("slave", slaveAddr);
 		jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, centerRoleMap);
+	}
+
+	/**校驗發送和目標用戶是否在同一服務器*/
+	public boolean checkSourceAndTargetServer(String fromUserId, String toUserId) {
+		boolean b =false;
+		if(!StringUtil.isEmpty(fromUserId)&&!StringUtil.isEmpty(toUserId)){
+			String fromServerIp = getUserServerIp(fromUserId);
+			String toServerIp = getUserServerIp(fromUserId);
+			if(fromServerIp.equals(toServerIp)){
+				b=true;
+			}
+		}
+		return b;
 	}
 }

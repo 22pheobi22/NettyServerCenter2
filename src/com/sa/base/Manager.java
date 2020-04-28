@@ -173,7 +173,13 @@ public enum Manager {
 			ServerManager.INSTANCE.sendPacketToRoomAllUsers(pact, consoleHead, fromUserId);
 		}
 	}
-
+	
+	public void sendPacketToServerExpectSourse(Packet pact, String consoleHead, String fromUserId) throws Exception{
+		RedisManager.INSTANCE.sendPacketToServerExpectSourse(pact, consoleHead, fromUserId);
+	}
+	public void sendPacketToRoomServerExpectSourse(Packet pact, String consoleHead, String fromUserId) throws Exception{
+		RedisManager.INSTANCE.sendPacketToRoomServerExpectSourse(pact, consoleHead, fromUserId);
+	}
 	public synchronized void log(Packet packet) {
 		Boolean consoleFlag = ConfManager.getConsoleFlag();
 		Boolean fileFlag = ConfManager.getFileLogFlag();

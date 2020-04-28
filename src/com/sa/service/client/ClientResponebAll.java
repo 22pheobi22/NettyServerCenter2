@@ -42,8 +42,9 @@ public class ClientResponebAll extends Packet {
 	@Override
 	public void execPacket() {
 		try {
-			/** 发送消息给全体用户*/
-			Manager.INSTANCE.sendPacketToAllUsers(this,Constant.CONSOLE_CODE_S);
+			/**發送全員消息到除源服務及中心外其他服務*/
+			Manager.INSTANCE.sendPacketToServerExpectSourse(this,Constant.CONSOLE_CODE_S, this.getFromUserId());
+			//Manager.INSTANCE.sendPacketToAllUsers(this,Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

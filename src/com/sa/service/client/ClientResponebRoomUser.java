@@ -53,7 +53,6 @@ public class ClientResponebRoomUser extends Packet {
 				/** 向房间内全员发送消息*/
 				Manager.INSTANCE.sendPacketToRoomAllUsers(this, Constant.CONSOLE_CODE_S,this.getFromUserId());
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

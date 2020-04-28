@@ -29,17 +29,10 @@ public class ServerRequestcAgreeApplyAuth extends Packet {
 
 	@Override
 	public void execPacket() {
-
-		String[] roomIds = this.getRoomId().split(",");
-		if (null != roomIds && roomIds.length > 0) {
-			for (String rId : roomIds) {
-				/** 实例化 开课 下行 并 赋值 并 执行 */
-				ClientResponecAgreeApplyAuth clientResponecAgreeApplyAuth = new ClientResponecAgreeApplyAuth(
-						this.getPacketHead(), this.getOptions());
-				clientResponecAgreeApplyAuth.setRoomId(rId);
-				clientResponecAgreeApplyAuth.execPacket();
-			}
-		}
+		/** 实例化 开课 下行 并 赋值 并 执行 */
+		ClientResponecAgreeApplyAuth clientResponecAgreeApplyAuth = new ClientResponecAgreeApplyAuth(
+				this.getPacketHead(), this.getOptions());
+		clientResponecAgreeApplyAuth.execPacket();
 	}
 
 }

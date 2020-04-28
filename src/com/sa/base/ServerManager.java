@@ -1,5 +1,6 @@
 package com.sa.base;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -139,6 +140,31 @@ public enum ServerManager {
 				writeAndFlush(ctx.getValue(), pact);
 //				ctx.getValue().writeAndFlush(pact);
 			}
+		}
+	}
+	
+	/**
+	 *  向所有在线用户发送数据包
+	 * @throws Exception
+	 */
+	public void sendPacketToAllUsersExpectSourceServer(Packet pact, String consoleHead) throws Exception{
+		// 如果数据包为空 则返回
+		if(pact == null ) return;
+
+		// 在控制台打印消息头
+		pact.printPacket(ConfManager.getConsoleFlag(), consoleHead, ConfManager.getFileLogFlag(), ConfManager.getFileLogPath());
+		// 缓存消息日志
+//		this.log(pact);
+		//消息来源服务ip
+		String sourceServerIp = ServerDataPool.dataManager.getUserServerIp(pact.getFromUserId());
+		//获取并遍历中心和源服务外的serverchannel
+		Collection<ChannelHandlerContext> channels = ServerDataPool.USER_CHANNEL_MAP.values();
+		channels.remove(ConfManager.getCenterId());
+		channels.remove(sourceServerIp);
+		
+		for (ChannelHandlerContext ctx : channels) {
+			// 发消息
+			writeAndFlush(ctx, pact);
 		}
 	}
 
