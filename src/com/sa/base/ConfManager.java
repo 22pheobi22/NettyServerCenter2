@@ -115,7 +115,7 @@ public class ConfManager {
 	public static String getCenterId() {
 		String strCenterId = CONF_MAP.get("center.id");
 
-		if (StringUtil.isEmpty(strCenterId) || !StringUtil.isInteger(strCenterId)) {
+		if (StringUtil.isEmpty(strCenterId)) {
 			strCenterId = "0";
 		}
 
