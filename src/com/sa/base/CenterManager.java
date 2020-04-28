@@ -76,7 +76,7 @@ public class CenterManager {
 				}
 			
 				if (0 == index) {
-					
+					ServerDataPool.redisDataManager.modifyMasterSlave();
 				}
 			}
 		}

@@ -48,6 +48,7 @@ public class RedisDataManager {
 	private String SHARE_LIST_KEY = "SHARE_KEY_LIST";
 	private String ROOM_SHARE_KEY = "ROOM_SHARE_";
 	private final String CENTER_MASTER_SLAVE_INFO = "CENTER_MASTER_SLAVE_INFO";
+	private final String HEART_BEAT = "HEART-BEAT-";
 	private final String MASTER = "MASTER";
 	private final String SLAVE = "SLAVE";
 
@@ -1090,14 +1091,31 @@ public class RedisDataManager {
 		Map<String, String> hashValsAll = jedisUtil.getHashAll(CENTER_MASTER_SLAVE_INFO);
 
 		if(null == hashValsAll ||  0 >= hashValsAll.size()) {
-			Map<String,String> centerRoleMap = new HashMap<>();
+			hashValsAll = new HashMap<>();
+			hashValsAll.put(MASTER, ConfManager.getCenterIp());
 
-			centerRoleMap.put(MASTER, ConfManager.getCenterIp());
-
-			jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, centerRoleMap);
-		}else{
-			hashValsAll.put(SLAVE, ConfManager.getCenterIp());
 			jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, hashValsAll);
+		} else {
+			int index = 0;
+			long now = System.currentTimeMillis();
+			String master = hashValsAll.get(MASTER);
+			Set<String> keys = getHeartBeats(HEART_BEAT + master + "-");
+			for (String key : keys) {
+				String value = getHeartBeat(key);
+				long time = Long.parseLong(value);
+				if (now - time < ConfManager.getCenterMasterOvertime()) {
+					index++;
+					break;
+				}
+			}
+
+			if (0 == index) {
+				hashValsAll.put(MASTER, ConfManager.getCenterIp());
+				jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, hashValsAll);
+			} else {
+				hashValsAll.put(SLAVE, ConfManager.getCenterIp());
+				jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, hashValsAll);
+			}
 		}
 	}
 	/**更改redis種主備角色信息*/
