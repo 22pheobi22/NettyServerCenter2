@@ -61,7 +61,7 @@ public class CenterManager {
 		String master = ServerDataPool.redisDataManager.getCenterMaster();
 
 		if (null != master && !"".equals(master)) {
-			Set<String> keys = ServerDataPool.redisDataManager.getHeartBeats(HEART_BEAT + "-" + master + "-");
+			Set<String> keys = ServerDataPool.redisDataManager.getHeartBeats(HEART_BEAT + master + "-");
 
 			if (null != keys) {
 				int index = 0;
