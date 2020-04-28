@@ -2,7 +2,6 @@ package com.sa.client;
 
 import java.net.InetSocketAddress;
 
-import com.sa.base.CenterManager;
 import com.sa.base.ConfManager;
 import com.sa.base.ServerDataPool;
 import com.sa.net.codec.PacketDecoder;

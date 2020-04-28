@@ -12,14 +12,15 @@
  */
 package com.sa.base;
 
+import java.util.Set;
+
 import com.sa.client.ChatClient;
 import com.sa.client.MonitorClient;
 
-import io.netty.channel.ChannelHandlerContext;
-
 public class CenterManager {
-	private String CENTER_LINK_SERVER_NAME = "CENTER-LINK-SERVER-";
-	private String CENTER_MASTER_SLAVE_MONITOR = "CENTER-MASTER-SLAVE-MONITOR-";
+	private final String CENTER_LINK_SERVER_NAME = "CENTER-LINK-SERVER-";
+	private final String CENTER_MASTER_SLAVE_MONITOR = "CENTER-MASTER-SLAVE-MONITOR-";
+	private final String HEART_BEAT = "HEART-BEAT-";
 
 	public void monitorLinkCenter() {
 		String key = CENTER_MASTER_SLAVE_MONITOR + ConfManager.getCenterIpAnother();
@@ -57,26 +58,36 @@ public class CenterManager {
 	 * 中心主备切换
 	 */
 	public void activeStandbySwitching() {
-		// TODO: 改redis中主信息
-		String masterAddr = ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort();
-		String slaveAddr = ConfManager.getCenterIpAnother()+":"+ConfManager.getCenterPortAnother();
-		ServerDataPool.redisDataManager.modifyMasterSlave(masterAddr, slaveAddr);
-		
-		// 启动连接server服务
-		this.centerLinkServer();
-		
-		// TODO:关闭原监控通道
-		ChannelHandlerContext ctx = ServerDataPool.USER_CHANNEL_MAP.get(ConfManager.getCenterIpAnother());
-		if(null!=ctx){
-			ctx.close();
+		String master = ServerDataPool.redisDataManager.getCenterMaster();
+
+		if (null != master && !"".equals(master)) {
+			Set<String> keys = ServerDataPool.redisDataManager.getHeartBeats(HEART_BEAT + "-" + master + "-");
+
+			if (null != keys) {
+				int index = 0;
+				long now = System.currentTimeMillis();
+				for (String key : keys) {
+					String value = ServerDataPool.redisDataManager.getHeartBeat(key);
+					long time = Long.parseLong(value);
+					if (now - time < ConfManager.getCenterMasterOvertime()) {
+						index ++;
+						break;
+					}
+				}
+			
+				if (0 == index) {
+					
+				}
+			}
 		}
-		
-		// 关闭监控线程 
-		String key = CENTER_MASTER_SLAVE_MONITOR+ConfManager.getCenterIpAnother();
-		ServerDataPool.threadManager.close(key);
 	}
 	
 	public boolean checkServerLink() {
 		return ServerDataPool.threadManager.check(CENTER_LINK_SERVER_NAME, 0);
+	}
+
+	public void heartBeat(String toUserId, String fromUserId) {
+		String key = HEART_BEAT + fromUserId + "-" + toUserId;
+		ServerDataPool.redisDataManager.heartBeat(key, System.currentTimeMillis());
 	}
 }

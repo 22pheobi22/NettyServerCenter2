@@ -380,4 +380,12 @@ public class ConfManager {
 	public static String getDelRedisTime() {
 		return CONF_MAP.get("redis.data.del.time");
 	}
+	
+	/** 超时主备切换(单位：毫秒) */
+	public static int getCenterMasterOvertime() {
+		String strOvertime = CONF_MAP.get("center.master.overtime");
+		strOvertime = null == strOvertime || "".equals(strOvertime) ? "10" : strOvertime;
+
+		return Integer.parseInt(strOvertime)*1000;
+	}
 }

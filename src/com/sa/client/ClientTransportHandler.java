@@ -27,7 +27,9 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 		Integer transactionId = (int) (1 + Math.random() * 100000000);
 		String toUserId = StringUtil.subStringIp(ctx.channel().remoteAddress().toString());
 
-		ServerLogin serverLogin = new ServerLogin(transactionId, "0", "0", toUserId, 0);
+		ServerLogin serverLogin = new ServerLogin(transactionId, "0", ConfManager.getCenterId(), toUserId, 0);
+		// TODO : 数字验签
+		serverLogin.setOption(123, "sign");
 
 		// 缓存 用户-通道信息
 		ServerDataPool.USER_CHANNEL_MAP.put(toUserId, ctx);
@@ -41,8 +43,6 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		Packet packet = (Packet) msg;
 		System.out.println(packet.toString());
-		// packet.printPacket(ClientConfigs.CONSOLE_FLAG, "",
-		// packet.toString());
 
 		PacketManager.INSTANCE.execPacket(packet);
 	}
