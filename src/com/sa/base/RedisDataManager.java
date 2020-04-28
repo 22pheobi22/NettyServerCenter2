@@ -46,6 +46,8 @@ public class RedisDataManager {
 	private String SHARE_LIST_KEY = "SHARE_KEY_LIST";
 	private String ROOM_SHARE_KEY = "ROOM_SHARE_";
 	private final String CENTER_MASTER_SLAVE_INFO = "CENTER_MASTER_SLAVE_INFO";
+	private final String MASTER = "MASTER";
+	private final String SLAVE = "SLAVE";
 
 	/**
 	 * 系统管理员
@@ -1060,34 +1062,44 @@ public class RedisDataManager {
 	 * 判断且设置中心主备信息
 	 * @return true：本机本服务是主中心；false：本机本服务是备中心
 	 */
-	public boolean setMasterSlave() {
-		boolean localServerIsMaster = false;
-		List<String> hashValsAll = jedisUtil.getHashValsAll(CENTER_MASTER_SLAVE_INFO);
+	public void setMasterSlave() {
+		Map<String, String> hashValsAll = jedisUtil.getHashAll(CENTER_MASTER_SLAVE_INFO);
 
 		if(null == hashValsAll ||  0 >= hashValsAll.size()) {
 			Map<String,String> centerRoleMap = new HashMap<>();
 
-			centerRoleMap.put("master", ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort());
-			centerRoleMap.put("slave", ConfManager.getCenterIpAnother()+":"+ConfManager.getCenterPortAnother());
+			centerRoleMap.put(MASTER, ConfManager.getCenterIp());
 
 			jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, centerRoleMap);
-			localServerIsMaster = true;
 		}else{
-			String masterCenterAddress = jedisUtil.getHash(CENTER_MASTER_SLAVE_INFO, "master");
-
-			String strCenterAddress = ConfManager.getCenterIp() + ":" + ConfManager.getClientSoketServerPort();
-			if(null != masterCenterAddress && masterCenterAddress.equals(strCenterAddress)){
-				localServerIsMaster = true;
-			}
+			hashValsAll.put(SLAVE, ConfManager.getCenterIp());
+			jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, hashValsAll);
 		}
-
-		return localServerIsMaster;
 	}
 	
-	public void modifyMasterSlave(String masterAddr,String slaveAddr){
-		Map<String,String> centerRoleMap = new HashMap<>();
-		centerRoleMap.put("master", masterAddr);
-		centerRoleMap.put("slave", slaveAddr);
-		jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, centerRoleMap);
+	public String getCenterMaster() {
+		return jedisUtil.getHash(CENTER_MASTER_SLAVE_INFO, MASTER);
+	}
+
+	public void modifyMasterSlave() {
+		Map<String,String> centerInfoMap = jedisUtil.getHashAll(CENTER_MASTER_SLAVE_INFO);
+
+		Map<String,String> tempMap = new HashMap<>();
+		tempMap.put(MASTER, centerInfoMap.get(SLAVE));
+		tempMap.put(SLAVE, centerInfoMap.get(MASTER));
+
+		jedisUtil.setHashMulti(CENTER_MASTER_SLAVE_INFO, tempMap);
+	}
+
+	public void heartBeat(String key, long currentTimeMillis) {
+		jedisUtil.setString(key, String.valueOf(currentTimeMillis));
+	}
+
+	public Set<String> getHeartBeats(String key) {
+		return jedisUtil.scanKeys(key);
+	}
+	
+	public String getHeartBeat(String key) {
+		return jedisUtil.getString(key);
 	}
 }

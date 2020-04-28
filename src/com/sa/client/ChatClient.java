@@ -3,7 +3,6 @@ package com.sa.client;
 import java.net.InetSocketAddress;
 
 import com.sa.base.ConfManager;
-import com.sa.base.ServerDataPool;
 import com.sa.net.codec.PacketDecoder;
 import com.sa.net.codec.PacketEncoder;
 
@@ -31,6 +30,25 @@ public class ChatClient implements Runnable {
 		this.port = port;
 	}
 
+	private class TempSocketChannel extends ChannelInitializer<SocketChannel> {
+		private String host;
+		
+		public TempSocketChannel(String host) {
+			this.host = host;
+		}
+		  
+        @Override  
+        protected void initChannel(SocketChannel arg0)
+                throws Exception {  
+            ChannelPipeline pipeline = arg0.pipeline();  
+            pipeline.addLast(new PacketDecoder(1024*100, 0,4,0,4));  
+            pipeline.addLast(new LengthFieldPrepender(4));  
+            pipeline.addLast(new PacketEncoder());
+            pipeline.addLast(new HeartBeatHandler(this.host));
+            pipeline.addLast(new ClientTransportHandler());  
+        }  
+	}
+
 	public void run() {
 		try {
 			connect(this.host, this.port);
@@ -44,20 +62,7 @@ public class ChatClient implements Runnable {
 
         try{  
         	Bootstrap b  = new Bootstrap();
-            b.group(group).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>(){  
-  
-                @Override  
-                protected void initChannel(SocketChannel arg0)
-                        throws Exception {  
-                    ChannelPipeline pipeline = arg0.pipeline();  
-                    pipeline.addLast(new PacketDecoder(1024*100, 0,4,0,4));  
-                    pipeline.addLast(new LengthFieldPrepender(4));  
-                    pipeline.addLast(new PacketEncoder());
-                    pipeline.addLast(new HeartBeatHandler());
-                    pipeline.addLast(new ClientTransportHandler());  
-                }  
-                  
-            });  
+            b.group(group).channel(NioSocketChannel.class).handler(new TempSocketChannel(this.host));  
             ChannelFuture f = b.connect(new InetSocketAddress(host, port)).sync();
             // 重连成功，重置重连次数
             if(f.channel().isActive()){
@@ -70,7 +75,6 @@ public class ChatClient implements Runnable {
         	//设置最大重连次数，防止服务端正常关闭导致的空循环
         	if (reconnectTimes < ConfManager.getMaxReconnectTimes()) {
                 reconnectTimes++;
-                ServerDataPool.threadManager.setNum(this.name, reconnectTimes);
         		reConnectServer();
         	}
 
@@ -94,7 +98,6 @@ public class ChatClient implements Runnable {
     public void resetReconnectTimes() {
     	if (reconnectTimes > 0) {
     		reconnectTimes = 0;
-    		 ServerDataPool.threadManager.setNum(this.name, reconnectTimes);
     		System.err.println("断线重连成功");
     	}
     }
