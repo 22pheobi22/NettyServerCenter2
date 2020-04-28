@@ -3,7 +3,6 @@ package com.sa.base;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
