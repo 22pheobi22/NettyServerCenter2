@@ -87,7 +87,7 @@ public class CenterManager {
 	}
 
 	public void heartBeat(String toUserId, String fromUserId) {
-		String key = HEART_BEAT + fromUserId + "-" + toUserId;
+		String key = HEART_BEAT + toUserId + "-" + fromUserId;
 		ServerDataPool.redisDataManager.heartBeat(key, System.currentTimeMillis());
 	}
 }
