@@ -91,4 +91,3 @@ public class CenterManager {
 		ServerDataPool.redisDataManager.heartBeat(key, System.currentTimeMillis());
 	}
 }
-
