@@ -42,9 +42,13 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		Packet packet = (Packet) msg;
-		System.out.println(packet.toString());
 
-		PacketManager.INSTANCE.execPacket(packet);
+		String master = ServerDataPool.redisDataManager.getCenterMaster();
+		String slave = ServerDataPool.redisDataManager.getCenterSlave();
+		if (ConfManager.getCenterId().equals(master) || packet.getFromUserId().equals(slave)) {
+			PacketManager.INSTANCE.execPacket(packet);
+		}
+		
 	}
 
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) {

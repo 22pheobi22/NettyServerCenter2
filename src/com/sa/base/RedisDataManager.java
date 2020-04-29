@@ -1130,6 +1130,10 @@ public class RedisDataManager {
 	public String getCenterMaster() {
 		return jedisUtil.getHash(CENTER_MASTER_SLAVE_INFO, MASTER);
 	}
+	
+	public String getCenterSlave() {
+		return jedisUtil.getHash(CENTER_MASTER_SLAVE_INFO, SLAVE);
+	}
 
 	public void modifyMasterSlave() {
 		Map<String,String> centerInfoMap = jedisUtil.getHashAll(CENTER_MASTER_SLAVE_INFO);
