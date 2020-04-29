@@ -200,11 +200,11 @@ public enum RedisManager {
 								ConfManager.getFileLogPath());
 		
 		//備中心通道
-		ChannelHandlerContext centerCtx = ServerDataPool.USER_CHANNEL_MAP.get("0");
+		//ChannelHandlerContext centerCtx = ServerDataPool.USER_CHANNEL_MAP.get("0");
 		Collection<ChannelHandlerContext> values = ServerDataPool.USER_CHANNEL_MAP.values();
-		if(null!=centerCtx){
+		/*if(null!=centerCtx){
 			values.remove(centerCtx);
-		}		
+		}*/		
 		for (ChannelHandlerContext ctx : values) {
 			// 向通道写数据并发送
 			writeAndFlush(ctx, pact);

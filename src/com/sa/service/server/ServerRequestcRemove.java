@@ -20,6 +20,7 @@ import com.sa.base.ServerDataPool;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
+import com.sa.service.client.ClientResponebRoomUser;
 import com.sa.service.client.ClientResponecRemove;
 
 public class ServerRequestcRemove extends Packet {
@@ -57,7 +58,7 @@ public class ServerRequestcRemove extends Packet {
 				/** 移除用户*/
 				ServerDataPool.dataManager.removeRoomUser(rId, this.getToUserId());
 				/** 通知被踢用户*/
-				//noticeUser();
+				noticeUser(rId);
 			}
 		}
 		
@@ -76,5 +77,11 @@ public class ServerRequestcRemove extends Packet {
 			ServerDataPool.dataManager.delUserServer(this.getToUserId());
 		}
 	}
-
+	
+	private void noticeUser(String rId) {
+		ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
+		crru.setOption(12, this.getToUserId());
+		crru.setRoomId(rId);
+		crru.execPacket();
+	}
 }
