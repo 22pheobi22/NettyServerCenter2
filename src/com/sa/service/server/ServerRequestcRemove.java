@@ -14,6 +14,8 @@
  */
 package com.sa.service.server;
 
+import com.sa.base.DataManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
@@ -58,13 +60,17 @@ public class ServerRequestcRemove extends Packet {
 				//noticeUser();
 			}
 		}
-		ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(),
-				this.getOptions());
-		clientResponecRemove.execPacket();
+		
+		boolean sameServer = ServerDataPool.dataManager.checkSourceAndTargetServer(this.getFromUserId(), this.getToUserId());
+		if(!sameServer){
+			ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(),
+					this.getOptions());
+			clientResponecRemove.execPacket();
+		}
 		/**该用户是否还存在于其他房间*/
 		String userRoomNo = ServerDataPool.dataManager.getUserRoomNo(this.getToUserId());
 		if(null==userRoomNo||"".equals(userRoomNo)){
-			//若不存在  发送踢人下行消息到服务 关闭该服务上用户通道
+			//若不存在  发送踢人下行消息到服务 关闭该服务上用户通道data
 			//Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
 			//移除user-ip信息
 			ServerDataPool.dataManager.delUserServer(this.getToUserId());

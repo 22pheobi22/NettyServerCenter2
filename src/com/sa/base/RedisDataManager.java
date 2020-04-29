@@ -1153,7 +1153,10 @@ public class RedisDataManager {
 		return jedisUtil.getString(key);
 	}
 
-	/**校驗發送和目標用戶是否在同一服務器*/
+	/**校驗發送和目標用戶是否在同一服務器
+	 * true：相同服务
+	 * false：不同服务
+	 * */
 	public boolean checkSourceAndTargetServer(String fromUserId, String toUserId) {
 		boolean b =false;
 		if(!StringUtil.isEmpty(fromUserId)&&!StringUtil.isEmpty(toUserId)){
