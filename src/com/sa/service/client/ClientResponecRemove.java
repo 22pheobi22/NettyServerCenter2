@@ -37,25 +37,6 @@ public class ClientResponecRemove extends Packet {
 	@Override
 	public void execPacket() {
 		try {
-			String[] roomIds = this.getRoomId().split(",");
-			if (null != roomIds && roomIds.length > 0) {
-				for (String rId : roomIds) {
-					/** 发送被迫下线通知*/
-					//offline();
-					/** 移除用户*/
-					ServerDataPool.dataManager.removeRoomUser(rId, this.getToUserId());
-					/** 通知被踢用户*/
-					//noticeUser();
-				}
-			}
-			/**该用户是否还存在于其他房间*/
-			String userRoomNo = ServerDataPool.dataManager.getUserRoomNo(this.getToUserId());
-			if(null==userRoomNo||"".equals(userRoomNo)){
-				//若不存在  发送踢人下行消息到服务 关闭该服务上用户通道
-				//Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
-				//移除user-ip信息
-				ServerDataPool.dataManager.delUserServer(this.getToUserId());
-			}
 			Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
 		} catch (Exception e) {
 			e.printStackTrace();

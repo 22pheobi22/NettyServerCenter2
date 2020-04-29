@@ -200,23 +200,18 @@ public enum RedisManager {
 								ConfManager.getFileLogPath());
 		
 		//備中心通道
-		ChannelHandlerContext centerCtx = ServerDataPool.USER_CHANNEL_MAP.get("0");
+		//ChannelHandlerContext centerCtx = ServerDataPool.USER_CHANNEL_MAP.get("0");
 		Collection<ChannelHandlerContext> values = ServerDataPool.USER_CHANNEL_MAP.values();
-		if(null!=centerCtx){
+		/*if(null!=centerCtx){
 			values.remove(centerCtx);
-		}		
+		}*/		
 		for (ChannelHandlerContext ctx : values) {
 			// 向通道写数据并发送
 			writeAndFlush(ctx, pact);
 		}
 	}
 
-	/**
-	 * 向所有服务器发送房间内消息 
-	 * 
-	 * @throws Exception
-	 */
-	// 在中心 向除中心及源服务外所有服务器发送房间内消息
+	/**發送消息到除中心及推送消息的服務器外的其他服務器*/
 	public void sendPacketToServerExpectSourse(Packet pact, String consoleHead, String fromUserId) throws Exception {
 		// 如果数据包为空 则返回
 		if (pact == null)

@@ -174,9 +174,11 @@ public enum Manager {
 		}
 	}
 	
+	/**發送消息到除中心及推送消息的服務器外的其他服務器*/
 	public void sendPacketToServerExpectSourse(Packet pact, String consoleHead, String fromUserId) throws Exception{
 		RedisManager.INSTANCE.sendPacketToServerExpectSourse(pact, consoleHead, fromUserId);
 	}
+	/**發送房間内消息--發送消息到処中心，推送消息的服務外的其他房間内學院所在服務*/
 	public void sendPacketToRoomServerExpectSourse(Packet pact, String consoleHead, String fromUserId) throws Exception{
 		RedisManager.INSTANCE.sendPacketToRoomServerExpectSourse(pact, consoleHead, fromUserId);
 	}

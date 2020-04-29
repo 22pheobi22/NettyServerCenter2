@@ -14,10 +14,13 @@
  */
 package com.sa.service.server;
 
+import com.sa.base.DataManager;
+import com.sa.base.Manager;
 import com.sa.base.ServerDataPool;
 import com.sa.base.element.People;
 import com.sa.net.Packet;
 import com.sa.net.PacketType;
+import com.sa.service.client.ClientResponebRoomUser;
 import com.sa.service.client.ClientResponecRemove;
 
 public class ServerRequestcRemove extends Packet {
@@ -47,26 +50,38 @@ public class ServerRequestcRemove extends Packet {
 
 	@Override
 	public void execPacket() {
-/*		String[] roomIds = this.getRoomId().split(",");
+		String[] roomIds = this.getRoomId().split(",");
 		if (null != roomIds && roomIds.length > 0) {
 			for (String rId : roomIds) {
-				*//** 获取目标用户信息 *//*
-				People people = ServerDataPool.dataManager.getRoomUesr(rId, this.getToUserId());
-				*//** 如果用户信息不为空 *//*
-				if (null != people) {
-					*//** 设置删除成功 *//*
-					this.setOption(255, "deleted");
-					*//** 实例化删除信息 下行 并赋值 并 执行 *//*
-					ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(),
-							this.getOptions());
-					clientResponecRemove.setRoomId(rId);
-					clientResponecRemove.execPacket();
-				}
+				/** 发送被迫下线通知*/
+				//offline();
+				/** 移除用户*/
+				ServerDataPool.dataManager.removeRoomUser(rId, this.getToUserId());
+				/** 通知被踢用户*/
+				noticeUser(rId);
 			}
-		}*/
-		ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(),
-				this.getOptions());
-		clientResponecRemove.execPacket();
+		}
+		
+		boolean sameServer = ServerDataPool.dataManager.checkSourceAndTargetServer(this.getFromUserId(), this.getToUserId());
+		if(!sameServer){
+			ClientResponecRemove clientResponecRemove = new ClientResponecRemove(this.getPacketHead(),
+					this.getOptions());
+			clientResponecRemove.execPacket();
+		}
+		/**该用户是否还存在于其他房间*/
+		String userRoomNo = ServerDataPool.dataManager.getUserRoomNo(this.getToUserId());
+		if(null==userRoomNo||"".equals(userRoomNo)){
+			//若不存在  发送踢人下行消息到服务 关闭该服务上用户通道data
+			//Manager.INSTANCE.sendPacketTo(this, Constant.CONSOLE_CODE_S);
+			//移除user-ip信息
+			ServerDataPool.dataManager.delUserServer(this.getToUserId());
+		}
 	}
-
+	
+	private void noticeUser(String rId) {
+		ClientResponebRoomUser crru = new ClientResponebRoomUser(this.getPacketHead());
+		crru.setOption(12, this.getToUserId());
+		crru.setRoomId(rId);
+		crru.execPacket();
+	}
 }
