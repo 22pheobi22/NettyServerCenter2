@@ -20,7 +20,7 @@ import com.sa.client.MonitorClient;
 public class CenterManager {
 	private final String CENTER_LINK_SERVER_NAME = "CENTER-LINK-SERVER-";
 	private final String CENTER_MASTER_SLAVE_MONITOR = "CENTER-MASTER-SLAVE-MONITOR-";
-	private final String HEART_BEAT = "HEART-BEAT-";
+	private final String CENTER_HEART_BEAT = "CENTER-HEART-BEAT-";
 
 	public void monitorLinkCenter() {
 		String key = CENTER_MASTER_SLAVE_MONITOR + ConfManager.getCenterIpAnother();
@@ -61,7 +61,7 @@ public class CenterManager {
 		String master = ServerDataPool.redisDataManager.getCenterMaster();
 
 		if (null != master && !"".equals(master)) {
-			Set<String> keys = ServerDataPool.redisDataManager.getHeartBeats(HEART_BEAT + master + "-");
+			Set<String> keys = ServerDataPool.redisDataManager.getHeartBeats(CENTER_HEART_BEAT + master + "-");
 
 			if (null != keys) {
 				int index = 0;
@@ -87,7 +87,7 @@ public class CenterManager {
 	}
 
 	public void heartBeat(String toUserId, String fromUserId) {
-		String key = HEART_BEAT + toUserId + "-" + fromUserId;
+		String key = CENTER_HEART_BEAT + toUserId + "-" + fromUserId;
 		ServerDataPool.redisDataManager.heartBeat(key, System.currentTimeMillis());
 	}
 }
