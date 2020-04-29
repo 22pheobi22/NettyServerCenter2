@@ -38,7 +38,6 @@ public class CenterManager {
 				String[] addr = address[i].split(":");
 
 				String key = CENTER_LINK_SERVER_NAME +addr[0];
-				System.out.println(key);
 				ChatClient chatClient = new ChatClient(key, addr[0], Integer.valueOf(addr[1]));
 				start(key, chatClient);
 			}
@@ -89,7 +88,6 @@ public class CenterManager {
 
 	public void heartBeat(String toUserId, String fromUserId) {
 		String key = CENTER_HEART_BEAT + toUserId + "->" + fromUserId;
-		System.out.println(key);
 		ServerDataPool.redisDataManager.heartBeat(key, System.currentTimeMillis());
 	}
 }

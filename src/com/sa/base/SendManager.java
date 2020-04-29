@@ -23,9 +23,8 @@ public class SendManager {
 	/** 向通道写消息并发送*/
 	public void writeAndFlush(ChannelHandlerContext ctx, Packet pact) throws Exception {
 		String master = ServerDataPool.redisDataManager.getCenterMaster();
-		String slave = ServerDataPool.redisDataManager.getCenterSlave();
 
-		if (ConfManager.getCenterId().equals(master) || pact.getFromUserId().equals(slave)) {
+		if (ConfManager.getCenterId().equals(master)) {
 			ChannelExtend ce = ServerDataPool.CHANNEL_USER_MAP.get(ctx);
 			if (null == ce) {
 				ce = ServerDataPool.TEMP_CONN_MAP.get(ctx);
