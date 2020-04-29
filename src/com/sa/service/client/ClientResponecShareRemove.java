@@ -35,8 +35,6 @@ public class ClientResponecShareRemove extends Packet {
 		try {
 			//發給
 			Manager.INSTANCE.sendPacketToRoomServerExpectSourse(this, Constant.CONSOLE_CODE_S,this.getFromUserId());
-			/** 发送给房间内所有用户*/
-			//Manager.INSTANCE.sendPacketToRoomAllUsers(this, Constant.CONSOLE_CODE_S,this.getFromUserId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

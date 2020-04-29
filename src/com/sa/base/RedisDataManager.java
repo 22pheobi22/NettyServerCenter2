@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.fastjson.JSON;
 import com.sa.base.element.ChatLog;
@@ -1007,7 +1008,7 @@ public class RedisDataManager {
 		return channelList;
 	}
 	
-	/** 根據用戶id--获取用户所在房间其他用户所在服务ip列表--发信者ip除外 */
+	/** 根據用戶id--获取用户所在房间其他用户所在服务与中心通道--发信者服务通道除外 */
 	public Set<ChannelHandlerContext> getChannelListOfRoomByUserId(String userId) {
 		Set<ChannelHandlerContext> channelList = new HashSet<>();
 		Set<String> serverIpList = getServerListOfUserRoomByUserId(userId);
@@ -1047,10 +1048,10 @@ public class RedisDataManager {
 	/**獲取除中心及用戶所在服務外 其他服務通道*/
 	public Collection<ChannelHandlerContext> listOtherServerChannlByUserId(String userId) {
 		ChannelHandlerContext uChannel = getUserServerChannel(userId);
-		ChannelHandlerContext cChannel = getUserServerChannel(ConfManager.getCenterId());
+		//ChannelHandlerContext cChannel = getUserServerChannel(ConfManager.getCenterId());
 		Collection<ChannelHandlerContext> values = ServerDataPool.USER_CHANNEL_MAP.values();
 		values.remove(uChannel);
-		values.remove(cChannel);
+		//values.remove(cChannel);
 		return values;
 	}
 
