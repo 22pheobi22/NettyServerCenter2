@@ -48,7 +48,7 @@ public class RedisDataManager {
 	private String SHARE_LIST_KEY = "SHARE_KEY_LIST";
 	private String ROOM_SHARE_KEY = "ROOM_SHARE_";
 	private final String CENTER_MASTER_SLAVE_INFO = "CENTER_MASTER_SLAVE_INFO";
-	private final String HEART_BEAT = "HEART-BEAT-";
+	private final String CENTER_HEART_BEAT = "CENTER-HEART-BEAT-";
 	private final String MASTER = "MASTER";
 	private final String SLAVE = "SLAVE";
 
@@ -1099,7 +1099,7 @@ public class RedisDataManager {
 			int index = 0;
 			long now = System.currentTimeMillis();
 			String master = hashValsAll.get(MASTER);
-			Set<String> keys = getHeartBeats(HEART_BEAT + master + "-");
+			Set<String> keys = getHeartBeats(CENTER_HEART_BEAT + master + "-");
 			for (String key : keys) {
 				String value = getHeartBeat(key);
 				long time = Long.parseLong(value);
@@ -1119,7 +1119,7 @@ public class RedisDataManager {
 		}
 	}
 	/**更改redis種主備角色信息*/
-	public void modifyMasterSlave(String masterAddr,String slaveAddr){
+	public void modifyMasterSlave(String masterAddr,String slaveAddr) {
 		Map<String,String> centerRoleMap = new HashMap<>();
 		centerRoleMap.put("master", masterAddr);
 		centerRoleMap.put("slave", slaveAddr);
