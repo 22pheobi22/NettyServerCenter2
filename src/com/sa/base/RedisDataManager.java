@@ -1100,7 +1100,7 @@ public class RedisDataManager {
 			int index = 0;
 			long now = System.currentTimeMillis();
 			String master = hashValsAll.get(MASTER);
-			Set<String> keys = getHeartBeats(CENTER_HEART_BEAT + master + "-");
+			Set<String> keys = getHeartBeats(CENTER_HEART_BEAT + master + "->");
 			for (String key : keys) {
 				String value = getHeartBeat(key);
 				long time = Long.parseLong(value);
