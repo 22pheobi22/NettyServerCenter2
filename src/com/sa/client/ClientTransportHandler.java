@@ -8,6 +8,7 @@ import com.sa.base.ServerDataPool;
 import com.sa.base.element.ChannelExtend;
 import com.sa.net.Packet;
 import com.sa.net.PacketManager;
+import com.sa.net.PacketType;
 import com.sa.service.server.ServerLogin;
 import com.sa.util.HttpClientUtil;
 import com.sa.util.StringUtil;
@@ -44,9 +45,11 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 		Packet packet = (Packet) msg;
 
 		String master = ServerDataPool.redisDataManager.getCenterMaster();
-		String slave = ServerDataPool.redisDataManager.getCenterSlave();
-		if (ConfManager.getCenterId().equals(master) || packet.getFromUserId().equals(slave)) {
+		if (ConfManager.getCenterId().equals(master)
+				|| packet.getPacketType() == PacketType.ClientHeartBeat) {
 			PacketManager.INSTANCE.execPacket(packet);
+		} else {
+			System.out.println("中心接受未处理");
 		}
 		
 	}
