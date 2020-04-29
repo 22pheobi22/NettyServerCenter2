@@ -15,6 +15,7 @@
 package com.sa.service.client;
 
 import com.sa.base.Manager;
+import com.sa.base.ServerDataPool;
 import com.sa.net.Packet;
 import com.sa.net.PacketHeadInfo;
 import com.sa.net.PacketType;
@@ -31,7 +32,10 @@ public class ClientResponecNotGag extends Packet {
 	@Override
 	public void execPacket() {
 		try {
-			Manager.INSTANCE.sendPacketToRoomServerExpectSourse(this, Constant.CONSOLE_CODE_S,this.getFromUserId());
+			boolean sameServer = ServerDataPool.dataManager.checkSourceAndTargetServer(this.getFromUserId(), this.getToUserId());
+			if(!sameServer||null == this.getToUserId() || "".equals(this.getToUserId())){
+				Manager.INSTANCE.sendPacketToRoomServerExpectSourse(this, Constant.CONSOLE_CODE_S,this.getFromUserId());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
