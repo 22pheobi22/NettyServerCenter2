@@ -46,10 +46,13 @@ public class ServerRequestcAgreeApplyAuth extends Packet {
 						(String) this.getOption(4));
 			}
 		}
-		/** 实例化 开课 下行 并 赋值 并 执行 */
-		ClientResponecAgreeApplyAuth clientResponecAgreeApplyAuth = new ClientResponecAgreeApplyAuth(
-				this.getPacketHead(), this.getOptions());
-		clientResponecAgreeApplyAuth.execPacket();
+		boolean b = ServerDataPool.dataManager.checkSourceAndTargetServer(this.getFromUserId(),this.getToUserId());
+		if(!b){
+			/** 实例化 开课 下行 并 赋值 并 执行 */
+			ClientResponecAgreeApplyAuth clientResponecAgreeApplyAuth = new ClientResponecAgreeApplyAuth(
+					this.getPacketHead(), this.getOptions());
+			clientResponecAgreeApplyAuth.execPacket();
+		}
 	}
 
 }
