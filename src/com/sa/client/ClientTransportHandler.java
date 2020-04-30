@@ -45,13 +45,14 @@ public class ClientTransportHandler extends ChannelInboundHandlerAdapter {
 		Packet packet = (Packet) msg;
 
 		String master = ServerDataPool.redisDataManager.getCenterMaster();
-		if (ConfManager.getCenterId().equals(master)
-				|| packet.getPacketType() == PacketType.ClientHeartBeat) {
+		if (ConfManager.getCenterId().equals(master) 
+				|| packet.getPacketType() == PacketType.ClientHeartBeat
+				|| packet.getPacketType() == PacketType.ClientLogin) {
 			PacketManager.INSTANCE.execPacket(packet);
 		} else {
 			System.out.println("中心接受未处理");
+			System.out.println(packet.toString());
 		}
-		
 	}
 
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
