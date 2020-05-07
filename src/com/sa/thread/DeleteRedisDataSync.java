@@ -35,10 +35,10 @@ public class DeleteRedisDataSync implements Runnable {
 				//角色判断  主中心才回收
 				boolean isMasterCenter= false;
 				JedisUtil jedisUtil = new JedisUtil();
-				List<String> hashValsAll = jedisUtil.getHashValsAll("centerRoleInfo");
+				List<String> hashValsAll = jedisUtil.getHashValsAll("CENTER_MASTER_SLAVE_INFO");
 				if(null!=hashValsAll){
-					String masterCenterAddress = jedisUtil.getHash("centerRoleInfo", "master");
-					if(null!=masterCenterAddress&&masterCenterAddress.equals(ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort())){
+					String masterCenterAddress = jedisUtil.getHash("CENTER_MASTER_SLAVE_INFO", "MASTER");
+					if(null!=masterCenterAddress&&masterCenterAddress.equals(ConfManager.getCenterIp())){
 						isMasterCenter=true;
 					}
 					if(isMasterCenter){
@@ -49,7 +49,7 @@ public class DeleteRedisDataSync implements Runnable {
 						//删除redis中房间空闲时长信息
 						jedisUtil.delHash(ROOM_FREE_MAP_KEY);
 						//删除redis种中主备信息
-						jedisUtil.delHash("centerRoleInfo");
+						//jedisUtil.delHash("centerRoleInfo");
 						//删除redis中用户IP信息
 						jedisUtil.delHash(USER_SERVERIP_MAP_KEY);
 					}

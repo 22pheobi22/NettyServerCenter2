@@ -22,13 +22,13 @@ public class RoomCancelSync implements Runnable {
 			//角色判断  主中心才回收
 			boolean isMasterCenter= false;
 			JedisUtil jedisUtil = new JedisUtil();
-			List<String> hashValsAll = jedisUtil.getHashValsAll("centerRoleInfo");
-			if(null!=hashValsAll){
-				String masterCenterAddress = jedisUtil.getHash("centerRoleInfo", "master");
-				if(null!=masterCenterAddress&&masterCenterAddress.equals(ConfManager.getCenterIp()+":"+ConfManager.getClientSoketServerPort())){
+			//List<String> hashValsAll = jedisUtil.getHashValsAll("centerRoleInfo");
+			//if(null!=hashValsAll){
+				String masterCenterAddress = jedisUtil.getHash("CENTER_MASTER_SLAVE_INFO", "MASTER");
+				if(null!=masterCenterAddress&&masterCenterAddress.equals(ConfManager.getCenterIp())){
 					isMasterCenter=true;
 				}
-			}
+			//}
 			if(isMasterCenter){
 				
 				Map<String, Integer> roomInfo = ServerDataPool.dataManager.getRoomInfo();
